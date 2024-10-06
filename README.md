@@ -1,15 +1,15 @@
-# Website
+# psake Docs Site
 
 This website is built using [Docusaurus](https://docusaurus.io/), a modern
 static website generator.
 
-### Installation
+## Installation
 
 ```shell
 yarn
 ```
 
-### Local Development
+## Local Development
 
 ```shell
 yarn start
@@ -18,7 +18,7 @@ yarn start
 This command starts a local development server and opens up a browser window.
 Most changes are reflected live without having to restart the server.
 
-### Build
+## Build
 
 ```shell
 yarn build
