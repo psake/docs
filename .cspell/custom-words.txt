@@ -1,0 +1,8 @@
+!Psake
+# psake should always be lowercase
+choco
+fschwiet
+Lucene
+psake
+psakefile
+ravendb

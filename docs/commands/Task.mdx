@@ -1,0 +1,185 @@
+---
+id: Task
+title: Task
+description: Help page for the PowerShell Psake "Task" command
+keywords:
+  - PowerShell
+  - Psake
+  - Help
+  - Documentation
+hide_title: false
+hide_table_of_contents: false
+custom_edit_url: null
+---
+
+:::info This page was generated
+Contributions are welcome in [Psake-repo](https://github.com/psake/psake).
+:::
+
+## SYNOPSIS
+
+Defines a build task to be executed by psake
+
+## SYNTAX
+
+### Normal (Default)
+
+```powershell
+Task [-name] <String> [[-action] <ScriptBlock>] [[-preaction] <ScriptBlock>] [[-postaction] <ScriptBlock>]
+ [[-precondition] <ScriptBlock>] [[-postcondition] <ScriptBlock>] [-continueOnError] [[-depends] <String[]>]
+ [[-requiredVariables] <String[]>] [[-description] <String>] [[-alias] <String>]
+ [-ProgressAction <ActionPreference>] [<CommonParameters>]
+```
+
+### SharedTask
+
+```powershell
+Task [-name] <String> [[-action] <ScriptBlock>] [[-preaction] <ScriptBlock>] [[-postaction] <ScriptBlock>]
+ [[-precondition] <ScriptBlock>] [[-postcondition] <ScriptBlock>] [-continueOnError] [[-depends] <String[]>]
+ [[-requiredVariables] <String[]>] [[-description] <String>] [[-alias] <String>] [-FromModule] <String>
+ [[-requiredVersion] <String>] [[-minimumVersion] <String>] [[-maximumVersion] <String>]
+ [[-lessThanVersion] <String>] [-ProgressAction <ActionPreference>] [<CommonParameters>]
+```
+
+## DESCRIPTION
+
+This function creates a 'task' object that will be used by the psake engine to execute a build task.
+Note: There must be at least one task called 'default' in the build script
+
+## EXAMPLES
+
+### EXAMPLE 1
+
+```powershell
+A sample build script is shown below:
+```
+
+Task default -Depends Test
+
+Task Test -Depends Compile, Clean \{
+    "This is a test"
+\}
+
+Task Compile -Depends Clean \{
+    "Compile"
+\}
+
+Task Clean \{
+    "Clean"
+\}
+
+The 'default' task is required and should not contain an 'Action' parameter.
+It uses the 'Depends' parameter to specify that 'Test' is a dependency
+
+The 'Test' task uses the 'Depends' parameter to specify that 'Compile' and 'Clean' are dependencies
+The 'Compile' task depends on the 'Clean' task.
+
+Note:
+The 'Action' parameter is defaulted to the script block following the 'Clean' task.
+
+An equivalent 'Test' task is shown below:
+
+Task Test -Depends Compile, Clean -Action \{
+    $testMessage
+\}
+
+The output for the above sample build script is shown below:
+
+Executing task, Clean...
+Clean
+Executing task, Compile...
+Compile
+Executing task, Test...
+This is a test
+
+Build Succeeded!
+
+----------------------------------------------------------------------
+Build Time Report
+----------------------------------------------------------------------
+Name    Duration
+----    --------
+Clean   00:00:00.0065614
+Compile 00:00:00.0133268
+Test    00:00:00.0225964
+Total:  00:00:00.0782496
+
+## PARAMETERS
+
+### -name
+
+The name of the task
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: True
+Position: 1
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -action
+
+A scriptblock containing the statements to execute for the task.
+
+```yaml
+Type: ScriptBlock
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: 2
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -preaction
+
+A scriptblock to be executed before the 'Action' scriptblock.
+Note: This parameter is ignored if the 'Action' scriptblock is not defined.
+
+```yaml
+Type: ScriptBlock
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: 3
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -postaction
+
+A scriptblock to be executed after the 'Action' scriptblock.
+Note: This parameter is ignored if the 'Action' scriptblock is not defined.
+
+```yaml
+Type: ScriptBlock
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: 4
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -precondition
+
+A scriptblock that is executed to determine if the task is executed or skipped.
+This scriptblock should return $true or $false
+
+```yaml
+Type: ScriptBlock
+Parameter Sets: (All)
+Aliases:
+
+R

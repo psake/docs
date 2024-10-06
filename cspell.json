@@ -1,0 +1,20 @@
+{
+    "version": "0.2",
+    "ignorePaths": [
+        ".cspell",
+        "docs/commands/"
+    ],
+    "dictionaryDefinitions": [
+        {
+            "name": "custom-words",
+            "path": "./.cspell/custom-words.txt"
+        }
+    ],
+    "dictionaries": [
+        "custom-words",
+        "powershell"
+    ],
+    "words": [],
+    "ignoreWords": [],
+    "import": []
+}

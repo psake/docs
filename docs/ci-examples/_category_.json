@@ -1,0 +1,8 @@
+{
+  "label": "CI/CD Examples",
+  "position": 3,
+  "link": {
+    "type": "generated-index",
+    "description": "A few examples of integrating psake with popular Continuous Delivery/Integration services."
+  }
+}

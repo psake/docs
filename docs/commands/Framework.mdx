@@ -1,0 +1,120 @@
+---
+id: Framework
+title: Framework
+description: Help page for the PowerShell Psake "Framework" command
+keywords:
+  - PowerShell
+  - Psake
+  - Help
+  - Documentation
+hide_title: false
+hide_table_of_contents: false
+custom_edit_url: null
+---
+
+:::info This page was generated
+Contributions are welcome in [Psake-repo](https://github.com/psake/psake).
+:::
+
+## SYNOPSIS
+
+Sets the version of the .NET framework you want to use during build.
+
+## SYNTAX
+
+```powershell
+Framework [-framework] <String> [-ProgressAction <ActionPreference>] [<CommonParameters>]
+```
+
+## DESCRIPTION
+
+This function will accept a string containing version of the .NET framework to use during build.
+Possible values: '1.0', '1.1', '2.0', '2.0x86', '2.0x64', '3.0', '3.0x86', '3.0x64', '3.5', '3.5x86', '3.5x64', '4.0', '4.0x86', '4.0x64', '4.5', '4.5x86', '4.5x64', '4.5.1', '4.5.1x86', '4.5.1x64'.
+Default is '3.5*', where x86 or x64 will be detected based on the bitness of the PowerShell process.
+
+## EXAMPLES
+
+### EXAMPLE 1
+
+```powershell
+Framework "4.0"
+```
+
+Task default -depends Compile
+
+Task Compile -depends Clean \{
+    msbuild /version
+\}
+
+-----------
+The script above will output detailed version of msbuid v4
+
+## PARAMETERS
+
+### -framework
+
+Version of the .NET framework to use during build.
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: True
+Position: 1
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -ProgressAction
+
+\{\{ Fill ProgressAction Description \}\}
+
+```yaml
+Type: ActionPreference
+Parameter Sets: (All)
+Aliases: proga
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### CommonParameters
+
+This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see [about_CommonParameters](http://go.microsoft.com/fwlink/?LinkID=113216).
+
+## INPUTS
+
+## OUTPUTS
+
+## NOTES
+
+## RELATED LINKS
+
+[Assert](Assert.mdx)
+
+[Exec](Exec.mdx)
+
+[FormatTaskName](FormatTaskName.mdx)
+
+[Get-PSakeScriptTasks](Get-PSakeScriptTasks.mdx)
+
+[Include](Include.mdx)
+
+[Invoke-psake](Invoke-psake.mdx)
+
+[Properties](Properties.mdx)
+
+[Task](Task.mdx)
+
+[TaskSetup](TaskSetup.mdx)
+
+[TaskTearDown](TaskTearDown.mdx)
+
+## VERSION
+
+*This page was generated using comment-based help in [Psake 4.9.0](https://github.com/psake/psake).*

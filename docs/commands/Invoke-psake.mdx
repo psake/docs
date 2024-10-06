@@ -1,0 +1,193 @@
+---
+id: Invoke-psake
+title: Invoke-psake
+description: Help page for the PowerShell Psake "Invoke-psake" command
+keywords:
+  - PowerShell
+  - Psake
+  - Help
+  - Documentation
+hide_title: false
+hide_table_of_contents: false
+custom_edit_url: null
+---
+
+:::info This page was generated
+Contributions are welcome in [Psake-repo](https://github.com/psake/psake).
+:::
+
+## SYNOPSIS
+
+Runs a psake build script.
+
+## SYNTAX
+
+```powershell
+Invoke-psake [[-buildFile] <String>] [[-taskList] <String[]>] [[-framework] <String>] [-docs]
+ [[-parameters] <Hashtable>] [[-properties] <Hashtable>] [[-initialization] <ScriptBlock>] [-nologo]
+ [-detailedDocs] [-notr] [-ProgressAction <ActionPreference>] [<CommonParameters>]
+```
+
+## DESCRIPTION
+
+This function runs a psake build script
+
+## EXAMPLES
+
+### EXAMPLE 1
+
+```powershell
+Invoke-psake
+```
+
+Runs the 'default' task in the '.build.ps1' build script
+
+### EXAMPLE 2
+
+```powershell
+Invoke-psake '.\build.ps1' Tests,Package
+```
+
+Runs the 'Tests' and 'Package' tasks in the '.build.ps1' build script
+
+### EXAMPLE 3
+
+```powershell
+Invoke-psake Tests
+```
+
+This example will run the 'Tests' tasks in the 'psakefile.ps1' build script.
+The 'psakefile.ps1' is assumed to be in the current directory.
+
+### EXAMPLE 4
+
+```powershell
+Invoke-psake 'Tests, Package'
+```
+
+This example will run the 'Tests' and 'Package' tasks in the 'psakefile.ps1' build script.
+The 'psakefile.ps1' is assumed to be in the current directory.
+
+### EXAMPLE 5
+
+```powershell
+Invoke-psake .\build.ps1 -docs
+```
+
+Prints a report of all the tasks and their dependencies and descriptions and then exits
+
+### EXAMPLE 6
+
+```powershell
+Invoke-psake .\parameters.ps1 -parameters @{"p1"="v1";"p2"="v2"}
+```
+
+Runs the build script called 'parameters.ps1' and passes in parameters 'p1' and 'p2' with values 'v1' and 'v2'
+
+Here's the .\parameters.ps1 build script:
+
+properties \{
+    $my_property = $p1 + $p2
+\}
+
+task default -depends TestParams
+
+task TestParams \{
+    Assert ($my_property -ne $null) '$my_property should not be null'
+\}
+
+Notice how you can refer to the parameters that were passed into the script from within the "properties" function.
+The value of the $p1 variable should be the string "v1" and the value of the $p2 variable should be "v2".
+
+### EXAMPLE 7
+
+```powershell
+Invoke-psake .\properties.ps1 -properties @{"x"="1";"y"="2"}
+```
+
+Runs the build script called 'properties.ps1' and passes in parameters 'x' and 'y' with values '1' and '2'
+
+This feature allows you to override existing properties in your build script.
+
+Here's the .\properties.ps1 build script:
+
+properties \{
+    $x = $null
+    $y = $null
+    $z = $null
+\}
+
+task default -depends TestProperties
+
+task TestProperties \{
+    Assert ($x -ne $null) "x should not be null"
+    Assert ($y -ne $null) "y should not be null"
+    Assert ($z -eq $null) "z should be null"
+\}
+
+## PARAMETERS
+
+### -buildFile
+
+The path to the psake build script to execute
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: 1
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -taskList
+
+A comma-separated list of task names to execute
+
+```yaml
+Type: String[]
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: 2
+Default value: @()
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -framework
+
+The version of the .NET framework you want to use during build.
+You can append x86 or x64 to force a specific framework.
+If not specified, x86 or x64 will be detected based on the bitness of the PowerShell process.
+Possible values: '1.0', '1.1', '2.0', '2.0x86', '2.0x64', '3.0', '3.0x86', '3.0x64', '3.5', '3.5x86', '3.5x64', '4.0', '4.0x86', '4.0x64', '4.5', '4.5x86', '4.5x64', '4.5.1', '4.5.1x86', '4.5.1x64'
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: 3
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -docs
+
+Prints a list of tasks and their descriptions
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: 4
+Default value: False
+Acc

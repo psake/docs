@@ -1,0 +1,8 @@
+{
+  "label": "Build Examples",
+  "position": 4,
+  "link": {
+    "type": "generated-index",
+    "description": "Examples of different artifacts you can build with psake."
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "label": "Advanced Tutorials",
+  "position": 5,
+  "link": {
+    "type": "generated-index",
+    "description": "Tutorials on how to leverage some of the more advanced options of psake."
+  }
+}

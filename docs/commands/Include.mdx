@@ -1,0 +1,129 @@
+---
+id: Include
+title: Include
+description: Help page for the PowerShell Psake "Include" command
+keywords:
+  - PowerShell
+  - Psake
+  - Help
+  - Documentation
+hide_title: false
+hide_table_of_contents: false
+custom_edit_url: null
+---
+
+:::info This page was generated
+Contributions are welcome in [Psake-repo](https://github.com/psake/psake).
+:::
+
+## SYNOPSIS
+
+Include the functions or code of another powershell script file into the current build script's scope
+
+## SYNTAX
+
+```powershell
+Include [-fileNamePathToInclude] <String> [-ProgressAction <ActionPreference>] [<CommonParameters>]
+```
+
+## DESCRIPTION
+
+A build script may declare an "includes" function which allows you to define a file containing powershell code to be included
+and added to the scope of the currently running build script.
+Code from such file will be executed after code from build script.
+
+## EXAMPLES
+
+### EXAMPLE 1
+
+```powershell
+A sample build script is shown below:
+```
+
+Include ".\build_utils.ps1"
+
+Task default -depends Test
+
+Task Test -depends Compile, Clean \{
+\}
+
+Task Compile -depends Clean \{
+\}
+
+Task Clean \{
+\}
+
+-----------
+The script above includes all the functions and variables defined in the ".\build_utils.ps1" script into the current build script's scope
+
+Note: You can have more than 1 "Include" function defined in the build script.
+
+## PARAMETERS
+
+### -fileNamePathToInclude
+
+A string containing the path and name of the powershell file to include
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: True
+Position: 1
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -ProgressAction
+
+\{\{ Fill ProgressAction Description \}\}
+
+```yaml
+Type: ActionPreference
+Parameter Sets: (All)
+Aliases: proga
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### CommonParameters
+
+This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see [about_CommonParameters](http://go.microsoft.com/fwlink/?LinkID=113216).
+
+## INPUTS
+
+## OUTPUTS
+
+## NOTES
+
+## RELATED LINKS
+
+[Assert](Assert.mdx)
+
+[Exec](Exec.mdx)
+
+[FormatTaskName](FormatTaskName.mdx)
+
+[Framework](Framework.mdx)
+
+[Get-PSakeScriptTasks](Get-PSakeScriptTasks.mdx)
+
+[Invoke-psake](Invoke-psake.mdx)
+
+[Properties](Properties.mdx)
+
+[Task](Task.mdx)
+
+[TaskSetup](TaskSetup.mdx)
+
+[TaskTearDown](TaskTearDown.mdx)
+
+## VERSION
+
+*This page was generated using comment-based help in [Psake 4.9.0](https://github.com/psake/psake).*
