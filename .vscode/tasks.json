@@ -45,5 +45,14 @@
         "isDefault": true
       }
     },
+    {
+      "label": "Test",
+      "type": "shell",
+      "command": "${cwd}/build.ps1 -Task Test -Verbose",
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      }
+    },
   ]
 }
