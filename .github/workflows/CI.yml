@@ -1,0 +1,11 @@
+name: Test
+on: [push]
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: Test
+      shell: pwsh
+      run: ./build.ps1 -Task Test -Bootstrap
