@@ -11,17 +11,18 @@ type FeatureItem = {
 const FeatureList: FeatureItem[] = [
   {
     title: 'Easy to Use',
-    Svg: require('@site/static/img/bricks.gif').default,
+    Svg: require('@site/static/img/bricks.svg').default,
     description: (
       <>
         psake was made to easily put together tasks and create simple to
-        understand dependancies.
+        understand dependencies.
       </>
     ),
   },
   {
     title: 'Focus on What Matters',
-    Svg: require('@site/static/img/cargo-ship.gif').default,
+
+    Svg: require('@site/static/img/cargo-ship.svg').default,
     description: (
       <>
         Make it easy to ship code by reducing your steps into tasks. Ship only
