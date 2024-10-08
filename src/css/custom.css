@@ -6,13 +6,13 @@
 
 /* Color is charcoal */
 :root {
-  --ifm-color-primary: #7e7e7c;
-  --ifm-color-primary-dark: #717170;
-  --ifm-color-primary-darker: #6b6b69;
-  --ifm-color-primary-darkest: #585857;
-  --ifm-color-primary-light: #8a8a89;
-  --ifm-color-primary-lighter: #91918f;
-  --ifm-color-primary-lightest: #a3a3a2;
+  --ifm-color-primary: #2a6b32;
+  --ifm-color-primary-dark: #26602d;
+  --ifm-color-primary-darker: #245b2a;
+  --ifm-color-primary-darkest: #1d4b23;
+  --ifm-color-primary-light: #2e7637;
+  --ifm-color-primary-lighter: #307b39;
+  --ifm-color-primary-lightest: #35863e;
   --ifm-code-font-size: 95%;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
 }
