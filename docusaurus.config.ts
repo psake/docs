@@ -94,8 +94,20 @@ const config: Config = {
           title: 'Docs',
           items: [
             {
-              label: 'Tutorial',
+              label: 'Quick Start',
               to: '/docs/intro',
+            },
+            {
+              label: 'Tutorial - Basics',
+              to: '/docs/tutorial-basics/installing',
+            },
+            {
+              label: 'Command Reference',
+              to: '/docs/commands/Assert',
+            },
+            {
+              label: 'Code of Conduct',
+              to: 'docs/code_of_conduct',
             },
           ],
         },
@@ -103,12 +115,20 @@ const config: Config = {
           title: 'Community',
           items: [
             {
-              label: 'Stack Overflow',
-              href: 'https://stackoverflow.com/questions/tagged/psake',
+              label: 'PowerShell Discord: #psake',
+              href: 'https://aka.ms/psdiscord',
             },
             {
-              label: 'Discord',
-              href: 'https://aka.ms/psdiscord',
+              label: 'PowerShell Slack: #psake',
+              href: 'https://aka.ms/psslack',
+            },
+            {
+              label: 'GitHub Discussions',
+              href: 'https://github.com/orgs/psake/discussions',
+            },
+            {
+              label: 'Stack Overflow',
+              href: 'https://stackoverflow.com/questions/tagged/psake',
             },
           ],
         },
