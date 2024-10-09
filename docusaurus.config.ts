@@ -108,7 +108,7 @@ const config: Config = {
             },
             {
               label: 'Discord',
-              href: 'https://discord.gg/Ju25cw6',
+              href: 'https://aka.ms/psdiscord',
             },
           ],
         },
@@ -122,6 +122,10 @@ const config: Config = {
             {
               label: 'GitHub',
               href: 'https://github.com/psake',
+            },
+            {
+              label: 'OpenCollective - Donate!',
+              href: 'https://opencollective.com/psake',
             },
             {
               html: `

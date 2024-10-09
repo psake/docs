@@ -4,27 +4,27 @@
  * work well for content-centric websites.
  */
 
-/* You can override the default Infima variables here. */
+/* Color is charcoal */
 :root {
-  --ifm-color-primary: #2e8555;
-  --ifm-color-primary-dark: #29784c;
-  --ifm-color-primary-darker: #277148;
-  --ifm-color-primary-darkest: #205d3b;
-  --ifm-color-primary-light: #33925d;
-  --ifm-color-primary-lighter: #359962;
-  --ifm-color-primary-lightest: #3cad6e;
+  --ifm-color-primary: #2a6b32;
+  --ifm-color-primary-dark: #26602d;
+  --ifm-color-primary-darker: #245b2a;
+  --ifm-color-primary-darkest: #1d4b23;
+  --ifm-color-primary-light: #2e7637;
+  --ifm-color-primary-lighter: #307b39;
+  --ifm-color-primary-lightest: #35863e;
   --ifm-code-font-size: 95%;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
 }
 
 /* For readability concerns, you should choose a lighter palette in dark mode. */
+/* Color is olive */
 [data-theme='dark'] {
-  --ifm-color-primary: #25c2a0;
-  --ifm-color-primary-dark: #21af90;
-  --ifm-color-primary-darker: #1fa588;
-  --ifm-color-primary-darkest: #1a8870;
-  --ifm-color-primary-light: #29d5b0;
-  --ifm-color-primary-lighter: #32d8b4;
-  --ifm-color-primary-lightest: #4fddbf;
-  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+  --ifm-color-primary: #96bc4f;
+  --ifm-color-primary-dark: #88ae42;
+  --ifm-color-primary-darker: #81a43f;
+  --ifm-color-primary-darkest: #6a8734;
+  --ifm-color-primary-light: #a2c362;
+  --ifm-color-primary-lighter: #a7c76c;
+  --ifm-color-primary-lightest: #b9d289;
 }
