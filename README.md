@@ -8,7 +8,7 @@ support versioned docs.
 
 ## Installation
 
-```shell
+```powershell
 .\builds.ps1 -Bootstrap
 ```
 
@@ -23,7 +23,7 @@ Most changes are reflected live without having to restart the server.
 
 ## Build
 
-```shell
+```powershell
 .\build.ps1 -Task Build
 ```
 
