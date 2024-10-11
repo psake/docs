@@ -8,10 +8,10 @@ sidebar_position: 11
 To summarize the differences between passing parameters and properties to the
 `Invoke-psake` function:
 
-* Parameters and "properties" can both be passed to the Invoke-psake function
+* Parameters and Properties can both be passed to the Invoke-psake function
   simultaneously
-* Parameters are set before any "properties" blocks are run
-* Properties are set after all "properties" blocks have run
+* Parameters are set before any `properties` blocks are run
+* Properties are set after all `properties` blocks have run
 
 ## Parameters
 
@@ -22,12 +22,17 @@ the Invoke-psake function. The following is an example:
 Invoke-psake .\parameters.ps1 -parameters @{"p1"="v1";"p2"="v2"}
 ```
 
-The example above runs the build script called "parameters.ps1" and passes in
-parameters 'p1' and 'p2' with values 'v1' and 'v2'. The parameter value for the
+The example above runs the build script called `parameters.ps1` and passes in
+parameters `p1` and `p2` with values `v1` and `v2`. The parameter value for the
 "parameters" parameter (say that 10 times really fast!) is a PowerShell
-hashtable where the name and value of each parameter is specified. Note: You
-don't need to use the "$" character when specifying the parameter names in the
-hashtable.
+hashtable where the name and value of each parameter is specified.
+
+:::note
+
+You don't need to use the "$" character when specifying the parameter names in
+the hashtable.
+
+:::
 
 ```powershell title="parameters.ps1"
 properties {
@@ -41,6 +46,9 @@ task TestParams {
 }
 ```
 
+The Assert in this example would pass because when it runs, `$my_property`
+would be set to `v1v2` and not be `$null`.
+
 ## Properties
 
 You can override a property in your build script using the `properties`
@@ -50,11 +58,17 @@ parameter of the Invoke-psake function. The following is an example:
 Invoke-psake .\properties.ps1 -properties @{"x"="1";"y"="2"}
 ```
 
-The example above runs the build script called "properties.ps1" and passes in
-parameters 'x' and 'y' with values '1' and '2'. The parameter value for the
+The example above runs the build script called `properties.ps1` and passes in
+parameters `x` and `y` with values `1` and `2`. The parameter value for the
 "properties" parameter is a PowerShell hashtable where the name and value of
-each property is specified. Note: You don't need to use the "$" character when
-specifying the property names in the hashtable.
+each property is specified.
+
+:::note
+
+You don't need to use the "$" character when specifying the property names in
+the hashtable.
+
+:::
 
 ```powershell title="properties.ps1"
 properties {
