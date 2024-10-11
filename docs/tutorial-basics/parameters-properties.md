@@ -56,9 +56,7 @@ parameters 'x' and 'y' with values '1' and '2'. The parameter value for the
 each property is specified. Note: You don't need to use the "$" character when
 specifying the property names in the hashtable.
 
-The "properties.ps1" build script looks like this:
-
-```powershell
+```powershell title="properties.ps1"
 properties {
  $x = $null
  $y = $null
