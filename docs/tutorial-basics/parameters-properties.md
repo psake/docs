@@ -86,6 +86,6 @@ task TestProperties {
 }
 ```
 
-The value of $x should be 1 and $y should be 2 by the time the "TestProperties"
-task is executed. The value of $z was not over-ridden so it should still be
-$null.
+The value of `$x` should be `1` and `$y` should be `2` by the time the
+`TestProperties` task is executed. The value of `$z` was not over-ridden so it
+should still be `$null`.
