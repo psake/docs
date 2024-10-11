@@ -1,7 +1,7 @@
 ---
-sidebar_position: 4
+title: Tasks
+description: "Learn how to use the most important building block in psake: The Task"
 ---
-# Tasks
 
 At the core of psake is the task. In it's simplest form you have a task with a
 name and an action.

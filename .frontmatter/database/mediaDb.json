@@ -1,1 +1,10 @@
-{"static":{"img":{}}}
+{
+  "static": {
+    "img": {}
+  },
+  "docs": {
+    "static": {
+      "img": {}
+    }
+  }
+}
