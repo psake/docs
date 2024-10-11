@@ -66,6 +66,138 @@
     {
       "title": "docs",
       "path": "[[workspace]]/docs"
+    },
+    {
+      "title": "commands",
+      "path": "[[workspace]]/docs/commands"
     }
-  ]
+  ],
+  "frontMatter.content.snippets": {
+    "MDX: Code Snippet": {
+      "description": "Markdown 'code' template\"",
+      "body": [
+        "```[[language]] title='[[title]]'",
+        "",
+        "```"
+      ],
+      "fields": [
+        {
+          "name": "language",
+          "title": "language",
+          "type": "choice",
+          "single": true,
+          "default": "powershell",
+          "choices": [
+            "bash",
+            "c",
+            "clike",
+            "coffeescript",
+            "cpp",
+            "css",
+            "diff",
+            "git",
+            "go",
+            "graphql",
+            "handlebars",
+            "javascript",
+            "json",
+            "jsx",
+            "less",
+            "makefile",
+            "markdown",
+            "markup",
+            "objectivec",
+            "ocaml",
+            "powershell",
+            "python",
+            "reason",
+            "sass",
+            "scss",
+            "sql",
+            "stylus",
+            "tsx",
+            "typescript",
+            "wasm",
+            "yaml"
+          ]
+        },
+        {
+          "name": "title",
+          "title": "title",
+          "type": "string",
+          "single": true,
+          "default": ""
+        }
+      ]
+    },
+    "Markdown Image Snippet": {
+      "body": "![[[&caption]]]([[&mediaUrl]] [[&title]])",
+      "description": "",
+      "isMediaSnippet": true
+    },
+    "Markdown Frontmatter Sidebar Snippet": {
+      "body": [
+        "---",
+        "sidebar_label: [[sidebar_label]]",
+        "sidebar_position: [[sidebar_position]]",
+        "---"
+      ],
+      "description": "",
+      "fields": [
+        {
+          "name": "sidebar_label",
+          "title": "sidebar_label",
+          "type": "string",
+          "single": true,
+          "default": ""
+        },
+        {
+          "name": "sidebar_position",
+          "title": "sidebar_position",
+          "type": "string",
+          "single": true,
+          "default": ""
+        }
+      ]
+    },
+    "Markdown Admonitions": {
+      "body": [
+        ":::[[type]] [[title]]",
+        "[[selection]]",
+        ":::"
+      ],
+      "description": "Markdown 'admonition' template.",
+      "fields": [
+        {
+          "name": "type",
+          "title": "type",
+          "type": "choice",
+          "single": true,
+          "default": "note",
+          "choices": [
+            "note",
+            "tip",
+            "info",
+            "caution",
+            "danger"
+          ]
+        },
+        {
+          "name": "title",
+          "title": "title",
+          "type": "string",
+          "single": true,
+          "default": ""
+        },
+        {
+          "name": "selection",
+          "title": "selection",
+          "type": "string",
+          "single": true,
+          "default": "FM_SELECTED_TEXT"
+        }
+      ]
+    }
+  },
+  "frontMatter.website.host": "https://psake.dev"
 }

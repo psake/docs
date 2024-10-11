@@ -1,17 +1,16 @@
 ---
+title: Parameters & Properties
 description: "How to use parameters and properties in your build script."
 sidebar_position: 11
 ---
 
-# Parameters & Properties
-
 To summarize the differences between passing parameters and properties to the
 `Invoke-psake` function:
 
-* Parameters and Properties can both be passed to the Invoke-psake function
+* Parameters and "properties" can both be passed to the Invoke-psake function
   simultaneously
-* Parameters are set before any `properties` blocks are run
-* Properties are set after all `properties` blocks have run
+* Parameters are set before any "properties" blocks are run
+* Properties are set after all "properties" blocks have run
 
 ## Parameters
 
