@@ -1,4 +1,4 @@
-[cmdletbinding(DefaultParameterSetName = 'Task')]
+[CmdletBinding(DefaultParameterSetName = 'Task')]
 param(
   # Build task(s) to execute
   [parameter(ParameterSetName = 'task', position = 0)]

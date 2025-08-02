@@ -14,7 +14,10 @@
         "custom-words",
         "powershell"
     ],
-    "words": [],
+    "words": [
+        "llms",
+        "nunit"
+    ],
     "ignoreWords": [],
     "import": []
 }
