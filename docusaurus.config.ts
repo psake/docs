@@ -168,53 +168,19 @@ const config: Config = {
 
   plugins: [
     [
-      'docusaurus-plugin-llms',
+      '@signalwire/docusaurus-plugin-llms-txt',
       {
-        // Options here
-        generateLLMsTxt: true,
-        generateLLMsFullTxt: true,
-        docsDir: 'docs',
-        ignoreFiles: ['advanced/*', 'private/*'],
-        title: 'psake Documentation',
-        description: 'Complete reference documentation for psake',
-        includeBlog: true,
-        // Content cleaning options
-        excludeImports: true,
-        removeDuplicateHeadings: true,
-        // Control documentation order
-        //includeOrder: [
-        //  'getting-started/*',
-        //  'guides/*',
-        //  'api/*',
-        //],
-        includeUnmatchedLast: true,
-        // Path transformation options
-        pathTransformation: {
-          // Paths to ignore when constructing URLs (will be removed if found)
-          ignorePaths: ['docs'],
-          // Paths to add when constructing URLs (will be prepended if not already present)
-          addPaths: ['api'],
-        },
-        // Custom LLM files for specific documentation sections
-        // customLLMFiles: [
-        //   {
-        //     filename: 'llms-python.txt',
-        //     includePatterns: ['api/python/**/*.md', 'guides/python/*.md'],
-        //     fullContent: true,
-        //     title: 'Python API Documentation',
-        //     description: 'Complete reference for Python API'
-        //   },
-        //   {
-        //     filename: 'llms-tutorials.txt',
-        //     includePatterns: ['tutorials/**/*.md'],
-        //     fullContent: false,
-        //     title: 'Tutorial Documentation',
-        //     description: 'All tutorials in a single file'
-        //   }
-        // ],
-      },
+        siteTitle: 'Psake',
+        siteDescription: 'Comprehensive guide to the psake build automation tool, including installation, usage, and advanced features.',
+        depth: 2,
+        content: {
+          includeBlog: true,
+          includePages: true,
+          enableLlmsFullTxt: true  // Optional: generates llms-full.txt
+        }
+      }
     ],
-  ],
+  ]
 };
 
 export default config;
