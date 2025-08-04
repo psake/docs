@@ -24,11 +24,6 @@
           "isPublishDate": true
         },
         {
-          "title": "Content preview",
-          "name": "preview",
-          "type": "image"
-        },
-        {
           "title": "Is in draft",
           "name": "draft",
           "type": "draft"
@@ -36,7 +31,11 @@
         {
           "title": "Tags",
           "name": "tags",
-          "type": "tags"
+          "type": "dataFile",
+          "dataFileId": "tags",
+          "dataFileKey": "handle",
+          "dataFileValue": "handle",
+          "multiple": true
         },
         {
           "title": "Categories",
@@ -49,6 +48,404 @@
           "type": "number"
         }
       ]
+    },
+    {
+      "name": "docs",
+      "pageBundle": false,
+      "previewPath": null,
+      "fields": [
+        {
+          "title": "ID",
+          "name": "id",
+          "type": "string",
+          "description": "A unique document ID"
+        },
+        {
+          "title": "Title",
+          "name": "title",
+          "type": "string",
+          "description": "The text title of your document"
+        },
+        {
+          "title": "Description",
+          "name": "description",
+          "type": "string",
+          "description": "The description of your document, used for SEO meta tags"
+        },
+        {
+          "title": "Keywords",
+          "name": "keywords",
+          "type": "tags",
+          "description": "Keywords meta tag for the document page, for search engines"
+        },
+        {
+          "title": "Image",
+          "name": "image",
+          "type": "image",
+          "description": "Cover or thumbnail image for social media previews"
+        },
+        {
+          "title": "Slug",
+          "name": "slug",
+          "type": "string",
+          "description": "Customize the document URL"
+        },
+        {
+          "title": "Tags",
+          "name": "tags",
+          "type": "dataFile",
+          "dataFileId": "tags",
+          "dataFileKey": "handle",
+          "dataFileValue": "handle",
+          "multiple": true
+        },
+        {
+          "title": "Draft",
+          "name": "draft",
+          "type": "draft",
+          "description": "Draft documents are only available during development"
+        },
+        {
+          "title": "Unlisted",
+          "name": "unlisted",
+          "type": "boolean",
+          "description": "Unlisted documents are hidden but accessible via direct link"
+        },
+        {
+          "title": "Sidebar Label",
+          "name": "sidebar_label",
+          "type": "string",
+          "description": "The text shown in the document sidebar"
+        },
+        {
+          "title": "Sidebar Position",
+          "name": "sidebar_position",
+          "type": "number",
+          "description": "Controls the position in the generated sidebar"
+        },
+        {
+          "title": "Sidebar Class Name",
+          "name": "sidebar_class_name",
+          "type": "string",
+          "description": "CSS class name for the sidebar label"
+        },
+        {
+          "title": "Pagination Label",
+          "name": "pagination_label",
+          "type": "string",
+          "description": "Text used in the document next/previous buttons"
+        },
+        {
+          "title": "Pagination Next",
+          "name": "pagination_next",
+          "type": "string",
+          "description": "ID of the next document in pagination"
+        },
+        {
+          "title": "Pagination Previous",
+          "name": "pagination_prev",
+          "type": "string",
+          "description": "ID of the previous document in pagination"
+        },
+        {
+          "title": "Hide Title",
+          "name": "hide_title",
+          "type": "boolean",
+          "description": "Whether to hide the title at the top of the doc"
+        },
+        {
+          "title": "Hide Table of Contents",
+          "name": "hide_table_of_contents",
+          "type": "boolean",
+          "description": "Whether to hide the table of contents"
+        },
+        {
+          "title": "TOC Min Heading Level",
+          "name": "toc_min_heading_level",
+          "type": "number",
+          "description": "Minimum heading level shown in TOC (2-6)"
+        },
+        {
+          "title": "TOC Max Heading Level",
+          "name": "toc_max_heading_level",
+          "type": "number",
+          "description": "Maximum heading level shown in TOC (2-6)"
+        },
+        {
+          "title": "Custom Edit URL",
+          "name": "custom_edit_url",
+          "type": "string",
+          "description": "Custom URL for editing this document"
+        },
+        {
+          "title": "Parse Number Prefixes",
+          "name": "parse_number_prefixes",
+          "type": "boolean",
+          "description": "Whether number prefix parsing is enabled"
+        },
+        {
+          "title": "Displayed Sidebar",
+          "name": "displayed_sidebar",
+          "type": "string",
+          "description": "Force display of a specific sidebar"
+        }
+      ]
+    },
+    {
+      "name": "blog",
+      "pageBundle": false,
+      "previewPath": null,
+      "fields": [
+        {
+          "title": "Title",
+          "name": "title",
+          "type": "string",
+          "description": "The blog post title"
+        },
+        {
+          "title": "Title Meta",
+          "name": "title_meta",
+          "type": "string",
+          "description": "SEO metadata title for <head>, used when displayed title and SEO title should differ"
+        },
+        {
+          "title": "Description",
+          "name": "description",
+          "type": "string",
+          "description": "The description of your blog post, used for SEO meta tags"
+        },
+        {
+          "title": "Keywords",
+          "name": "keywords",
+          "type": "tags",
+          "description": "Keywords meta tag for search engines"
+        },
+        {
+          "title": "Image",
+          "name": "image",
+          "type": "image",
+          "description": "Cover or thumbnail image for social media previews"
+        },
+        {
+          "title": "Slug",
+          "name": "slug",
+          "type": "string",
+          "description": "Customize the blog post URL"
+        },
+        {
+          "title": "Date",
+          "name": "date",
+          "type": "datetime",
+          "description": "The blog post creation date",
+          "isPublishDate": true
+        },
+        {
+          "title": "Authors",
+          "name": "authors",
+          "type": "dataFile",
+          "dataFileId": "authors",
+          "dataFileKey": "handle",
+          "dataFileValue": "name",
+          "multiple": true
+        },
+        {
+          "title": "Sidebar Label",
+          "name": "sidebar_label",
+          "type": "string",
+          "description": "Custom label for the blog sidebar"
+        },
+        {
+          "title": "Tags",
+          "name": "tags",
+          "type": "dataFile",
+          "dataFileId": "tags",
+          "dataFileKey": "handle",
+          "dataFileValue": "handle",
+          "multiple": true,
+          "description": "A list of tags to categorize your blog post"
+        },
+        {
+          "title": "Draft",
+          "name": "draft",
+          "type": "draft",
+          "description": "Draft blog posts are only available during development"
+        },
+        {
+          "title": "Unlisted",
+          "name": "unlisted",
+          "type": "boolean",
+          "description": "Unlisted blog posts are hidden but accessible via direct link"
+        },
+        {
+          "title": "Hide Table of Contents",
+          "name": "hide_table_of_contents",
+          "type": "boolean",
+          "description": "Whether to hide the table of contents"
+        },
+        {
+          "title": "TOC Min Heading Level",
+          "name": "toc_min_heading_level",
+          "type": "number",
+          "description": "Minimum heading level shown in TOC (2-6)"
+        },
+        {
+          "title": "TOC Max Heading Level",
+          "name": "toc_max_heading_level",
+          "type": "number",
+          "description": "Maximum heading level shown in TOC (2-6)"
+        }
+      ]
+    },
+    {
+      "name": "pages",
+      "pageBundle": false,
+      "previewPath": null,
+      "fields": [
+        {
+          "title": "Title",
+          "name": "title",
+          "type": "string",
+          "description": "The page title"
+        },
+        {
+          "title": "Description",
+          "name": "description",
+          "type": "string",
+          "description": "The description of your page, used for SEO meta tags"
+        },
+        {
+          "title": "Keywords",
+          "name": "keywords",
+          "type": "tags",
+          "description": "Keywords meta tag for search engines"
+        },
+        {
+          "title": "Image",
+          "name": "image",
+          "type": "image",
+          "description": "Cover or thumbnail image for social media previews"
+        },
+        {
+          "title": "Slug",
+          "name": "slug",
+          "type": "string",
+          "description": "Customize the page URL"
+        },
+        {
+          "title": "Wrapper Class Name",
+          "name": "wrapperClassName",
+          "type": "string",
+          "description": "CSS class name added to the wrapper element for targeting specific page content"
+        },
+        {
+          "title": "Hide Table of Contents",
+          "name": "hide_table_of_contents",
+          "type": "boolean",
+          "description": "Whether to hide the table of contents"
+        },
+        {
+          "title": "Draft",
+          "name": "draft",
+          "type": "draft",
+          "description": "Draft pages are only available during development"
+        },
+        {
+          "title": "Unlisted",
+          "name": "unlisted",
+          "type": "boolean",
+          "description": "Unlisted pages are hidden but accessible via direct link"
+        }
+      ]
+    }
+  ],
+  "frontMatter.data.files": [
+    {
+      "id": "authors",
+      "title": "Authors",
+      "file": "[[workspace]]/authors.choices.jsonc",
+      "fileType": "json",
+      "labelField": "handle",
+      "schema": {
+        "title": "Authors",
+        "type": "object",
+        "required": [
+          "name",
+          "handle"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "url": {
+            "type": "string",
+            "title": "URL"
+          },
+          "image_url": {
+            "type": "string",
+            "title": "Image URL"
+          },
+          "handle": {
+            "type": "string",
+            "title": "Handle"
+          },
+          "socials": {
+            "type": "object",
+            "title": "Social Links",
+            "properties": {
+              "x": {
+                "type": "string",
+                "title": "X (Twitter)"
+              },
+              "linkedin": {
+                "type": "string",
+                "title": "LinkedIn"
+              },
+              "github": {
+                "type": "string",
+                "title": "GitHub"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "tags",
+      "title": "Tags",
+      "file": "[[workspace]]/tags.choices.jsonc",
+      "fileType": "json",
+      "labelField": "handle",
+      "schema": {
+        "title": "Tags",
+        "type": "object",
+        "required": [
+          "label",
+          "handle"
+        ],
+        "properties": {
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "permalink": {
+            "type": "string",
+            "title": "Permalink"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "handle": {
+            "type": "string",
+            "title": "Handle"
+          }
+        }
+      }
     }
   ],
   "frontMatter.framework.id": "docusaurus",
@@ -57,19 +454,31 @@
   "frontMatter.content.pageFolders": [
     {
       "title": "blog",
-      "path": "[[workspace]]/blog"
+      "path": "[[workspace]]/blog",
+      "contentTypes": [
+        "blog"
+      ]
     },
     {
       "title": "pages",
-      "path": "[[workspace]]/src/pages"
+      "path": "[[workspace]]/src/pages",
+      "contentTypes": [
+        "page"
+      ]
     },
     {
       "title": "docs",
-      "path": "[[workspace]]/docs"
+      "path": "[[workspace]]/docs",
+      "contentTypes": [
+        "doc"
+      ]
     },
     {
       "title": "commands",
-      "path": "[[workspace]]/docs/commands"
+      "path": "[[workspace]]/docs/commands",
+      "contentTypes": [
+        "doc"
+      ]
     }
   ],
   "frontMatter.content.snippets": {
@@ -199,5 +608,7 @@
       ]
     }
   },
-  "frontMatter.website.host": "https://psake.dev"
+  "frontMatter.website.host": "https://psake.dev",
+  "frontMatter.dashboard.openOnStart": true,
+  "frontMatter.framework.startCommand": "yarn start"
 }
