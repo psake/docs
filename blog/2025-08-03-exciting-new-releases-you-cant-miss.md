@@ -22,64 +22,75 @@ keywords:
 image: /img/social-card.png
 draft: false
 fmContentType: blog
-title_meta: august-new-releases-and-more
+title_meta: August - New Releases and more!
 ---
 
-It's been a while since our last update. In this post we'll be covering some of
-the most recent releases, some new team members, and different efforts we're
-taking on.
+It's been a while since our last update, and we've got some exciting news to
+share! In this post, we'll cover recent releases, welcome new team members, and
+highlight the various initiatives we're working on to make psake even better.
 
 <!-- truncate -->
 
 ## Latest Versions
 
-Since initially rolling out this docs site we haven't really announced any
-versions through here. We could say we've been in stealth mode (but we're not
-that cool).
+Since launching this documentation site, we haven't been great about announcing
+new versions here. You could say we've been in stealth mode (though we're
+definitely not that cool).
 
 ### psake
 
-Back in October we released psake 4.9.1, and since then have landed a few PR's
-including a few community contributions.
+Back in October, we released psake 4.9.1, and since then we've merged several
+pull requests, including some fantastic community contributions.
 
-See the
+Check out the
 [psake Changelog](https://github.com/psake/psake/blob/main/CHANGELOG.md) for all
 the details.
 
-The next release should introduce a new way to overwrite the psake logging
-mechanism. This would allow teams to hook in additionally logging frameworks or
-improve CI/CD specific flows.
+The next release will introduce a new way to override the psake logging
+mechanism. This will allow teams to integrate additional logging frameworks or
+create improved CI/CD-specific workflows.
 
 ### PowerShellBuild
 
-Two days ago PowerShellBuild, our set of common tasks for psake and Invoke-Build
-was updated to support overriding the task dependencies. We also added support
-for localization (see below). This brings us up to version 0.7.3 as the latest
-release. Since 0.6.2 we've had 4.5k downloads and we're hope to continue to
-improve the project.
+Just a few days ago, we updated PowerShellBuild - our collection of common tasks
+for psake and Invoke-Build - to support overriding task dependencies. We also
+added localization support (more on that below). This brings us to version 0.7.3
+as our latest release. Since version 0.6.2, we've seen 4.5k downloads, and we
+hope to keep improving the project based on your feedback.
 
 See the
 [PowerShellBuild Changelog](https://github.com/psake/PowerShellBuild/blob/main/CHANGELOG.md)
-for all the details.
+for complete details.
 
-## Newest Team Members
+## Welcome Our Newest Team Members
 
-You may have noticed them working or reviewing code in our repositories, but I'd
-like to formally announce Joshua Hendricks and Trent Blackburn as members to the
-psake core team.
+You may have noticed them working on and reviewing code in our repositories, but
+we'd like to formally welcome Joshua Hendricks and Trent Blackburn as new
+members of the psake core team!
 
-If you're interested in contributing, please consider opening an issue and/or a
-PR.
+**Joshua** is our resident
+[MVP](https://mvp.microsoft.com/MVP/profile/f98b4f3e-12fd-40de-bdce-1467f04d430d)
+who's well-known for presenting at PowerShell + DevOps Global Summit on building
+beautiful docs and sending notifications.
 
-## Localization
+**Trent** currently develops PowerShell automations at Tesla, previously
+specialized in PowerShell at Amazon, and has also presented at the annual
+PowerShell + DevOps Global Summit.
 
-psake has long had the framework set for supporting localization (aka l10n), but
-has only had one language implemented (English). One of our goals is to make
-psake as accessible as possible for all users.
+Both bring incredible expertise to the team, and we're excited to have them
+aboard! If you're interested in contributing to psake, please consider opening
+an issue or submitting a pull request—we'd love to hear from you.
 
-To make it easier for the community we've configured a
-[CrowdIn project](http://crowdin.com/project/psake) that allows for easy
+## Expanding Global Accessibility with Localization
+
+psake has long had the framework in place for supporting localization (l10n),
+but until now has only been available in English. One of our key goals is making
+psake as accessible as possible for users worldwide.
+
+To make community contributions easier, we've set up a
+[Crowdin project](http://crowdin.com/project/psake) that enables straightforward
 translation requests and suggestions.
 
-With the CrowdIn project in place we now have a simple pipeline to introduce new
-localized versions. Please consider suggesting!
+With the Crowdin project now live, we have a streamlined pipeline for
+introducing new localized versions. We'd love your help in making psake
+available in more languages - please consider contributing translations!
