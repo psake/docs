@@ -71,7 +71,8 @@ members of the psake core team!
 **Joshua** is our resident
 [MVP](https://mvp.microsoft.com/MVP/profile/f98b4f3e-12fd-40de-bdce-1467f04d430d)
 who's well-known for presenting at PowerShell + DevOps Global Summit on building
-beautiful docs and sending notifications.
+beautiful docs and sending notifications. He's a developer at Milestone Systems
+where he maintains their PowerShell module.
 
 **Trent** currently develops PowerShell automations at Tesla, previously
 specialized in PowerShell at Amazon, and has also presented at the annual
