@@ -1,0 +1,17 @@
+[
+  {
+    "_comment": "This file is auto-generated from blog/authors.yml via a psake task"
+  },
+  {
+    "url": "https://gilbertsanchez.com",
+    "title": "Core Contributor",
+    "image_url": "https://github.com/heyitsgilbert.png",
+    "name": "Gilbert Sanchez",
+    "socials": {
+      "linkedin": "gilbertsanchez",
+      "github": "HeyItsGilbert",
+      "x": "HeyItsGilbertS"
+    },
+    "handle": "heyitsgilbert"
+  }
+]

@@ -1,4 +1,5 @@
 #require -Version 7
+$ErrorView = 'Detailed'
 Properties {
   $script:OutputPath = $null
   $script:OutputFormat = 'Nunit'
@@ -40,20 +41,20 @@ FormatTaskName {
   Write-Host $taskName.ToUpper() -ForegroundColor Blue
 }
 
-Task Default -depends Build
+Task Default -Depends Build
 
-Task Init -description "Initial action to setup the further action." -action {
+Task Init -Description "Initial action to setup the further action." -Action {
   yarn install
 }
 
-Task Build -depends Init, GenerateCommandReference {
+Task Build -Depends Init, GenerateCommandReference, FrontMatterCMSSync {
   yarn run build
   if ($LastExitCode -ne 0) {
     throw "NPM Build failed"
   }
 }
 
-Task Server -depends Build -description "Run the docusaurus server." {
+Task Server -Depends Build -Description "Run the docusaurus server." {
   yarn run serve
 }
 
@@ -90,16 +91,16 @@ $taskSplat = @{
   description = "Use Alt3.Docusaurus.Powershell module to generate our reference docs."
   depends = 'GenerateCommandReference-Gen'
 }
-Task -name 'GenerateCommandReference' @taskSplat
+Task -Name 'GenerateCommandReference' @taskSplat
 
-Task -name 'GenerateCommandReference-Clean' -action {
+Task -Name 'GenerateCommandReference-Clean' -Action {
   Write-Host "Removing existing MDX files" -ForegroundColor Magenta
   if (Test-Path -Path $script:docsOutputFolder) {
     Remove-Item -Path $script:docsOutputFolder
   }
 }
 
-Task -name "GenerateCommandReference-Gen" -depends 'GenerateCommandReference-Clean' {
+Task -Name "GenerateCommandReference-Gen" -Depends 'GenerateCommandReference-Clean' {
   Write-Host "Generating new MDX files" -ForegroundColor Magenta
   New-DocusaurusHelp @docusaurusOptions
 
@@ -112,4 +113,36 @@ Task -name "GenerateCommandReference-Gen" -depends 'GenerateCommandReference-Cle
     } | Set-Content $path
   }
 }
-#region Command Reference Generation Tasks
+#endregion Command Reference Generation Tasks
+
+#region Sync Front Matter Data
+Task -Name 'FrontMatterCMSSync' {
+  (
+    'blog/authors.yml',
+    'blog/tags.yml'
+  ) | ForEach-Object {
+    if (-not (Test-Path $_)) {
+      Write-Warning "File not found: $_"
+      return
+    }
+    $name = $_ -replace '\.yml$', '.choices.jsonc'
+    $outputFile = Join-Path -Path $PSScriptRoot -ChildPath (Split-Path -Path $name -Leaf)
+
+    [array]$output = @(
+      @{
+        "_comment" = "This file is auto-generated from $_ via a psake task"
+      }
+    )
+    $yaml = Get-Content -Raw $_ | ConvertFrom-Yaml
+    foreach ($item in $yaml.Keys) {
+      $value = $yaml[$item]
+      if (-not $value.ContainsKey('handle')) {
+        $value.Add('handle', $item)
+      }
+      $output += $value
+    }
+    Set-Content -Path $outputFile -Force -Value ($output | ConvertTo-Json -Depth 10)
+  }
+  # TODO: Add support to sync back from FrontMatter CMS to authors.json and tags.json
+} -Description "Syncs Docusaurus JSON data from authors.json and tags.json to FrontMatter CMS friendly choices.json files."
+#endregion Sync Front Matter Data
