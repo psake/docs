@@ -17,4 +17,7 @@
   'Alt3.Docusaurus.Powershell' = @{
     Version = '1.0.36'
   }
+  'Yayaml' = @{
+    Version = '0.6.0'
+  }
 }

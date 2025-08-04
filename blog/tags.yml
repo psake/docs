@@ -1,19 +1,89 @@
-facebook:
-  label: Facebook
-  permalink: /facebook
-  description: Facebook tag description
+powershell:
+  label: PowerShell
+  permalink: /powershell
+  description: PowerShell scripting and automation content
 
-hello:
-  label: Hello
-  permalink: /hello
-  description: Hello tag description
+build-automation:
+  label: Build Automation
+  permalink: /build-automation
+  description: Automated build processes and continuous integration
 
-docusaurus:
-  label: Docusaurus
-  permalink: /docusaurus
-  description: Docusaurus tag description
+psake:
+  label: psake
+  permalink: /psake
+  description: psake build automation framework content
 
-hola:
-  label: Hola
-  permalink: /hola
-  description: Hola tag description
+ci-cd:
+  label: CI/CD
+  permalink: /ci-cd
+  description: Continuous Integration and Continuous Deployment
+
+testing:
+  label: Testing
+  permalink: /testing
+  description: Software testing strategies and tools
+
+deployment:
+  label: Deployment
+  permalink: /deployment
+  description: Application deployment and release management
+
+scripting:
+  label: Scripting
+  permalink: /scripting
+  description: Script development and automation techniques
+
+tutorial:
+  label: Tutorial
+  permalink: /tutorial
+  description: Step-by-step tutorials and guides
+
+getting-started:
+  label: Getting Started
+  permalink: /getting-started
+  description: Beginner-friendly content and setup guides
+
+advanced:
+  label: Advanced
+  permalink: /advanced
+  description: Advanced techniques and expert-level content
+
+best-practices:
+  label: Best Practices
+  permalink: /best-practices
+  description: Recommended approaches and industry standards
+
+tips:
+  label: Tips & Tricks
+  permalink: /tips
+  description: Helpful tips and useful tricks
+
+troubleshooting:
+  label: Troubleshooting
+  permalink: /troubleshooting
+  description: Problem-solving and debugging guides
+
+release:
+  label: Release
+  permalink: /release
+  description: Product releases and version announcements
+
+announcement:
+  label: Announcement
+  permalink: /announcement
+  description: Important announcements and updates
+
+msbuild:
+  label: MSBuild
+  permalink: /msbuild
+  description: Microsoft Build Engine integration
+
+dotnet:
+  label: .NET
+  permalink: /dotnet
+  description: .NET framework and .NET Core development
+
+visual-studio:
+  label: Visual Studio
+  permalink: /visual-studio
+  description: Visual Studio IDE integration and tools

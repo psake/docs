@@ -1,0 +1,113 @@
+[
+  {
+    "_comment": "This file is auto-generated from blog/tags.yml via a psake task"
+  },
+  {
+    "permalink": "/dotnet",
+    "label": ".NET",
+    "description": ".NET framework and .NET Core development",
+    "handle": "dotnet"
+  },
+  {
+    "permalink": "/deployment",
+    "label": "Deployment",
+    "description": "Application deployment and release management",
+    "handle": "deployment"
+  },
+  {
+    "permalink": "/build-automation",
+    "label": "Build Automation",
+    "description": "Automated build processes and continuous integration",
+    "handle": "build-automation"
+  },
+  {
+    "permalink": "/testing",
+    "label": "Testing",
+    "description": "Software testing strategies and tools",
+    "handle": "testing"
+  },
+  {
+    "permalink": "/announcement",
+    "label": "Announcement",
+    "description": "Important announcements and updates",
+    "handle": "announcement"
+  },
+  {
+    "permalink": "/tutorial",
+    "label": "Tutorial",
+    "description": "Step-by-step tutorials and guides",
+    "handle": "tutorial"
+  },
+  {
+    "permalink": "/psake",
+    "label": "psake",
+    "description": "psake build automation framework content",
+    "handle": "psake"
+  },
+  {
+    "permalink": "/getting-started",
+    "label": "Getting Started",
+    "description": "Beginner-friendly content and setup guides",
+    "handle": "getting-started"
+  },
+  {
+    "permalink": "/ci-cd",
+    "label": "CI/CD",
+    "description": "Continuous Integration and Continuous Deployment",
+    "handle": "ci-cd"
+  },
+  {
+    "permalink": "/visual-studio",
+    "label": "Visual Studio",
+    "description": "Visual Studio IDE integration and tools",
+    "handle": "visual-studio"
+  },
+  {
+    "permalink": "/troubleshooting",
+    "label": "Troubleshooting",
+    "description": "Problem-solving and debugging guides",
+    "handle": "troubleshooting"
+  },
+  {
+    "permalink": "/powershell",
+    "label": "PowerShell",
+    "description": "PowerShell scripting and automation content",
+    "handle": "powershell"
+  },
+  {
+    "permalink": "/advanced",
+    "label": "Advanced",
+    "description": "Advanced techniques and expert-level content",
+    "handle": "advanced"
+  },
+  {
+    "permalink": "/best-practices",
+    "label": "Best Practices",
+    "description": "Recommended approaches and industry standards",
+    "handle": "best-practices"
+  },
+  {
+    "permalink": "/tips",
+    "label": "Tips & Tricks",
+    "description": "Helpful tips and useful tricks",
+    "handle": "tips"
+  },
+  {
+    "permalink": "/scripting",
+    "label": "Scripting",
+    "description": "Script development and automation techniques",
+    "handle": "scripting"
+  },
+  {
+    "permalink": "/msbuild",
+    "label": "MSBuild",
+    "description": "Microsoft Build Engine integration",
+    "handle": "msbuild"
+  },
+  {
+    "permalink": "/release",
+    "label": "Release",
+    "description": "Product releases and version announcements",
+    "handle": "release"
+  }
+]
