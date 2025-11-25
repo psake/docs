@@ -54,6 +54,17 @@ const sidebars: SidebarsConfig = {
     },
     {
       type: 'category',
+      label: 'Best Practices',
+      items: [
+        'best-practices/organizing-large-scripts',
+        'best-practices/environment-management',
+        'best-practices/secret-management',
+        'best-practices/testing-build-scripts',
+        'best-practices/versioning-strategy'
+      ]
+    },
+    {
+      type: 'category',
       label: 'CI Examples',
       items: [
         'ci-examples/github-actions',
