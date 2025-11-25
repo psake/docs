@@ -9,77 +9,19 @@ When building with psake, you often need to pass information between tasks, retu
 
 ## Understanding psake's Output Model
 
-psake's primary output mechanism is **exit codes**:
-- **Exit code 0**: Build succeeded
-- **Exit code 1**: Build failed
+**Important:** psake executes your build script in its own scope, which means:
 
-The `Invoke-psake` function itself **does not return custom objects** or data structures. Instead, use one of the patterns described below.
+- The `Invoke-psake` function **does not return custom objects** or data structures
+- Variables defined inside your psakefile (even with `$script:` scope) are **not accessible** after `Invoke-psake` completes
+- psake's primary success/failure indicator is the **exit code** (0 = success, 1 = failure)
+
+To return data from a psake build, you must use external mechanisms like files or environment variables.
 
 ## Recommended Patterns
 
-### 1. Script-Level Variables (Best for Simple Data)
+### 1. Output Files (Primary Recommended Approach)
 
-The most straightforward way to return data from a psake build is using script-level variables that persist after `Invoke-psake` completes.
-
-#### Example: Returning a Hashtable
-
-```powershell title="psakefile.ps1"
-# Declare script-level variable
-$script:BuildOutput = @{}
-
-Properties {
-    $ArtifactDir = "./artifacts"
-}
-
-Task Build {
-    # Perform build
-    exec { dotnet build -o $ArtifactDir }
-
-    # Populate output data
-    $script:BuildOutput.ArtifactUrl = "https://cdn.example.com/builds/1.0.0/app.zip"
-    $script:BuildOutput.Version = "1.0.0"
-    $script:BuildOutput.BuildTime = Get-Date
-}
-```
-
-```powershell title="build.ps1 (calling script)"
-# Import psake
-Import-Module psake
-
-# Run build
-Invoke-psake -buildFile .\psakefile.ps1 -taskList Build
-
-# Check exit code
-if ($LASTEXITCODE -ne 0) {
-    throw "Build failed"
-}
-
-# Access the output data
-Write-Host "Artifact URL: $($BuildOutput.ArtifactUrl)"
-Write-Host "Version: $($BuildOutput.Version)"
-Write-Host "Build Time: $($BuildOutput.BuildTime)"
-
-# Use the data in subsequent operations
-if (![string]::IsNullOrEmpty($BuildOutput.ArtifactUrl)) {
-    # Deploy, upload, or process artifact
-    Write-Host "Ready to deploy artifact at: $($BuildOutput.ArtifactUrl)"
-}
-```
-
-**Pros:**
-- Simple and direct
-- No file I/O overhead
-- Type-safe (can use any PowerShell object)
-- Data available immediately
-
-**Cons:**
-- Only works when calling `Invoke-psake` from PowerShell
-- Variables must be script-scoped
-- Not suitable for CI/CD pipelines that need persistent artifacts
-
-### 2. Output Files (Best for CI/CD and Complex Data)
-
-For CI/CD pipelines or when you need persistent, structured data, write outputs to files.
+**This is the best practice for returning data from psake builds.** Write your outputs to JSON or YAML files that can be read after the build completes.
 
 #### JSON Output File
 
@@ -110,22 +52,40 @@ Task Build {
 }
 ```
 
-```powershell title="deploy.ps1 (subsequent script)"
-# Read build output
-$buildOutput = Get-Content ./build-output.json | ConvertFrom-Json
+```powershell title="build.ps1 (calling script)"
+# Import and run psake
+Import-Module psake
+Invoke-psake -buildFile ./psakefile.ps1 -taskList Build
 
-# Use the data
-Write-Host "Deploying version: $($buildOutput.Version)"
-Write-Host "Artifact URL: $($buildOutput.ArtifactUrl)"
-
-foreach ($artifact in $buildOutput.Artifacts) {
-    Write-Host "  Artifact: $($artifact.Name) at $($artifact.Path)"
+# Check exit code
+if ($LASTEXITCODE -ne 0) {
+    Write-Error "Build failed with exit code: $LASTEXITCODE"
+    exit $LASTEXITCODE
 }
+
+# Read the output file
+if (Test-Path ./build-output.json) {
+    $buildOutput = Get-Content ./build-output.json | ConvertFrom-Json
+
+    Write-Host "`n========== Build Results ==========" -ForegroundColor Cyan
+    Write-Host "Version: $($buildOutput.Version)"
+    Write-Host "Artifact URL: $($buildOutput.ArtifactUrl)"
+    Write-Host "Build Time: $($buildOutput.BuildTime)"
+    Write-Host "Artifacts:"
+    foreach ($artifact in $buildOutput.Artifacts) {
+        Write-Host "  - $($artifact.Name) at $($artifact.Path)"
+    }
+    Write-Host "===================================`n" -ForegroundColor Cyan
+}
+
+exit 0
 ```
+
+**Answer to the original question:** For your use case of returning a hashtable with an `ArtifactUrl` field, write it to a JSON file as shown above. This is the standard, reliable approach.
 
 #### YAML Output File
 
-```powershell
+```powershell title="psakefile.ps1"
 Task Build {
     # Create output object
     $output = @{
@@ -140,20 +100,23 @@ Task Build {
 ```
 
 **Pros:**
+- **Actually works** - data persists after psake completes
 - Works across different processes and languages
-- Persists between build steps
 - Ideal for CI/CD pipelines
 - Can be version controlled or uploaded as artifacts
 - Human-readable (JSON/YAML)
+- Type-safe when using structured formats
 
 **Cons:**
 - File I/O overhead
 - Requires parsing in consuming code
 - Need to handle file paths carefully
 
-### 3. Environment Variables (Best for CI/CD Integration)
+**When to use:** This should be your default choice for returning build metadata, artifact URLs, or any structured data.
 
-Environment variables are excellent for passing data to CI/CD systems like GitHub Actions, Azure Pipelines, or GitLab CI.
+### 2. Environment Variables (For CI/CD Integration)
+
+Environment variables can pass simple string values to CI/CD systems, but be aware that they may not persist in all PowerShell scenarios.
 
 ```powershell title="psakefile.ps1"
 Task Build {
@@ -200,13 +163,58 @@ jobs:
 - No file management
 
 **Cons:**
-- Limited to string values
-- Not suitable for complex objects
-- Environment variables may not persist across processes
+- **Limited to string values** - cannot return complex objects
+- **May not persist** outside the psake process in all scenarios
+- Less reliable than output files
+
+**When to use:** In CI/CD pipelines where you need to pass simple string values to subsequent steps. For reliability, combine with output files.
+
+### 3. Sharing Data Between Tasks (Within Same Build)
+
+While you cannot return data from `Invoke-psake` to the caller using variables, you **can** share data between tasks within the same build using script-scoped variables.
+
+```powershell title="psakefile.ps1"
+# Script-scoped variable accessible to all tasks
+$script:BuildMetadata = @{}
+
+Properties {
+    $Configuration = "Release"
+}
+
+Task Init {
+    # Store data for use by other tasks
+    $script:BuildMetadata.StartTime = Get-Date
+    $script:BuildMetadata.Configuration = $Configuration
+}
+
+Task Build -Depends Init {
+    # Access data from previous task
+    Write-Host "Started at: $($script:BuildMetadata.StartTime)"
+    Write-Host "Configuration: $($script:BuildMetadata.Configuration)"
+
+    exec { dotnet build -c $Configuration }
+
+    # Add more data
+    $script:BuildMetadata.BuildCompleted = Get-Date
+}
+
+Task Package -Depends Build {
+    # Access accumulated metadata
+    $duration = $script:BuildMetadata.BuildCompleted - $script:BuildMetadata.StartTime
+    Write-Host "Build took: $($duration.TotalSeconds) seconds"
+
+    # Package artifacts
+    exec { dotnet pack }
+}
+```
+
+**Important:** These variables are **only** accessible within the same `Invoke-psake` call. They **cannot** be accessed by the calling script.
+
+**When to use:** For passing data between tasks within the same build execution.
 
 ### 4. BuildTearDown for Centralized Reporting
 
-Use `BuildTearDown` to generate summary reports or outputs after all tasks complete.
+Use `BuildTearDown` to generate summary reports or outputs that run after all tasks complete (even on failure).
 
 ```powershell title="psakefile.ps1"
 # Track build metadata
@@ -214,6 +222,7 @@ $script:BuildMetrics = @{
     TasksExecuted = @()
     StartTime = $null
     EndTime = $null
+    ArtifactUrl = $null
 }
 
 BuildSetup {
@@ -229,32 +238,33 @@ BuildTearDown {
     $script:BuildMetrics.EndTime = Get-Date
     $duration = $script:BuildMetrics.EndTime - $script:BuildMetrics.StartTime
 
-    # Create summary report
+    # Create summary report (IMPORTANT: Write to file, not just variables)
     $summary = @{
         Success = $psake.build_success
         Duration = $duration.TotalSeconds
         TasksExecuted = $script:BuildMetrics.TasksExecuted
-        ArtifactUrl = $script:BuildOutput.ArtifactUrl
+        ArtifactUrl = $script:BuildMetrics.ArtifactUrl
+        Timestamp = (Get-Date).ToString("o")
     }
 
-    # Write to file
+    # Write to file so it's accessible after Invoke-psake completes
     $summary | ConvertTo-Json | Set-Content ./build-summary.json
 
     Write-Host "`n========== Build Summary ==========" -ForegroundColor Cyan
     Write-Host "Status: $(if ($psake.build_success) { 'SUCCESS' } else { 'FAILED' })"
     Write-Host "Duration: $($duration.TotalSeconds) seconds"
     Write-Host "Tasks: $($script:BuildMetrics.TasksExecuted -join ', ')"
+    if ($script:BuildMetrics.ArtifactUrl) {
+        Write-Host "Artifact: $($script:BuildMetrics.ArtifactUrl)"
+    }
     Write-Host "===================================" -ForegroundColor Cyan
 }
 
 Task Build {
-    # Build logic
     exec { dotnet build }
 
-    # Set artifact URL
-    $script:BuildOutput = @{
-        ArtifactUrl = "https://cdn.example.com/builds/1.0.0/app.zip"
-    }
+    # Store artifact URL for BuildTearDown to include in summary
+    $script:BuildMetrics.ArtifactUrl = "https://cdn.example.com/builds/1.0.0/app.zip"
 }
 ```
 
@@ -265,11 +275,33 @@ Task Build {
 
 **Cons:**
 - Only runs after all tasks complete
-- Cannot be used for inter-task communication
+- **Must write to files** to be accessible after Invoke-psake
+
+**When to use:** For generating build summaries, metrics, or cleanup operations that should always run.
 
 ## Anti-Patterns to Avoid
 
-### Don't Use Write-Host for Structured Data
+### ❌ Don't Rely on Script Variables Being Accessible Outside psake
+
+```powershell
+# ❌ BAD: This does NOT work
+# psakefile.ps1
+$script:BuildOutput = @{ ArtifactUrl = "https://example.com/app.zip" }
+
+Task Build {
+    $script:BuildOutput.Version = "1.0.0"
+}
+
+# build.ps1
+Invoke-psake -buildFile ./psakefile.ps1
+Write-Host $BuildOutput.ArtifactUrl  # ❌ $BuildOutput is not defined!
+```
+
+**Why it's bad:** psake executes the build file in its own scope. Variables are not accessible after `Invoke-psake` returns.
+
+**Better approach:** Write to an output file (JSON/YAML)
+
+### ❌ Don't Use Write-Host for Structured Data
 
 ```powershell
 # ❌ BAD: Mixing structured data with console output
@@ -285,9 +317,9 @@ Task Build {
 - Hard to distinguish from psake's own output
 - Not machine-readable
 
-**Better approach:** Use script variables or output files
+**Better approach:** Write to JSON file
 
-### Don't Use Write-Output for Return Values
+### ❌ Don't Use Write-Output for Return Values
 
 ```powershell
 # ❌ BAD: Attempting to return data via Write-Output
@@ -302,9 +334,9 @@ Task Build {
 - Difficult to capture reliably
 - Not the intended use of `Invoke-psake`
 
-**Better approach:** Use script variables or output files
+**Better approach:** Write to JSON file
 
-### Don't Use Global Variables
+### ❌ Don't Use Global Variables
 
 ```powershell
 # ❌ BAD: Using global scope
@@ -316,27 +348,28 @@ Task Build {
 **Why it's bad:**
 - Pollutes global namespace
 - Hard to track and debug
+- May not work depending on how psake is invoked
 - Not clear which task sets which globals
 
-**Better approach:** Use script-scoped variables with clear naming
+**Better approach:** Write to JSON file (or use `$script:` for inter-task communication)
 
 ## Complete Example: Multi-Task Build with Outputs
 
+This example shows the **recommended pattern** for returning data from a psake build.
+
 ```powershell title="psakefile.ps1"
 #requires -Version 7
-
-# Script-level output container
-$script:BuildOutput = @{
-    Version = $null
-    ArtifactPaths = @()
-    ArtifactUrl = $null
-    TestResults = @{}
-}
 
 Properties {
     $Configuration = "Release"
     $ArtifactDir = "./artifacts"
     $OutputFile = "./build-output.json"
+}
+
+# Internal data sharing between tasks (not accessible outside psake)
+$script:InternalBuildData = @{
+    Version = $null
+    TestsPassed = $false
 }
 
 Task Default -Depends Build, Test, Package
@@ -346,26 +379,24 @@ Task Build {
 
     # Get version from project file
     [xml]$project = Get-Content ./src/App.csproj
-    $script:BuildOutput.Version = $project.Project.PropertyGroup.Version
+    $script:InternalBuildData.Version = $project.Project.PropertyGroup.Version
 
     # Build
     exec { dotnet build -c $Configuration }
 
-    Write-Host "Built version: $($script:BuildOutput.Version)"
+    Write-Host "Built version: $($script:InternalBuildData.Version)"
 }
 
 Task Test -Depends Build {
     Write-Host "Running tests..." -ForegroundColor Green
 
-    $testResult = exec { dotnet test --no-build -c $Configuration } -returnCode
-
-    $script:BuildOutput.TestResults = @{
-        Passed = ($testResult -eq 0)
-        ExitCode = $testResult
+    try {
+        exec { dotnet test --no-build -c $Configuration }
+        $script:InternalBuildData.TestsPassed = $true
     }
-
-    if ($testResult -ne 0) {
-        throw "Tests failed"
+    catch {
+        $script:InternalBuildData.TestsPassed = $false
+        throw
     }
 }
 
@@ -381,37 +412,35 @@ Task Package -Depends Test {
     exec { dotnet publish -c $Configuration -o $ArtifactDir }
 
     # Create zip archive
-    $zipName = "app-v$($script:BuildOutput.Version).zip"
+    $zipName = "app-v$($script:InternalBuildData.Version).zip"
     $zipPath = Join-Path $ArtifactDir $zipName
     Compress-Archive -Path "$ArtifactDir/*" -DestinationPath $zipPath -Force
 
-    # Record artifact paths
-    $script:BuildOutput.ArtifactPaths += $zipPath
+    # Simulate upload to CDN (in real scenario, this would actually upload)
+    $artifactUrl = "https://cdn.example.com/builds/$($script:InternalBuildData.Version)/$zipName"
 
-    # Simulate upload and get URL
-    $script:BuildOutput.ArtifactUrl = "https://cdn.example.com/builds/$($script:BuildOutput.Version)/$zipName"
+    # IMPORTANT: Write outputs to file so they're accessible after Invoke-psake
+    $output = @{
+        Version = $script:InternalBuildData.Version
+        ArtifactUrl = $artifactUrl
+        ArtifactPath = $zipPath
+        TestsPassed = $script:InternalBuildData.TestsPassed
+        BuildTime = (Get-Date).ToString("o")
+        Configuration = $Configuration
+    }
+
+    $output | ConvertTo-Json -Depth 10 | Set-Content $OutputFile
 
     Write-Host "Package created: $zipPath"
-    Write-Host "Artifact URL: $($script:BuildOutput.ArtifactUrl)"
-}
-
-BuildTearDown {
-    # Always write output file, even on failure
-    $script:BuildOutput | ConvertTo-Json -Depth 10 | Set-Content $OutputFile
-
-    Write-Host "`nBuild output written to: $OutputFile" -ForegroundColor Cyan
-
-    if ($psake.build_success) {
-        Write-Host "Build completed successfully!" -ForegroundColor Green
-    } else {
-        Write-Host "Build failed!" -ForegroundColor Red
-    }
+    Write-Host "Artifact URL: $artifactUrl"
+    Write-Host "Output written to: $OutputFile"
 }
 ```
 
 ```powershell title="build.ps1 (wrapper script)"
 param(
-    [string]$Task = "Default"
+    [string]$Task = "Default",
+    [hashtable]$Properties = @{}
 )
 
 # Import psake
@@ -421,7 +450,8 @@ if (-not (Get-Module psake -ListAvailable)) {
 Import-Module psake
 
 # Run build
-Invoke-psake -buildFile ./psakefile.ps1 -taskList $Task
+Write-Host "Running psake build..." -ForegroundColor Cyan
+Invoke-psake -buildFile ./psakefile.ps1 -taskList $Task -properties $Properties
 
 # Check result
 if ($LASTEXITCODE -ne 0) {
@@ -429,42 +459,182 @@ if ($LASTEXITCODE -ne 0) {
     exit $LASTEXITCODE
 }
 
-# Read output file
-if (Test-Path ./build-output.json) {
-    $output = Get-Content ./build-output.json | ConvertFrom-Json
+# Read and display output file
+$outputFile = "./build-output.json"
+if (Test-Path $outputFile) {
+    $output = Get-Content $outputFile | ConvertFrom-Json
 
     Write-Host "`n========== Build Results ==========" -ForegroundColor Cyan
     Write-Host "Version: $($output.Version)"
+    Write-Host "Configuration: $($output.Configuration)"
     Write-Host "Artifact URL: $($output.ArtifactUrl)"
-    Write-Host "Test Status: $(if ($output.TestResults.Passed) { 'PASSED' } else { 'FAILED' })"
-    Write-Host "Artifacts:"
-    foreach ($artifact in $output.ArtifactPaths) {
-        Write-Host "  - $artifact"
-    }
+    Write-Host "Artifact Path: $($output.ArtifactPath)"
+    Write-Host "Tests Passed: $($output.TestsPassed)"
+    Write-Host "Build Time: $($output.BuildTime)"
     Write-Host "===================================`n" -ForegroundColor Cyan
 
-    # Return the output for use by caller
+    # Example: Use the output data for subsequent operations
+    if ($output.TestsPassed -and $output.ArtifactUrl) {
+        Write-Host "✓ Build artifacts ready for deployment" -ForegroundColor Green
+        Write-Host "  Deploy with: ./deploy.ps1 -ArtifactUrl '$($output.ArtifactUrl)'"
+    }
+
+    # Make output available to calling code
     return $output
+} else {
+    Write-Warning "No build output file found at: $outputFile"
 }
 
 exit 0
 ```
 
+```powershell title="deploy.ps1 (example consumer)"
+param(
+    [Parameter(Mandatory)]
+    [string]$ArtifactUrl
+)
+
+# This script can be called after the build completes
+# It reads the artifact URL from the output file or receives it as a parameter
+
+Write-Host "Deploying artifact from: $ArtifactUrl" -ForegroundColor Green
+
+# Read additional metadata from build output if needed
+if (Test-Path ./build-output.json) {
+    $buildInfo = Get-Content ./build-output.json | ConvertFrom-Json
+    Write-Host "Deploying version: $($buildInfo.Version)"
+}
+
+# Deployment logic here...
+```
+
+## Usage in CI/CD Pipelines
+
+### GitHub Actions
+
+```yaml title=".github/workflows/build.yml"
+name: Build and Deploy
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Install psake
+        shell: pwsh
+        run: Install-Module -Name psake -Scope CurrentUser -Force
+
+      - name: Run build
+        shell: pwsh
+        run: |
+          Import-Module psake
+          Invoke-psake -taskList Default
+
+          if ($LASTEXITCODE -ne 0) {
+            throw "Build failed"
+          }
+
+      - name: Read build output
+        id: build-output
+        shell: pwsh
+        run: |
+          $output = Get-Content ./build-output.json | ConvertFrom-Json
+          echo "version=$($output.Version)" >> $env:GITHUB_OUTPUT
+          echo "artifact_url=$($output.ArtifactUrl)" >> $env:GITHUB_OUTPUT
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-artifacts-${{ steps.build-output.outputs.version }}
+          path: ./artifacts/
+
+      - name: Deploy (on main branch)
+        if: github.ref == 'refs/heads/main'
+        shell: pwsh
+        run: |
+          $output = Get-Content ./build-output.json | ConvertFrom-Json
+          ./deploy.ps1 -ArtifactUrl $output.ArtifactUrl
+```
+
+### Azure Pipelines
+
+```yaml title="azure-pipelines.yml"
+trigger:
+  - main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+  - task: UseDotNet@2
+    inputs:
+      version: '8.0.x'
+
+  - pwsh: Install-Module -Name psake -Scope CurrentUser -Force
+    displayName: 'Install psake'
+
+  - pwsh: |
+      Import-Module psake
+      Invoke-psake -taskList Default
+
+      if ($LASTEXITCODE -ne 0) {
+        Write-Error "Build failed"
+        exit 1
+      }
+    displayName: 'Run psake build'
+
+  - pwsh: |
+      $output = Get-Content ./build-output.json | ConvertFrom-Json
+      Write-Host "##vso[task.setvariable variable=BuildVersion]$($output.Version)"
+      Write-Host "##vso[task.setvariable variable=ArtifactUrl]$($output.ArtifactUrl)"
+    displayName: 'Extract build outputs'
+
+  - task: PublishBuildArtifacts@1
+    inputs:
+      pathToPublish: './artifacts'
+      artifactName: 'drop-$(BuildVersion)'
+
+  - pwsh: |
+      Write-Host "Deploying version: $(BuildVersion)"
+      Write-Host "Artifact URL: $(ArtifactUrl)"
+      ./deploy.ps1 -ArtifactUrl "$(ArtifactUrl)"
+    displayName: 'Deploy'
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+```
+
 ## Best Practices Summary
 
-1. **Use script-scoped variables** for simple data that stays within PowerShell
-2. **Write JSON/YAML files** for complex data, CI/CD integration, and persistence
-3. **Use environment variables** for simple string values in CI/CD pipelines
-4. **Use BuildTearDown** for summary reports and metrics
-5. **Always check exit codes** - they remain the primary success indicator
-6. **Avoid Write-Host/Write-Output** for structured data
-7. **Document your output schema** so consumers know what to expect
-8. **Handle failures gracefully** - ensure output files are written even on build failure
+1. **Use JSON/YAML output files** - This is the primary recommended approach for returning data
+2. **Write to files in BuildTearDown** - Ensures outputs are generated even on failure
+3. **Always check exit codes** - They remain the primary success/failure indicator
+4. **Use `$script:` variables for inter-task communication** - But understand they're not accessible outside psake
+5. **Avoid Write-Host/Write-Output** for structured data - Use files instead
+6. **Document your output schema** - So consumers know what to expect
+7. **Handle failures gracefully** - Ensure output files contain meaningful error information
+8. **Upload output files as CI artifacts** - Makes them available across pipeline stages
+
+## Quick Reference
+
+| Need to... | Use... | Example |
+|------------|--------|---------|
+| Return data from psake | JSON output file | `$data \| ConvertTo-Json \| Set-Content output.json` |
+| Share data between tasks | Script-scoped variables | `$script:BuildData = @{}` |
+| Pass simple strings to CI | Environment variables | `$env:BUILD_VERSION = "1.0.0"` |
+| Generate build summary | BuildTearDown + output file | See complete example above |
+| Pass data INTO psake | Properties or parameters | `Invoke-psake -properties @{Version="1.0"}` |
 
 ## See Also
 
 - [Exit Codes](/docs/reference/exit-codes) - Understanding psake's primary output mechanism
-- [Structure of a psake Build Script](/docs/tutorial-advanced/structure-of-a-psake-build-script) - Build script components
-- [Parameters & Properties](/docs/tutorial-basics/parameters-properties) - Passing data into builds
+- [Structure of a psake Build Script](/docs/tutorial-advanced/structure-of-a-psake-build-script) - Build script components including BuildTearDown
+- [Parameters & Properties](/docs/tutorial-basics/parameters-properties) - Passing data INTO builds
 - [Build Script Resilience](/docs/tutorial-advanced/build-script-resilience) - Error handling patterns
 - [GitHub Actions Integration](/docs/ci-examples/github-actions) - CI/CD examples
