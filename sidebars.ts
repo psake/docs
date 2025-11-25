@@ -46,7 +46,9 @@ const sidebars: SidebarsConfig = {
       type: 'category',
       label: 'Build Types',
       items: [
-        'build-types/dot-net-solution'
+        'build-types/dot-net-solution',
+        'build-types/nodejs',
+        'build-types/docker'
       ]
     },
     {
