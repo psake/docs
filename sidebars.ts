@@ -67,6 +67,15 @@ const sidebars: SidebarsConfig = {
       items: commands
     },
     {
+      type: 'category',
+      label: 'Troubleshooting',
+      items: [
+        'troubleshooting/common-errors',
+        'troubleshooting/faq',
+        'troubleshooting/debugging-guide',
+      ]
+    },
+    {
       type: 'doc',
       label: 'Code of Conduct',
       id: 'code_of_conduct'

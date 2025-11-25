@@ -1,0 +1,8 @@
+{
+  "label": "Troubleshooting",
+  "position": 7,
+  "link": {
+    "type": "generated-index",
+    "description": "Find solutions to common psake problems, get answers to frequently asked questions, and learn debugging techniques."
+  }
+}
