@@ -78,6 +78,16 @@ const sidebars: SidebarsConfig = {
       ]
     },
     {
+      type: 'category',
+      label: 'Reference',
+      items: [
+        'reference/glossary',
+        'reference/cheat-sheet',
+        'reference/configuration-reference',
+        'reference/exit-codes',
+      ]
+    },
+    {
       type: 'doc',
       label: 'Code of Conduct',
       id: 'code_of_conduct'

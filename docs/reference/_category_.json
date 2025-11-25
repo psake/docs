@@ -1,0 +1,8 @@
+{
+  "label": "Reference",
+  "position": 7,
+  "link": {
+    "type": "generated-index",
+    "description": "Quick reference materials, glossary, and configuration documentation for psake."
+  }
+}

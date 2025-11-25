@@ -100,3 +100,47 @@ to orchestrate their build process.
 * [J2N](https://github.com/NightOwl888/J2N)
 * [ICU4N](https://github.com/NightOwl888/ICU4N)
 * [RandomizedTesting](https://github.com/NightOwl888/RandomizedTesting)
+
+## Documentation Guide
+
+### Getting Started
+
+New to psake? Start here:
+
+- **[Installing psake](/docs/tutorial-basics/installing)** - Installation methods and prerequisites
+- **[Running psake](/docs/tutorial-basics/run-psake)** - Your first psake build
+- **[Tasks](/docs/tutorial-basics/tasks)** - Understanding tasks and dependencies
+- **[Parameters and Properties](/docs/tutorial-basics/parameters-properties)** - Configuring your builds
+
+### Build Type Examples
+
+Learn how to use psake with different project types:
+
+- **[.NET Solutions](/docs/build-types/dot-net-solution)** - Building .NET projects with MSBuild
+- **[Node.js Projects](/docs/build-types/nodejs)** - npm, TypeScript, and Webpack builds
+- **[Docker Builds](/docs/build-types/docker)** - Building and publishing Docker images
+
+### CI/CD Integration
+
+Integrate psake with your CI/CD pipeline:
+
+- **[GitHub Actions](/docs/ci-examples/github-actions)** - Complete GitHub Actions setup
+- **[Azure Pipelines](/docs/ci-examples/azure-pipelines)** - Azure DevOps integration
+- **[GitLab CI](/docs/ci-examples/gitlab-ci)** - GitLab CI/CD configuration
+
+### Troubleshooting
+
+Having issues? Check these resources:
+
+- **[Common Errors](/docs/troubleshooting/common-errors)** - Solutions to frequent problems
+- **[FAQ](/docs/troubleshooting/faq)** - Frequently asked questions
+- **[Debugging Guide](/docs/troubleshooting/debugging-guide)** - Debugging build scripts
+
+### Reference
+
+Quick reference and comprehensive documentation:
+
+- **[Glossary](/docs/reference/glossary)** - Definitions of psake terms and concepts
+- **[Cheat Sheet](/docs/reference/cheat-sheet)** - Quick reference for common patterns
+- **[Configuration Reference](/docs/reference/configuration-reference)** - All configuration options
+- **[Exit Codes](/docs/reference/exit-codes)** - Understanding exit codes in CI/CD
