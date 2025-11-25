@@ -54,6 +54,8 @@ const sidebars: SidebarsConfig = {
       label: 'CI Examples',
       items: [
         'ci-examples/github-actions',
+        'ci-examples/azure-pipelines',
+        'ci-examples/gitlab-ci',
         'ci-examples/hudson',
         'ci-examples/cruise-control',
         'ci-examples/team-city',
