@@ -53,6 +53,7 @@ const sidebars: SidebarsConfig = {
       type: 'category',
       label: 'CI Examples',
       items: [
+        'ci-examples/github-actions',
         'ci-examples/hudson',
         'ci-examples/cruise-control',
         'ci-examples/team-city',
