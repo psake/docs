@@ -376,8 +376,8 @@ Task BuildSolution {
 Yes! psake works with all major CI/CD platforms:
 
 - **GitHub Actions** - See [GitHub Actions guide](/docs/ci-examples/github-actions)
-- **Azure Pipelines** - See [Azure Pipelines guide](/docs/ci-examples/azure-pipelines)
-- **GitLab CI** - See [GitLab CI guide](/docs/ci-examples/gitlab-ci)
+- **Azure Pipelines** - Uses standard PowerShell tasks
+- **GitLab CI** - Uses PowerShell in Docker containers or Windows runners
 - **Jenkins, TeamCity, etc.** - Just run PowerShell scripts
 
 Basic pattern:
