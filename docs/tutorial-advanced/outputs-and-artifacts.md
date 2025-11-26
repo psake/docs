@@ -81,8 +81,6 @@ if (Test-Path ./build-output.json) {
 exit 0
 ```
 
-**Answer to the original question:** For your use case of returning a hashtable with an `ArtifactUrl` field, write it to a JSON file as shown above. This is the standard, reliable approach.
-
 #### YAML Output File
 
 ```powershell title="psakefile.ps1"
@@ -211,73 +209,6 @@ Task Package -Depends Build {
 **Important:** These variables are **only** accessible within the same `Invoke-psake` call. They **cannot** be accessed by the calling script.
 
 **When to use:** For passing data between tasks within the same build execution.
-
-### 4. BuildTearDown for Centralized Reporting
-
-Use `BuildTearDown` to generate summary reports or outputs that run after all tasks complete (even on failure).
-
-```powershell title="psakefile.ps1"
-# Track build metadata
-$script:BuildMetrics = @{
-    TasksExecuted = @()
-    StartTime = $null
-    EndTime = $null
-    ArtifactUrl = $null
-}
-
-BuildSetup {
-    $script:BuildMetrics.StartTime = Get-Date
-}
-
-TaskSetup {
-    $taskName = $psake.context.Peek().currentTaskName
-    $script:BuildMetrics.TasksExecuted += $taskName
-}
-
-BuildTearDown {
-    $script:BuildMetrics.EndTime = Get-Date
-    $duration = $script:BuildMetrics.EndTime - $script:BuildMetrics.StartTime
-
-    # Create summary report (IMPORTANT: Write to file, not just variables)
-    $summary = @{
-        Success = $psake.build_success
-        Duration = $duration.TotalSeconds
-        TasksExecuted = $script:BuildMetrics.TasksExecuted
-        ArtifactUrl = $script:BuildMetrics.ArtifactUrl
-        Timestamp = (Get-Date).ToString("o")
-    }
-
-    # Write to file so it's accessible after Invoke-psake completes
-    $summary | ConvertTo-Json | Set-Content ./build-summary.json
-
-    Write-Host "`n========== Build Summary ==========" -ForegroundColor Cyan
-    Write-Host "Status: $(if ($psake.build_success) { 'SUCCESS' } else { 'FAILED' })"
-    Write-Host "Duration: $($duration.TotalSeconds) seconds"
-    Write-Host "Tasks: $($script:BuildMetrics.TasksExecuted -join ', ')"
-    if ($script:BuildMetrics.ArtifactUrl) {
-        Write-Host "Artifact: $($script:BuildMetrics.ArtifactUrl)"
-    }
-    Write-Host "===================================" -ForegroundColor Cyan
-}
-
-Task Build {
-    exec { dotnet build }
-
-    # Store artifact URL for BuildTearDown to include in summary
-    $script:BuildMetrics.ArtifactUrl = "https://cdn.example.com/builds/1.0.0/app.zip"
-}
-```
-
-**Pros:**
-- Centralized output logic
-- Executes regardless of success/failure
-- Good for metrics and reporting
-
-**Cons:**
-- Only runs after all tasks complete
-- **Must write to files** to be accessible after Invoke-psake
-
-**When to use:** For generating build summaries, metrics, or cleanup operations that should always run.
 
 ## Anti-Patterns to Avoid
 
@@ -613,13 +544,12 @@ steps:
 ## Best Practices Summary
 
 1. **Use JSON/YAML output files** - This is the primary recommended approach for returning data
-2. **Write to files in BuildTearDown** - Ensures outputs are generated even on failure
-3. **Always check exit codes** - They remain the primary success/failure indicator
-4. **Use `$script:` variables for inter-task communication** - But understand they're not accessible outside psake
-5. **Avoid Write-Host/Write-Output** for structured data - Use files instead
-6. **Document your output schema** - So consumers know what to expect
-7. **Handle failures gracefully** - Ensure output files contain meaningful error information
-8. **Upload output files as CI artifacts** - Makes them available across pipeline stages
+2. **Always check exit codes** - They remain the primary success/failure indicator
+3. **Use `$script:` variables for inter-task communication** - But understand they're not accessible outside psake
+4. **Avoid Write-Host/Write-Output** for structured data - Use files instead
+5. **Document your output schema** - So consumers know what to expect
+6. **Handle failures gracefully** - Ensure output files contain meaningful error information
+7. **Upload output files as CI artifacts** - Makes them available across pipeline stages
 
 ## Quick Reference
 
@@ -628,13 +558,12 @@ steps:
 | Return data from psake | JSON output file | `$data \| ConvertTo-Json \| Set-Content output.json` |
 | Share data between tasks | Script-scoped variables | `$script:BuildData = @{}` |
 | Pass simple strings to CI | Environment variables | `$env:BUILD_VERSION = "1.0.0"` |
-| Generate build summary | BuildTearDown + output file | See complete example above |
 | Pass data INTO psake | Properties or parameters | `Invoke-psake -properties @{Version="1.0"}` |
 
 ## See Also
 
 - [Exit Codes](/docs/reference/exit-codes) - Understanding psake's primary output mechanism
-- [Structure of a psake Build Script](/docs/tutorial-advanced/structure-of-a-psake-build-script) - Build script components including BuildTearDown
+- [Structure of a psake Build Script](/docs/tutorial-advanced/structure-of-a-psake-build-script) - Build script components
 - [Parameters & Properties](/docs/tutorial-basics/parameters-properties) - Passing data INTO builds
 - [Build Script Resilience](/docs/tutorial-advanced/build-script-resilience) - Error handling patterns
 - [GitHub Actions Integration](/docs/ci-examples/github-actions) - CI/CD examples
