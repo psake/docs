@@ -396,7 +396,7 @@ Task Deploy -precondition { $Environment -eq 'Production' } {
 
 - name: Create GitHub Release
   if: startsWith(github.ref, 'refs/tags/')
-  uses: softprops/action-gh-release@v1
+  uses: softprops/action-gh-release@v2
   with:
     files: |
       ./build/*.zip
