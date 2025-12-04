@@ -35,6 +35,15 @@ jobs:
           Invoke-psake -buildFile .\psakefile.ps1 -taskList Build
 ```
 
+## PowerShell on GitHub-Hosted Runners
+
+GitHub-hosted runners come with PowerShell pre-installed on all platforms:
+
+- **PowerShell 7.4+ (`pwsh`)**: Available on Windows, Linux, and macOS runners
+- **Windows PowerShell 5.1 (`powershell`)**: Only available on Windows runners
+
+**Important:** Always use `shell: pwsh` in your workflows for cross-platform compatibility. Only use `shell: powershell` if you specifically need Windows PowerShell 5.1 features.
+
 ## Installing psake in GitHub Actions
 
 There are several approaches to installing psake in your workflow:
@@ -202,22 +211,12 @@ jobs:
       fail-fast: false
       matrix:
         os: [windows-latest, ubuntu-latest, macos-latest]
-        powershell-version: ['7.2', '7.4']
-        include:
-          - os: windows-latest
-            powershell-version: '5.1'
 
     runs-on: ${{ matrix.os }}
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Setup PowerShell ${{ matrix.powershell-version }}
-        if: matrix.powershell-version != '5.1'
-        uses: PowerShell/setup-powershell@v1
-        with:
-          powershell-version: ${{ matrix.powershell-version }}
 
       - name: Install psake
         shell: pwsh
@@ -238,8 +237,32 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: build-${{ matrix.os }}-ps${{ matrix.powershell-version }}
+          name: build-${{ matrix.os }}
           path: ./build/
+```
+
+**Testing with Windows PowerShell 5.1:**
+
+If you need to test specifically with Windows PowerShell 5.1, add a separate job:
+
+```yaml
+jobs:
+  build-cross-platform:
+    # ... pwsh matrix build from above ...
+
+  build-windows-powershell:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install psake
+        shell: powershell  # Windows PowerShell 5.1
+        run: Install-Module -Name psake -Scope CurrentUser -Force
+
+      - name: Run psake build
+        shell: powershell
+        run: Invoke-psake -buildFile .\psakefile.ps1 -taskList Build, Test
 ```
 
 ## Secret Management
@@ -470,12 +493,14 @@ Task Publish -depends Pack {
 
 **Problem:** Scripts fail due to execution policy on Windows runners
 
-**Solution:** Use `pwsh` shell (PowerShell Core) instead of `powershell` (Windows PowerShell):
+**Solution:** Use `shell: pwsh` (PowerShell 7) instead of `shell: powershell` (Windows PowerShell 5.1):
 ```yaml
 - name: Run psake
-  shell: pwsh  # Not 'powershell'
+  shell: pwsh  # PowerShell 7 - available on all platforms
   run: Invoke-psake
 ```
+
+**Note:** The `pwsh` shell is available on Windows, Linux, and macOS runners. The `powershell` shell is only available on Windows and may have stricter execution policies.
 
 ### Build Failures Not Failing the Workflow
 
@@ -527,14 +552,15 @@ Properties {
 
 **Problem:** Cache doesn't restore modules correctly
 
-**Solution:** Use platform-specific cache paths:
+**Solution:** List both Windows and Unix paths—GitHub Actions will cache what exists:
 
 ```yaml
 - name: Cache PowerShell modules
   uses: actions/cache@v4
   with:
     path: |
-      ${{ runner.os == 'Windows' && '~\Documents\PowerShell\Modules' || '~/.local/share/powershell/Modules' }}
+      ~/.local/share/powershell/Modules
+      ~/Documents/PowerShell/Modules
     key: ${{ runner.os }}-psake-${{ hashFiles('**/requirements.psd1') }}
 ```
 
