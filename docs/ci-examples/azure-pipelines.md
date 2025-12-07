@@ -80,10 +80,10 @@ Speed up builds by caching the PowerShell modules directory:
 ```yaml
 - task: Cache@2
   inputs:
-    key: 'psake | "$(Agent.OS)" | requirements.psd1'
+    key: 'psmodules | "$(Agent.OS)" | requirements.psd1'
     restoreKeys: |
-      psake | "$(Agent.OS)"
-      psake
+      psmodules | "$(Agent.OS)"
+      psmodules
     path: $(Pipeline.Workspace)/.psmodules
   displayName: 'Cache PowerShell modules'
 
@@ -182,7 +182,7 @@ stages:
           - task: PublishCodeCoverageResults@2
             condition: succeededOrFailed()
             inputs:
-              codeCoverageTool: 'JaCoCo'
+              codeCoverageTool: 'Cobertura'
               summaryFileLocation: '$(System.DefaultWorkingDirectory)/**/coverage.xml'
             displayName: 'Publish code coverage'
 
@@ -273,40 +273,54 @@ strategy:
   matrix:
     Windows_PS7:
       imageName: 'windows-latest'
-      pwshVersion: '7.4'
+      psTask: 'pwsh'
     Linux_PS7:
       imageName: 'ubuntu-latest'
-      pwshVersion: '7.4'
+      psTask: 'pwsh'
     macOS_PS7:
       imageName: 'macOS-latest'
-      pwshVersion: '7.4'
+      psTask: 'pwsh'
     Windows_PS51:
       imageName: 'windows-2019'
-      pwshVersion: '5.1'
+      psTask: 'powershell'
 
 pool:
   vmImage: $(imageName)
 
 steps:
-  - pwsh: |
-      Write-Host "OS: $(imageName)"
-      Write-Host "PowerShell Version: $($PSVersionTable.PSVersion)"
+  - task: PowerShell@2
+    inputs:
+      targetType: 'inline'
+      pwsh: ${{ eq(variables.psTask, 'pwsh') }}
+      script: |
+        Write-Host "OS: $env:AGENT_OS"
+        Write-Host "PowerShell Version: $($PSVersionTable.PSVersion)"
     displayName: 'Display environment info'
 
-  - pwsh: |
-      Install-Module -Name psake -Scope CurrentUser -Force
+  - task: PowerShell@2
+    inputs:
+      targetType: 'inline'
+      pwsh: ${{ eq(variables.psTask, 'pwsh') }}
+      script: |
+        Install-Module -Name psake -Scope CurrentUser -Force
     displayName: 'Install psake'
 
-  - pwsh: |
-      Invoke-psake -buildFile .\psakefile.ps1 -taskList Build, Test
+  - task: PowerShell@2
+    inputs:
+      targetType: 'inline'
+      pwsh: ${{ eq(variables.psTask, 'pwsh') }}
+      script: |
+        Invoke-psake -buildFile .\psakefile.ps1 -taskList Build, Test
     displayName: 'Run psake build'
 
-  - task: PublishBuildArtifacts@1
-    inputs:
-      pathToPublish: '$(System.DefaultWorkingDirectory)/build'
-      artifactName: 'build-$(imageName)-ps$(pwshVersion)'
+  - publish: '$(System.DefaultWorkingDirectory)/build'
+    artifact: 'build-$(imageName)'
     displayName: 'Upload artifacts'
 ```
+
+**Note:** The `pwsh` parameter in PowerShell@2 task controls which PowerShell version runs:
+- `pwsh: true` = PowerShell 7+ (cross-platform)
+- `pwsh: false` = Windows PowerShell 5.1 (Windows only)
 
 ## Variable Groups and Secrets
 
@@ -490,7 +504,7 @@ Task Test -depends Build {
             --results-directory "$BuildDir/TestResults" `
             /p:CollectCoverage=true `
             /p:CoverletOutputFormat=cobertura `
-            /p:CoverletOutput="$BuildDir/coverage.xml"
+            /p:CoverletOutput="$BuildDir/"
     }
 }
 
