@@ -1,0 +1,199 @@
+.quickStartSection {
+  padding: 4rem 0;
+  background: linear-gradient(180deg, var(--ifm-background-color) 0%, var(--ifm-background-surface-color) 100%);
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.header h2 {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+.subtitle {
+  font-size: 1.25rem;
+  color: var(--ifm-color-emphasis-700);
+}
+
+.stepsContainer {
+  max-width: 900px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.step {
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 2rem;
+  position: relative;
+  animation: fadeInUp 0.6s ease-out backwards;
+}
+
+.step:nth-child(1) {
+  animation-delay: 0.1s;
+}
+
+.step:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.step:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+.stepNumber {
+  flex-shrink: 0;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--ifm-color-primary), var(--ifm-color-primary-dark));
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.75rem;
+  font-weight: bold;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.stepContent {
+  flex: 1;
+  background: var(--ifm-background-color);
+  padding: 1.5rem;
+  border-radius: 12px;
+  border: 1px solid var(--ifm-color-emphasis-200);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.stepContent:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+[data-theme='dark'] .stepContent {
+  background: #1e1e1e;
+  border-color: var(--ifm-color-emphasis-300);
+}
+
+.stepTitle {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+  color: var(--ifm-color-primary);
+}
+
+.stepDescription {
+  color: var(--ifm-color-emphasis-700);
+  margin-bottom: 1rem;
+}
+
+.codeContainer {
+  position: relative;
+}
+
+.copyButton {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  background: var(--ifm-color-primary);
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 500;
+  z-index: 1;
+  transition: background 0.2s ease;
+}
+
+.copyButton:hover {
+  background: var(--ifm-color-primary-dark);
+}
+
+.stepConnector {
+  position: absolute;
+  left: 30px;
+  top: 60px;
+  height: calc(100% - 40px);
+  display: flex;
+  align-items: center;
+}
+
+.ctaContainer {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 3rem;
+  flex-wrap: wrap;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .step {
+    gap: 1rem;
+  }
+
+  .stepNumber {
+    width: 50px;
+    height: 50px;
+    font-size: 1.5rem;
+  }
+
+  .stepContent {
+    padding: 1rem;
+  }
+
+  .stepTitle {
+    font-size: 1.25rem;
+  }
+
+  .header h2 {
+    font-size: 2rem;
+  }
+
+  .subtitle {
+    font-size: 1rem;
+  }
+
+  .stepConnector {
+    left: 25px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .step {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .stepNumber {
+    align-self: flex-start;
+  }
+
+  .stepConnector {
+    display: none;
+  }
+
+  .ctaContainer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .ctaContainer a {
+    width: 100%;
+  }
+}

@@ -28,3 +28,75 @@
   --ifm-color-primary-lighter: #a7c76c;
   --ifm-color-primary-lightest: #b9d289;
 }
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Enhanced button styles */
+.button {
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.button--primary {
+  background: linear-gradient(135deg, var(--ifm-color-primary), var(--ifm-color-primary-dark));
+  border: none;
+}
+
+.button--primary:hover {
+  background: linear-gradient(135deg, var(--ifm-color-primary-dark), var(--ifm-color-primary-darkest));
+}
+
+/* Code block enhancements */
+.prism-code {
+  font-size: 0.875rem;
+  border-radius: 8px;
+}
+
+/* Link hover effects */
+a {
+  transition: color 0.2s ease;
+}
+
+/* Section spacing */
+section {
+  scroll-margin-top: 80px;
+}
+
+/* Improved scrollbar for code blocks */
+.prism-code::-webkit-scrollbar {
+  height: 8px;
+  width: 8px;
+}
+
+.prism-code::-webkit-scrollbar-track {
+  background: var(--ifm-color-emphasis-200);
+  border-radius: 4px;
+}
+
+.prism-code::-webkit-scrollbar-thumb {
+  background: var(--ifm-color-emphasis-400);
+  border-radius: 4px;
+}
+
+.prism-code::-webkit-scrollbar-thumb:hover {
+  background: var(--ifm-color-emphasis-600);
+}
+
+/* Accessibility improvements */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

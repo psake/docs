@@ -4,20 +4,179 @@
  */
 
 .heroBanner {
-  padding: 4rem 0;
-  text-align: center;
+  padding: 6rem 0;
   position: relative;
   overflow: hidden;
+  background: linear-gradient(135deg,
+    var(--ifm-color-primary-lightest) 0%,
+    var(--ifm-background-color) 50%,
+    var(--ifm-color-primary-lightest) 100%
+  );
+  background-size: 200% 200%;
+  animation: gradientShift 15s ease infinite;
+}
+
+[data-theme='dark'] .heroBanner {
+  background: linear-gradient(135deg,
+    rgba(150, 188, 79, 0.1) 0%,
+    var(--ifm-background-color) 50%,
+    rgba(150, 188, 79, 0.1) 100%
+  );
+  background-size: 200% 200%;
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.heroContent {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  align-items: center;
+  min-height: 500px;
+}
+
+.heroText {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.heroTitle {
+  font-size: 4rem;
+  font-weight: 800;
+  line-height: 1.1;
+  margin: 0;
+  background: linear-gradient(135deg, var(--ifm-color-primary), var(--ifm-color-primary-dark));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: fadeInDown 0.6s ease-out;
+}
+
+[data-theme='dark'] .heroTitle {
+  background: linear-gradient(135deg, var(--ifm-color-primary-light), var(--ifm-color-primary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.heroSubtitle {
+  font-size: 1.5rem;
+  color: var(--ifm-color-emphasis-800);
+  margin: 0;
+  animation: fadeInDown 0.6s ease-out 0.1s backwards;
+}
+
+[data-theme='dark'] .heroSubtitle {
+  color: var(--ifm-color-emphasis-600);
+}
+
+.buttonGroup {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  animation: fadeInDown 0.6s ease-out 0.2s backwards;
+}
+
+.githubIcon {
+  margin-right: 0.5rem;
+}
+
+.badges {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  animation: fadeInDown 0.6s ease-out 0.3s backwards;
+}
+
+.badges img {
+  height: 20px;
+}
+
+.heroCode {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @media screen and (max-width: 996px) {
   .heroBanner {
-    padding: 2rem;
+    padding: 3rem 2rem;
+  }
+
+  .heroContent {
+    grid-template-columns: 1fr;
+    gap: 3rem;
+    min-height: auto;
+  }
+
+  .heroText {
+    text-align: center;
+    align-items: center;
+  }
+
+  .heroTitle {
+    font-size: 3rem;
+  }
+
+  .heroSubtitle {
+    font-size: 1.25rem;
+  }
+
+  .buttonGroup {
+    justify-content: center;
+  }
+
+  .badges {
+    justify-content: center;
   }
 }
 
-.buttons {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+@media screen and (max-width: 768px) {
+  .heroBanner {
+    padding: 2rem 1rem;
+  }
+
+  .heroTitle {
+    font-size: 2.5rem;
+  }
+
+  .heroSubtitle {
+    font-size: 1.125rem;
+  }
+
+  .buttonGroup {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .buttonGroup a {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .heroTitle {
+    font-size: 2rem;
+  }
+
+  .heroSubtitle {
+    font-size: 1rem;
+  }
 }
