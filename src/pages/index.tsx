@@ -19,9 +19,12 @@ function HomepageHeader() {
       <div className="container">
         <div className={styles.heroContent}>
           <div className={styles.heroText}>
-            <Heading as="h1" className={styles.heroTitle}>
-              {siteConfig.title}
-            </Heading>
+            <div className={styles.heroTitleContainer}>
+              <img src="/img/logo.svg" alt="psake logo" className={styles.heroLogo} />
+              <Heading as="h1" className={styles.heroTitle}>
+                {siteConfig.title}
+              </Heading>
+            </div>
             <p className={styles.heroSubtitle}>{siteConfig.tagline}</p>
 
             <div className={styles.buttonGroup}>
