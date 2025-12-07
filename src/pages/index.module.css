@@ -43,6 +43,20 @@
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+  justify-content: center;
+}
+
+.heroTitleContainer {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  animation: fadeInDown 0.6s ease-out;
+}
+
+.heroLogo {
+  width: 80px;
+  height: 80px;
+  flex-shrink: 0;
 }
 
 .heroTitle {
@@ -50,29 +64,16 @@
   font-weight: 800;
   line-height: 1.1;
   margin: 0;
-  background: linear-gradient(135deg, var(--ifm-color-primary), var(--ifm-color-primary-dark));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  animation: fadeInDown 0.6s ease-out;
-}
-
-[data-theme='dark'] .heroTitle {
-  background: linear-gradient(135deg, var(--ifm-color-primary-light), var(--ifm-color-primary));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: white;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .heroSubtitle {
   font-size: 1.5rem;
-  color: var(--ifm-color-emphasis-800);
+  color: white;
   margin: 0;
   animation: fadeInDown 0.6s ease-out 0.1s backwards;
-}
-
-[data-theme='dark'] .heroSubtitle {
-  color: var(--ifm-color-emphasis-600);
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
 }
 
 .buttonGroup {
@@ -130,6 +131,16 @@
     align-items: center;
   }
 
+  .heroTitleContainer {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .heroLogo {
+    width: 60px;
+    height: 60px;
+  }
+
   .heroTitle {
     font-size: 3rem;
   }
@@ -152,6 +163,11 @@
     padding: 2rem 1rem;
   }
 
+  .heroLogo {
+    width: 50px;
+    height: 50px;
+  }
+
   .heroTitle {
     font-size: 2.5rem;
   }
@@ -172,6 +188,11 @@
 }
 
 @media screen and (max-width: 480px) {
+  .heroLogo {
+    width: 40px;
+    height: 40px;
+  }
+
   .heroTitle {
     font-size: 2rem;
   }
