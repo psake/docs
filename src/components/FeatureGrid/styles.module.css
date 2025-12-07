@@ -1,5 +1,5 @@
 .featureSection {
-  padding: 4rem 0;
+  padding: 4rem 1rem;
   background: var(--ifm-background-color);
 }
 
@@ -111,6 +111,10 @@
 }
 
 @media screen and (max-width: 768px) {
+  .featureSection {
+    padding: 3rem 1rem;
+  }
+
   .grid {
     grid-template-columns: 1fr;
     gap: 1.5rem;
@@ -122,6 +126,7 @@
 
   .subtitle {
     font-size: 1rem;
+    padding: 0 1rem;
   }
 
   .featureCard {
@@ -134,5 +139,51 @@
 
   .featureTitle {
     font-size: 1.25rem;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .featureSection {
+    padding: 2rem 0.75rem;
+  }
+
+  .header {
+    margin-bottom: 2rem;
+  }
+
+  .header h2 {
+    font-size: 1.75rem;
+  }
+
+  .subtitle {
+    font-size: 0.95rem;
+  }
+
+  .grid {
+    gap: 1rem;
+  }
+
+  .featureCard {
+    padding: 1.25rem;
+  }
+
+  .featureIcon {
+    font-size: 2.25rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .featureTitle {
+    font-size: 1.125rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .featureDescription {
+    font-size: 0.9rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .featureCode pre {
+    font-size: 0.7rem !important;
+    padding: 0.625rem !important;
   }
 }
