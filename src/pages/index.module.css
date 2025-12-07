@@ -12,8 +12,6 @@
     var(--ifm-background-color) 50%,
     var(--ifm-color-primary-lightest) 100%
   );
-  background-size: 200% 200%;
-  animation: gradientShift 15s ease infinite;
 }
 
 [data-theme='dark'] .heroBanner {
@@ -22,13 +20,6 @@
     var(--ifm-background-color) 50%,
     rgba(150, 188, 79, 0.1) 100%
   );
-  background-size: 200% 200%;
-}
-
-@keyframes gradientShift {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
 }
 
 .heroContent {
