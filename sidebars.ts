@@ -1,5 +1,6 @@
 import type { SidebarsConfig } from '@docusaurus/plugin-content-docs';
 import commands from "./docs/commands/docusaurus.sidebar.js";
+
 /**
  * Creating a sidebar enables you to:
  - create an ordered group of docs
@@ -11,26 +12,31 @@ import commands from "./docs/commands/docusaurus.sidebar.js";
  Create as many sidebars as you want.
  */
 const sidebars: SidebarsConfig = {
-  // By default, Docusaurus generates a sidebar from the docs folder structure
-  tutorialSidebar: [
+  // Getting Started - For newcomers and quick onboarding
+  gettingStartedSidebar: [
     'intro',
+    'tutorial-basics/installing',
+    'tutorial-basics/getting-help',
+    'tutorial-basics/run-psake',
+    'tutorial-basics/tasks',
+    'tutorial-basics/parameters-properties',
+  ],
+
+  // Guides - How-to guides, examples, and best practices
+  guidesSidebar: [
     {
       type: 'category',
-      label: 'Tutorial - Basics',
+      label: 'Core Concepts',
       items: [
-        'tutorial-basics/installing',
-        'tutorial-basics/getting-help',
-        'tutorial-basics/run-psake',
-        'tutorial-basics/tasks',
-        'tutorial-basics/parameters-properties',
         'tutorial-basics/default-build-files',
         'tutorial-basics/how-to-fail-a-build',
         'tutorial-basics/nested-build',
+        'tutorial-advanced/structure-of-a-psake-build-script',
       ],
     },
     {
       type: 'category',
-      label: 'Tutorial - Advanced',
+      label: 'Advanced Techniques',
       items: [
         'tutorial-advanced/access-functions-in-another-file',
         'tutorial-advanced/build-script-resilience',
@@ -39,13 +45,12 @@ const sidebars: SidebarsConfig = {
         'tutorial-advanced/outputs-and-artifacts',
         'tutorial-advanced/print-psake-task-name',
         'tutorial-advanced/retry-rules',
-        'tutorial-advanced/structure-of-a-psake-build-script',
         'tutorial-advanced/variable-referencing',
       ],
     },
     {
       type: 'category',
-      label: 'Build Types',
+      label: 'Build Type Examples',
       items: [
         'build-types/dot-net-solution',
         'build-types/nodejs',
@@ -54,7 +59,7 @@ const sidebars: SidebarsConfig = {
     },
     {
       type: 'category',
-      label: 'CI Examples',
+      label: 'CI/CD Integration',
       items: [
         'ci-examples/github-actions',
         'ci-examples/azure-pipelines',
@@ -64,10 +69,24 @@ const sidebars: SidebarsConfig = {
         'ci-examples/team-city',
       ]
     },
+  ],
+
+  // Reference - Command reference, troubleshooting, and lookup materials
+  referenceSidebar: [
     {
       type: 'category',
       label: 'Command Reference',
       items: commands
+    },
+    {
+      type: 'category',
+      label: 'Reference Materials',
+      items: [
+        'reference/configuration-reference',
+        'reference/cheat-sheet',
+        'reference/glossary',
+        'reference/exit-codes',
+      ]
     },
     {
       type: 'category',
@@ -79,34 +98,11 @@ const sidebars: SidebarsConfig = {
       ]
     },
     {
-      type: 'category',
-      label: 'Reference',
-      items: [
-        'reference/glossary',
-        'reference/cheat-sheet',
-        'reference/configuration-reference',
-        'reference/exit-codes',
-      ]
-    },
-    {
       type: 'doc',
       label: 'Code of Conduct',
       id: 'code_of_conduct'
     },
   ],
-
-  // But you can create a sidebar manually
-  /*
-  tutorialSidebar: [
-    'intro',
-    'hello',
-    {
-      type: 'category',
-      label: 'Tutorial',
-      items: ['tutorial-basics/create-a-document'],
-    },
-  ],
-   */
 };
 
 export default sidebars;
