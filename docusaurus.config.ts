@@ -82,9 +82,21 @@ const config: Config = {
       items: [
         {
           type: 'docSidebar',
-          sidebarId: 'tutorialSidebar',
+          sidebarId: 'gettingStartedSidebar',
           position: 'left',
-          label: 'Tutorial',
+          label: 'Get Started',
+        },
+        {
+          type: 'docSidebar',
+          sidebarId: 'guidesSidebar',
+          position: 'left',
+          label: 'Guides',
+        },
+        {
+          type: 'docSidebar',
+          sidebarId: 'referenceSidebar',
+          position: 'left',
+          label: 'Reference',
         },
         { to: '/blog', label: 'Blog', position: 'left' },
         {
@@ -101,16 +113,16 @@ const config: Config = {
           title: 'Docs',
           items: [
             {
-              label: 'Quick Start',
+              label: 'Get Started',
               to: '/docs/intro',
             },
             {
-              label: 'Tutorial - Basics',
-              to: '/docs/tutorial-basics/installing',
+              label: 'Guides',
+              to: '/docs/tutorial-basics/default-build-files',
             },
             {
               label: 'Command Reference',
-              to: '/docs/commands/Assert',
+              to: '/docs/commands/Invoke-psake',
             },
             {
               label: 'Code of Conduct',
