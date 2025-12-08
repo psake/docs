@@ -63,3 +63,22 @@
     font-size: 0.65rem;
   }
 }
+
+@media screen and (max-width: 360px) {
+  .statsContainer {
+    gap: 0.5rem;
+    margin: 0.75rem 0;
+  }
+
+  .statItem {
+    gap: 0.1rem;
+  }
+
+  .statValue {
+    font-size: 1.125rem;
+  }
+
+  .statLabel {
+    font-size: 0.6rem;
+  }
+}
