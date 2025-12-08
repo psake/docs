@@ -187,3 +187,52 @@
     padding: 0.625rem !important;
   }
 }
+
+@media screen and (max-width: 360px) {
+  .featureSection {
+    padding: 1.5rem 0.5rem;
+  }
+
+  .header {
+    margin-bottom: 1.5rem;
+  }
+
+  .header h2 {
+    font-size: 1.5rem;
+  }
+
+  .subtitle {
+    font-size: 0.875rem;
+    padding: 0 0.5rem;
+  }
+
+  .grid {
+    gap: 0.875rem;
+  }
+
+  .featureCard {
+    padding: 1rem;
+  }
+
+  .featureIcon {
+    font-size: 2rem;
+    margin-bottom: 0.625rem;
+  }
+
+  .featureTitle {
+    font-size: 1rem;
+    margin-bottom: 0.375rem;
+  }
+
+  .featureDescription {
+    font-size: 0.85rem;
+    margin-bottom: 0.625rem;
+    line-height: 1.4;
+  }
+
+  .featureCode pre {
+    font-size: 0.65rem !important;
+    padding: 0.5rem !important;
+    overflow-x: auto !important;
+  }
+}
