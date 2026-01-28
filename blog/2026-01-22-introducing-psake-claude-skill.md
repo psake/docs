@@ -1,7 +1,7 @@
 ---
 title: Introducing the psake Agent Skill
 description: Enhance your AI-assisted development with the new psake Agent Skill—bringing intelligent build automation guidance to Claude, GitHub Copilot, and other AI coding assistants.
-date: 2026-01-22T18:00:00.000Z
+date: 2026-01-27T18:00:00.000Z
 slug: introducing-psake-agent-skill
 authors:
   - heyitsgilbert
