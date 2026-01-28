@@ -183,6 +183,11 @@ const config: Config = {
       darkTheme: prismThemes.dracula,
       additionalLanguages: ['powershell'],
     },
+    algolia: {
+      appId: '43T9593UR6',
+      apiKey: 'c1401fd240037484ee4c73678f311a02',
+      indexName: 'psake',
+    },
   } satisfies Preset.ThemeConfig,
 
   plugins: [
