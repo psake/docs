@@ -86,6 +86,7 @@ const sidebars: SidebarsConfig = {
         'reference/cheat-sheet',
         'reference/glossary',
         'reference/exit-codes',
+        'reference/llm-tools',
       ]
     },
     {
