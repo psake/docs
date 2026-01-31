@@ -1,6 +1,6 @@
 # Custom Logging
 
-psake routes all internal messages through configurable output handlers. You can override these handlers in your `psake-config.ps1` file to integrate with your own logging system.
+psake routes all internal messages through configurable output handlers. You can override these handlers in your [`psake-config.ps1`](../tutorial-basics/psake-config.md) file to integrate with your own logging system.
 
 ## Default Handlers
 

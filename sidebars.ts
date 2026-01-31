@@ -20,6 +20,7 @@ const sidebars: SidebarsConfig = {
     'tutorial-basics/run-psake',
     'tutorial-basics/tasks',
     'tutorial-basics/parameters-properties',
+    'tutorial-basics/psake-config',
   ],
 
   // Guides - How-to guides, examples, and best practices
