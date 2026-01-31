@@ -2,6 +2,10 @@
 
 psake loads a `psake-config.ps1` file at the start of every build to set default values for your build environment. You can use this file to change psake's default build file name, framework version, task name format, output handlers, and more.
 
+:::note
+Most projects do not need a `psake-config.ps1` file. psake's built-in defaults work well for the majority of use cases. Only create one if you need to change a specific default.
+:::
+
 ## How psake Finds the Config File
 
 psake searches for `psake-config.ps1` in two locations, in order:
@@ -12,6 +16,10 @@ psake searches for `psake-config.ps1` in two locations, in order:
 The first file found wins. If neither location contains a config file, psake uses its built-in defaults.
 
 This means you can place a `psake-config.ps1` next to your `psakefile.ps1` to customize settings per-project, or place one alongside the psake module for machine-wide defaults.
+
+## Partial Overrides
+
+Your config file does not need to set every property. psake initializes all properties to their defaults before loading your config file, so any property you omit keeps its default value. You only need to set the properties you want to change.
 
 ## Configuration Properties
 
@@ -72,10 +80,10 @@ $config.modules = @(".\modules\*.psm1", ".\my_module.psm1")
 
 ## Output Handlers
 
-psake routes all internal messages through configurable output handlers. For a full guide on customizing logging, see [Custom Logging](../tutorial-advanced/custom-logging.md).
+psake routes all internal messages through configurable output handlers. For a full guide on customizing logging, see [Custom Logging](./custom-logging.md).
 
 ## See Also
 
-- [Custom Logging](../tutorial-advanced/custom-logging.md) — Override psake's output handlers
-- [Configuration Reference](../reference/configuration-reference.md) — Full reference for `Invoke-psake` parameters and build script settings
-- [Structure of a psake Build Script](../tutorial-advanced/structure-of-a-psake-build-script.md) — How build scripts are organized
+- [Custom Logging](./custom-logging.md) — Override psake's output handlers
+- [Configuration Reference](../reference/configuration-reference) — Full reference for `Invoke-psake` parameters and build script settings
+- [Structure of a psake Build Script](./structure-of-a-psake-build-script.md) — How build scripts are organized

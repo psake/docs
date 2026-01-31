@@ -20,7 +20,6 @@ const sidebars: SidebarsConfig = {
     'tutorial-basics/run-psake',
     'tutorial-basics/tasks',
     'tutorial-basics/parameters-properties',
-    'tutorial-basics/psake-config',
   ],
 
   // Guides - How-to guides, examples, and best practices
@@ -43,6 +42,7 @@ const sidebars: SidebarsConfig = {
         'tutorial-advanced/build-script-resilience',
         'tutorial-advanced/debug-script',
         'tutorial-advanced/custom-logging',
+        'tutorial-advanced/psake-config',
         'tutorial-advanced/logging-errors',
         'tutorial-advanced/outputs-and-artifacts',
         'tutorial-advanced/print-psake-task-name',
