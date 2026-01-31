@@ -1,12 +1,10 @@
 # Logging Errors
 
-The latest version of **psake** no longer provides a way to log errors to a
-file. Most builds are executed by a continuous integration server which already
-logs all console output so it's redundant to provide that same functionality in
-psake. If an error does occur detailed error information is emitted to the
-console so that it will get saved by whatever CI server is running psake.
+By default, psake does not log errors to a file. When an error occurs, detailed error information is emitted to the console. Most CI servers capture all console output, so this is usually sufficient.
 
-Here is an example of an error from a psake build script:
+If you need to route errors to a file or custom logger, you can override psake's error output handler. See [Custom Logging](./custom-logging.md) for details.
+
+Here is an example of the default error output from a psake build script:
 
 ```powershell
 ----------------------------------------------------------------------
