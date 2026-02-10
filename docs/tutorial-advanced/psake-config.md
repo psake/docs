@@ -1,3 +1,7 @@
+---
+description: "How to customize psake defaults with psake-config.ps1"
+---
+
 # psake Configuration File
 
 psake loads a `psake-config.ps1` file at the start of every build to set default values for your build environment. You can use this file to change psake's default build file name, framework version, task name format, output handlers, and more.

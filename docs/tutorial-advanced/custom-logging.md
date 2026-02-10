@@ -1,3 +1,7 @@
+---
+description: "How to override psake's output handlers for custom logging"
+---
+
 # Custom Logging
 
 psake routes all internal messages through configurable output handlers. You can override these handlers in your [`psake-config.ps1`](./psake-config.md) file to integrate with your own logging system.
