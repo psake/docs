@@ -41,6 +41,8 @@ const sidebars: SidebarsConfig = {
         'tutorial-advanced/access-functions-in-another-file',
         'tutorial-advanced/build-script-resilience',
         'tutorial-advanced/debug-script',
+        'tutorial-advanced/custom-logging',
+        'tutorial-advanced/psake-config',
         'tutorial-advanced/logging-errors',
         'tutorial-advanced/outputs-and-artifacts',
         'tutorial-advanced/print-psake-task-name',
