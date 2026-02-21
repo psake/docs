@@ -94,6 +94,12 @@ const config: Config = {
         },
         {
           type: 'docSidebar',
+          sidebarId: 'powershellBuildSidebar',
+          position: 'left',
+          label: 'PowerShellBuild',
+        },
+        {
+          type: 'docSidebar',
           sidebarId: 'referenceSidebar',
           position: 'left',
           label: 'Reference',
@@ -119,6 +125,10 @@ const config: Config = {
             {
               label: 'Guides',
               to: '/docs/tutorial-basics/default-build-files',
+            },
+            {
+              label: 'PowerShellBuild',
+              to: '/docs/powershellbuild/introduction',
             },
             {
               label: 'Command Reference',
