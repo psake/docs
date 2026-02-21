@@ -52,6 +52,17 @@ const sidebars: SidebarsConfig = {
     },
     {
       type: 'category',
+      label: 'PowerShellBuild',
+      items: [
+        'powershellbuild/introduction',
+        'powershellbuild/getting-started',
+        'powershellbuild/task-reference',
+        'powershellbuild/configuration',
+        'powershellbuild/real-world-example',
+      ],
+    },
+    {
+      type: 'category',
       label: 'Build Type Examples',
       items: [
         'build-types/dot-net-solution',
