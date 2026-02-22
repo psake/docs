@@ -83,15 +83,15 @@ properties {
 |---------|---------|-------------|
 | `Test.ScriptAnalysis.Enabled` | `$true` | Run PSScriptAnalyzer |
 | `Test.ScriptAnalysis.FailBuildOnSeverityLevel` | `'Error'` | Build fails on violations at or above this severity (`'Error'`, `'Warning'`, `'Information'`) |
-| `Test.ScriptAnalysis.SettingsPath` | `$null` | Path to a PSScriptAnalyzer settings file |
+| `Test.ScriptAnalysis.SettingsPath` | `./PSScriptAnalyzerSettings.psd1` | Path to a PSScriptAnalyzer settings file. Defaults to `PSScriptAnalyzerSettings.psd1` in the project root — if the file exists it is used automatically |
 
 ```powershell
 properties {
     # Fail on warnings too
     $PSBPreference.Test.ScriptAnalysis.FailBuildOnSeverityLevel = 'Warning'
 
-    # Use a custom ruleset
-    $PSBPreference.Test.ScriptAnalysis.SettingsPath = "$PSScriptRoot/.psscriptanalyzer.psd1"
+    # Override the default settings file location
+    $PSBPreference.Test.ScriptAnalysis.SettingsPath = "$PSScriptRoot/build/analyzersettings.psd1"
 }
 ```
 

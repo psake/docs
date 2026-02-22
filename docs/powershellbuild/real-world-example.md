@@ -28,6 +28,7 @@ MyModule/
 │       └── build.yml
 ├── psakeFile.ps1
 ├── build.ps1
+├── PSScriptAnalyzerSettings.psd1  # Auto-detected by PowerShellBuild
 └── requirements.psd1
 ```
 
@@ -120,9 +121,9 @@ properties {
     $PSBPreference.Test.ImportModule       = $true
 
     # Test — PSScriptAnalyzer
+    # SettingsPath defaults to ./PSScriptAnalyzerSettings.psd1 in the project root
     $PSBPreference.Test.ScriptAnalysis.Enabled                = $true
     $PSBPreference.Test.ScriptAnalysis.FailBuildOnSeverityLevel = 'Error'
-    $PSBPreference.Test.ScriptAnalysis.SettingsPath           = "$PSScriptRoot/.psscriptanalyzer.psd1"
 
     # Test — Code Coverage
     $PSBPreference.Test.CodeCoverage.Enabled          = $true
@@ -196,11 +197,11 @@ task Deploy -depends BumpVersion, ValidateReadme, Publish {
 }
 ```
 
-## `.psscriptanalyzer.psd1`
+## `PSScriptAnalyzerSettings.psd1`
 
-A custom PSScriptAnalyzer settings file referenced above:
+PowerShellBuild looks for `PSScriptAnalyzerSettings.psd1` in the project root by default. Place your custom rules here and they will be picked up automatically — no need to set `SettingsPath`.
 
-```powershell title=".psscriptanalyzer.psd1"
+```powershell title="PSScriptAnalyzerSettings.psd1"
 @{
     ExcludeRules = @(
         'PSAvoidUsingWriteHost'    # Write-Host is acceptable in build scripts
