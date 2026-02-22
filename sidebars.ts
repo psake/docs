@@ -73,6 +73,15 @@ const sidebars: SidebarsConfig = {
     },
   ],
 
+  // PowerShellBuild - Companion module for building PowerShell modules
+  powershellBuildSidebar: [
+    'powershellbuild/introduction',
+    'powershellbuild/getting-started',
+    'powershellbuild/task-reference',
+    'powershellbuild/configuration',
+    'powershellbuild/real-world-example',
+  ],
+
   // Reference - Command reference, troubleshooting, and lookup materials
   referenceSidebar: [
     {
