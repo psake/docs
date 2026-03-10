@@ -70,20 +70,13 @@ Scaffolding new tasks and build file structures is faster with nine built-in sni
 3. Open a project that contains a `psakefile.ps1` or `build.ps1`
 4. The extension activates automatically—check the Explorer sidebar for the psake Tasks panel
 
-That's it. No configuration required.
+That's it. No configuration required—but there's plenty available if you need it.
 
-## v1.0.1: Configuration Enhancements
+## Fully Configurable
 
-Hot on the heels of v1.0, we shipped v1.0.1 with additional configuration options for users who need more control:
+The extension works out of the box, but every aspect of its behavior can be tuned to fit your workflow. Toggle CodeLens on or off, point to a custom PowerShell executable, pass extra parameters to `Invoke-psake` or your build script, and customize shell arguments—all without restarting VS Code.
 
-- **`psake.codeLens.enabled`** — Toggle CodeLens on or off
-- **`psake.powershellExecutable`** — Specify a custom PowerShell executable
-- **`psake.shellArgs`** — Customize shell arguments (defaults to `-NoProfile`)
-- **`psake.invokeParameters`** — Pass extra parameters to `Invoke-psake`
-- **`psake.buildScriptParameters`** — Pass extra parameters to your build script
-- **`psake.buildScriptTaskParameter`** — Customize the task parameter name
-
-All settings update dynamically—no restart needed.
+For the full list of settings, check out the [VS Code extension docs](/docs/integrations/vscode-extension#configuration).
 
 ## Part of a Growing Ecosystem
 
