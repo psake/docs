@@ -83,6 +83,11 @@ dotnet:
   permalink: /dotnet
   description: .NET framework and .NET Core development
 
+vscode:
+  label: VS Code
+  permalink: /vscode
+  description: Visual Studio Code extension and editor integration
+
 visual-studio:
   label: Visual Studio
   permalink: /visual-studio

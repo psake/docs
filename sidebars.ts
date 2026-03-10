@@ -71,6 +71,13 @@ const sidebars: SidebarsConfig = {
         'ci-examples/team-city',
       ]
     },
+    {
+      type: 'category',
+      label: 'Editor & Tool Integration',
+      items: [
+        'integrations/vscode-extension',
+      ]
+    },
   ],
 
   // PowerShellBuild - Companion module for building PowerShell modules
