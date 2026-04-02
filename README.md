@@ -9,13 +9,13 @@ support versioned docs.
 ## Installation
 
 ```powershell
-.\builds.ps1 -Bootstrap
+.\build.ps1 -Bootstrap
 ```
 
 ## Local Development
 
 ```powershell
-.\build.ps1 -Task Server 
+.\build.ps1 -Task Server
 ```
 
 This command starts a local development server and opens up a browser window.
