@@ -10,7 +10,7 @@ support versioned docs.
 
 - [Node.js](https://nodejs.org/) >= 18.0
 - [Yarn](https://classic.yarnpkg.com/) (`npm install -g yarn`)
-- [PowerShell 7+](https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell) (`pwsh`)
+- [PowerShell 7+](https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell) (run `pwsh`)
 
 ## Installation
 
