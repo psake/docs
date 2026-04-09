@@ -6,6 +6,12 @@ This website is built using [Docusaurus](https://docusaurus.io/), a modern
 static website generator. The main feature for us was it's ability to
 support versioned docs.
 
+## Prerequisites
+
+- [Node.js](https://nodejs.org/) >= 18.0
+- [Yarn](https://classic.yarnpkg.com/) (`npm install -g yarn`)
+- [PowerShell 7+](https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell) (run `pwsh`)
+
 ## Installation
 
 ```powershell
