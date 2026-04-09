@@ -108,7 +108,7 @@ Task -Name "GenerateCommandReference-Gen" -Depends 'GenerateCommandReference-Cle
   Get-ChildItem $script:docsOutputFolder | ForEach-Object {
     $path = $_.FullName
     Write-Host "Fixing relative links for: $path"
-    Get-Content $path | ForEach-Object {
+    (Get-Content $path) | ForEach-Object {
       $_ -replace "\[(.+)\]\(\)", '[$1]($1.mdx)'
     } | Set-Content $path
   }
@@ -136,7 +136,7 @@ Task -Name 'FrontMatterCMSSync' {
     $yaml = Get-Content -Raw $_ | ConvertFrom-Yaml
     foreach ($item in $yaml.Keys) {
       $value = $yaml[$item]
-      if (-not $value.ContainsKey('handle')) {
+      if (-not $value.Contains('handle')) {
         $value.Add('handle', $item)
       }
       $output += $value
