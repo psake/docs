@@ -23,9 +23,9 @@ fmContentType: blog
 title_meta: "Building a Resilient build.ps1"
 ---
 
-In psake projects, `build.ps1` is the entry point script that wires everything together. It installs dependencies, configures the environment, and hands off to psake to run your actual build tasks. Think of it as the bootstrapper that gets a fresh machine — or a CI agent — from zero to a working build in a single command: `.\build.ps1`.
+In psake projects, a `build.ps1` is the conventional entry point script that wires everything together. It installs dependencies, configures the environment, and hands off to psake to run your actual build tasks. Think of it as the bootstrapper that gets a fresh machine — or a CI agent — from zero to a working build in a single command: `.\build.ps1`.
 
-The [default `build.ps1`](https://github.com/psake/psake/blob/main/build.ps1) that ships with psake handles the basics well: bootstrap installation, help output, build environment detection, and proper CI exit codes. But once you're running concurrent CI jobs, managing internal package feeds, or onboarding new contributors, a few gaps start to show. Here are five patterns that harden your entry point for the real world.
+psake itself doesn't ship a `build.ps1` — it's a best practice that most projects adopt. You can see a good [example in the psake repo itself](https://github.com/psake/psake/blob/main/build.ps1), which covers the basics: bootstrap installation, help output, build environment detection, and proper CI exit codes. But once you're running concurrent CI jobs, managing internal package feeds, or onboarding new contributors, a few gaps start to show. Here are five patterns that harden your entry point for the real world.
 
 <!-- truncate -->
 
