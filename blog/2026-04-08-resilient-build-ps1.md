@@ -25,113 +25,154 @@ title_meta: "Building a Resilient build.ps1"
 
 In psake projects, a `build.ps1` is the conventional entry point script that wires everything together. It installs dependencies, configures the environment, and hands off to psake to run your actual build tasks. Think of it as the bootstrapper that gets a fresh machine — or a CI agent — from zero to a working build in a single command: `.\build.ps1`.
 
-psake itself doesn't ship a `build.ps1` — it's a best practice that most projects adopt. You can see a good [example in the psake repo itself](https://github.com/psake/psake/blob/main/build.ps1), which covers the basics: bootstrap installation, help output, build environment detection, and proper CI exit codes. But once you're running concurrent CI jobs, managing internal package feeds, or onboarding new contributors, a few gaps start to show. Here are five patterns that harden your entry point for the real world.
+psake itself doesn't ship a `build.ps1` — it's a best practice that most projects adopt. A typical starter script covers the basics: bootstrap installation, help output, build environment detection, and proper CI exit codes. But once you're running concurrent CI jobs, managing internal package feeds, or onboarding new contributors, a few gaps start to show.
 
 <!-- truncate -->
 
-## Clear Error Handling
-
-The default script silently fails with cryptic "term not recognized" errors when dependencies aren't installed. A simple guard clause makes the fix obvious:
+The script below addresses those gaps with clear error handling, dynamic tab completion, CI-safe module imports, internal repository support, and PowerShellGet version pinning. I cover each pattern in detail in the [full post on my blog](https://tablackburn.github.io/p/resilient-build-ps1/) — but here's the complete script. Copy it into your project and adjust the repository name and URL to match your environment:
 
 ```powershell
-if (-not (Get-Module -Name 'PSDepend' -ListAvailable)) {
-    throw 'Missing dependencies. Please run with the "-Bootstrap" flag to install dependencies.'
-}
-```
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute(
+    'PSReviewUnusedParameter',
+    'Command',
+    Justification = 'false positive'
+)]
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute(
+    'PSReviewUnusedParameter',
+    'Parameter',
+    Justification = 'false positive'
+)]
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute(
+    'PSReviewUnusedParameter',
+    'CommandAst',
+    Justification = 'false positive'
+)]
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute(
+    'PSReviewUnusedParameter',
+    'FakeBoundParams',
+    Justification = 'false positive'
+)]
+[CmdletBinding(DefaultParameterSetName = 'task')]
+param(
+    [parameter(ParameterSetName = 'task', Position = 0)]
+    [ArgumentCompleter( {
+            param($Command, $Parameter, $WordToComplete, $CommandAst, $FakeBoundParams)
+            try {
+                Get-PSakeScriptTasks -BuildFile './psakeFile.ps1' -ErrorAction 'Stop' |
+                Where-Object { $_.Name -like "$WordToComplete*" } |
+                Select-Object -ExpandProperty 'Name'
+            }
+            catch {
+                @()
+            }
+        })]
+    [string[]]$Task = 'default',
+    [switch]$Bootstrap,
+    [parameter(ParameterSetName = 'Help')]
+    [switch]$Help
+)
 
-Instead of hunting through stack traces, new contributors get a one-line message telling them exactly what to do.
+$ErrorActionPreference = 'Stop'
+$psakeFile = './psakeFile.ps1'
 
-## Dynamic Tab Completion
+if ($Bootstrap) {
+    # Patch TLS protocols for older Windows versions
+    [System.Net.ServicePointManager]::SecurityProtocol = (
+        [System.Net.ServicePointManager]::SecurityProtocol -bor
+        [System.Net.SecurityProtocolType]::Tls12 -bor
+        [System.Net.SecurityProtocolType]::Tls13
+    )
 
-Hardcoded `[ValidateSet()]` values require manual updates every time you add a task. Replace them with `[ArgumentCompleter]` for live discovery:
+    Get-PackageProvider -Name 'Nuget' -ForceBootstrap | Out-Null
+    Set-PSRepository -Name 'PSGallery' -InstallationPolicy 'Trusted'
 
-```powershell
-[ArgumentCompleter( {
-        param($Command, $Parameter, $WordToComplete, $CommandAst, $FakeBoundParams)
-        try {
-            Get-PSakeScriptTasks -BuildFile './build.psake.ps1' -ErrorAction 'Stop' |
-            Where-Object { $_.Name -like "$WordToComplete*" } |
-            Select-Object -ExpandProperty 'Name'
+    # Pin PowerShellGet to v2
+    $powerShellGetModule = Get-Module -Name 'PowerShellGet' -ListAvailable |
+        Where-Object { $_.Version.Major -eq 2 } |
+        Sort-Object -Property 'Version' -Descending |
+        Select-Object -First 1
+
+    $powerShellGetModuleParameters = @{
+        Name           = 'PowerShellGet'
+        MinimumVersion = '2.0.0'
+        MaximumVersion = '2.99.99'
+        Force          = $true
+    }
+
+    if (-not $powerShellGetModule) {
+        Install-Module @powerShellGetModuleParameters -Scope 'CurrentUser' -AllowClobber
+    }
+    Import-Module @powerShellGetModuleParameters
+
+    # Register internal repository (idempotent)
+    $repositoryName = 'internal-nuget-repo'
+    if (-not (Get-PSRepository -Name $repositoryName -ErrorAction 'SilentlyContinue')) {
+        $repositoryUrl = "https://nuget.example.com/api/v2/$repositoryName"
+        $registerPSRepositorySplat = @{
+            Name                      = $repositoryName
+            SourceLocation            = $repositoryUrl
+            PublishLocation           = $repositoryUrl
+            ScriptSourceLocation      = $repositoryUrl
+            InstallationPolicy        = 'Trusted'
+            PackageManagementProvider = 'NuGet'
         }
-        catch {
-            @()
-        }
-    })]
-[string[]]$Task = 'default',
-```
+        Register-PSRepository @registerPSRepositorySplat
+    }
 
-Now tab completion always reflects the actual tasks in your psake file — no maintenance required.
+    # Install PSDepend if missing
+    if (-not (Get-Module -Name 'PSDepend' -ListAvailable)) {
+        Install-Module -Name 'PSDepend' -Repository 'PSGallery' -Scope 'CurrentUser' -Force
+    }
 
-## Try-Import-First Pattern
+    # Try-import-first pattern
+    $psDependParameters = @{
+        Path          = $PSScriptRoot
+        Recurse       = $False
+        WarningAction = 'SilentlyContinue'
+        Import        = $True
+        Force         = $True
+        ErrorAction   = 'Stop'
+    }
 
-When parallel CI jobs share a module cache, `Install-Module` can hit file locks and fail. The fix: try importing existing modules first, and only install if the import fails.
-
-```powershell
-$importSucceeded = $false
-try {
-    Invoke-PSDepend @psDependParameters
-    $importSucceeded = $true
-    Write-Verbose 'Successfully imported existing modules.' -Verbose
-}
-catch {
-    Write-Verbose "Could not import all required modules: $_" -Verbose
-    Write-Verbose 'Attempting to install missing or outdated dependencies...' -Verbose
-}
-
-if (-not $importSucceeded) {
+    $importSucceeded = $false
     try {
-        Invoke-PSDepend @psDependParameters -Install
+        Invoke-PSDepend @psDependParameters
+        $importSucceeded = $true
+        Write-Verbose 'Successfully imported existing modules.' -Verbose
     }
     catch {
-        Write-Error "Failed to install and import required dependencies: $_"
-        throw
+        Write-Verbose "Could not import all required modules: $_" -Verbose
+        Write-Verbose 'Attempting to install missing or outdated dependencies...' -Verbose
+    }
+
+    if (-not $importSucceeded) {
+        try {
+            Invoke-PSDepend @psDependParameters -Install
+        }
+        catch {
+            Write-Error "Failed to install and import required dependencies: $_"
+            Write-Error 'This may be due to locked module files. Please restart the build environment or clear module locks.'
+            if ($_.Exception.InnerException) {
+                Write-Error "Inner exception: $($_.Exception.InnerException.Message)"
+            }
+            throw
+        }
     }
 }
-```
-
-This eliminates a common source of flaky builds in enterprise CI pipelines.
-
-## Internal Repository Support
-
-Organizations often host modules on internal NuGet feeds (ProGet, Azure Artifacts, etc.). Idempotent registration keeps the script portable:
-
-```powershell
-$repositoryName = 'internal-nuget-repo'
-if (-not (Get-PSRepository -Name $repositoryName -ErrorAction 'SilentlyContinue')) {
-    Register-PSRepository @registerPSRepositorySplat
-}
-```
-
-Pair this with TLS protocol patching to ensure compatibility with modern security requirements:
-
-```powershell
-[System.Net.ServicePointManager]::SecurityProtocol = (
-    [System.Net.ServicePointManager]::SecurityProtocol -bor
-    [System.Net.SecurityProtocolType]::Tls12 -bor
-    [System.Net.SecurityProtocolType]::Tls13
-)
-```
-
-## PowerShellGet Version Pinning
-
-PowerShellGet v3 introduces breaking API changes. Pinning to v2.x keeps behavior predictable:
-
-```powershell
-$powerShellGetModuleParameters = @{
-    Name           = 'PowerShellGet'
-    MinimumVersion = '2.0.0'
-    MaximumVersion = '2.99.99'
-    Force          = $true
+else {
+    if (-not (Get-Module -Name 'PSDepend' -ListAvailable)) {
+        throw 'Missing dependencies. Please run with the "-Bootstrap" flag to install dependencies.'
+    }
+    Invoke-PSDepend -Path $PSScriptRoot -Recurse $False -WarningAction 'SilentlyContinue' -Import -Force
 }
 
-if (-not $powerShellGetModule) {
-    Install-Module @powerShellGetModuleParameters -Scope 'CurrentUser' -AllowClobber
+if ($PSCmdlet.ParameterSetName -eq 'Help') {
+    Get-PSakeScriptTasks -buildFile $psakeFile |
+        Format-Table -Property Name, Description, Alias, DependsOn
 }
-Import-Module @powerShellGetModuleParameters
+else {
+    Set-BuildEnvironment -Force
+    Invoke-psake -buildFile $psakeFile -taskList $Task -nologo
+    exit ([int](-not $psake.build_success))
+}
 ```
-
-This prevents surprise breakage when a CI agent picks up a new PowerShellGet version.
-
-## Get the Complete Script
-
-These five patterns combine into a production-ready 143-line bootstrap that handles concurrent CI pipelines, enterprise package management, and mixed OS environments. For the full walkthrough and complete script, check out the [original post on my blog](https://tablackburn.github.io/p/resilient-build-ps1/).
