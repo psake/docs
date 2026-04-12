@@ -7,3 +7,12 @@ heyitsgilbert:
     x: HeyItsGilbertS
     linkedin: gilbertsanchez
     github: HeyItsGilbert
+
+tablackburn:
+  name: Trent Blackburn
+  title: Contributor
+  url: https://tablackburn.github.io
+  image_url: https://github.com/tablackburn.png
+  socials:
+    github: tablackburn
+    linkedin: trentblackburn
