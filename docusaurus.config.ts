@@ -5,7 +5,7 @@ import type * as Preset from '@docusaurus/preset-classic';
 
 const config: Config = {
   title: 'psake',
-  tagline: 'A build automation tool written in PowerShell',
+  tagline: 'psake is a PowerShell build automation tool inspired by rake and bake. Define tasks, declare dependencies, and ship with confidence.',
   favicon: 'img/favicon.ico',
 
   // Set the production url of your site here
