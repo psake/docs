@@ -95,7 +95,21 @@ The output format can also be set via the `PSAKE_OUTPUT_FORMAT` environment vari
 
 ## Quiet Mode
 
-The new `-Quiet` parameter suppresses all console output while still returning the full structured result. Useful for scripts that only care about the exit code and result object, not the build log.
+The new `-Quiet` parameter suppresses all console output while still returning the full `PsakeBuildResult` object—including complete error records for any failed tasks. No output is swallowed; it's simply not printed.
+
+This is particularly valuable when psake is invoked by an LLM agent or AI coding tool. Console build logs are noisy: progress messages, separator lines, and timing output all burn through context that the model could spend on the actual problem. With `-Quiet`, the agent gets silence on stdout and a precise, structured result it can inspect programmatically:
+
+```powershell
+$result = Invoke-psake -Quiet
+if (-not $result.Success) {
+    # Full error records are available—no log scraping needed
+    $result.Tasks | Where-Object { $_.Error } | ForEach-Object {
+        Write-Host "Task '$($_.Name)' failed: $($_.Error.Message)"
+    }
+}
+```
+
+Rather than parsing wall-of-text build output, the agent can check `$result.Success`, iterate `$result.Tasks`, and read `$_.Error` directly—structured data that maps cleanly to a tool call response. Pair this with `-OutputFormat JSON` if you need to pass the result across a process boundary or into a prompt.
 
 ## New Testing APIs
 
