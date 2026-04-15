@@ -111,6 +111,12 @@ if (-not $result.Success) {
 
 Rather than parsing wall-of-text build output, the agent can check `$result.Success`, iterate `$result.Tasks`, and read `$_.Error` directly—structured data that maps cleanly to a tool call response. Pair this with `-OutputFormat JSON` if you need to pass the result across a process boundary or into a prompt.
 
+:::tip Using psake with an AI coding assistant?
+
+The [psake Agent Skill](/blog/introducing-psake-agent-skill) has been updated for 5.0 and is available through the [LLM tools marketplace](https://github.com/psake/psake-llm-tools). Install it into Claude, GitHub Copilot, or any Agent Skills–compatible client to give your assistant first-class knowledge of the new declarative syntax, caching, structured output, and migration patterns covered in this post.
+
+:::
+
 ## New Testing APIs
 
 Two new functions let you inspect and test your build scripts without running a full build:
