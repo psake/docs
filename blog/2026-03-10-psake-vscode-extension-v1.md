@@ -21,7 +21,7 @@ keywords:
   - PowerShell
   - CodeLens
   - developer tools
-image: /img/social-card.png
+image: /img/og-image.png
 draft: false
 fmContentType: blog
 title_meta: "psake VS Code Extension v1.0"

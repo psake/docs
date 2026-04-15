@@ -17,7 +17,7 @@ keywords:
   - PowerShell
   - build automation
   - CI/CD
-image: /img/social-card.png
+image: /img/og-image.png
 draft: false
 fmContentType: blog
 title_meta: "Building a Resilient build.ps1"

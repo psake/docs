@@ -19,7 +19,7 @@ keywords:
   - release announcement
   - CI/CD
   - localization
-image: /img/social-card.png
+image: /img/og-image.png
 draft: false
 fmContentType: blog
 title_meta: August - New Releases and more!

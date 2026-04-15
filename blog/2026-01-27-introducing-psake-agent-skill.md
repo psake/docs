@@ -21,7 +21,7 @@ keywords:
   - PowerShell
   - LLM tools
   - developer productivity
-image: /img/social-card.png
+image: /img/og-image.png
 draft: false
 fmContentType: blog
 title_meta: Introducing the psake Agent Skill

@@ -21,7 +21,7 @@ keywords:
   - structured output
   - GitHub Actions
   - build system
-image: /img/social-card.png
+image: /img/og-image.png
 draft: false
 fmContentType: blog
 title_meta: "psake 5.0.0 Released"
