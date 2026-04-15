@@ -104,7 +104,7 @@ if ($Bootstrap) {
     }
     Import-Module @powerShellGetModuleParameters
 
-    # Register internal repository (idempotent)
+    <# Register internal repository (idempotent)
     $repositoryName = 'internal-nuget-repo'
     if (-not (Get-PSRepository -Name $repositoryName -ErrorAction 'SilentlyContinue')) {
         $repositoryUrl = "https://nuget.example.com/api/v2/$repositoryName"
@@ -117,7 +117,7 @@ if ($Bootstrap) {
             PackageManagementProvider = 'NuGet'
         }
         Register-PSRepository @registerPSRepositorySplat
-    }
+    }#>
 
     # Install PSDepend if missing
     if (-not (Get-Module -Name 'PSDepend' -ListAvailable)) {
