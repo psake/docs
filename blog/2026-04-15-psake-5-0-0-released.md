@@ -42,7 +42,7 @@ Task 'Build' @{
 }
 ```
 
-Every key is validated at compile time—typos like `DependsOnn` or `Acton` are caught before a single task runs. The original parameter-based syntax still works, so your existing build scripts don't need to change.
+Every key is validated at compile time—typos like `DependsOn` or `Action` are caught before a single task runs. The original parameter-based syntax still works, so your existing build scripts don't need to change.
 
 ## Two-Phase Compilation
 
