@@ -113,7 +113,7 @@ Rather than parsing wall-of-text build output, the agent can check `$result.Succ
 
 ## New Testing APIs
 
-Two new functions make build script testing much more tractable:
+Two new functions let you inspect and test your build scripts without running a full build:
 
 - **`Get-PsakeBuildPlan`** — Returns the full execution plan for a build file without running it. Inspect task order, dependencies, and caching configuration in tests.
 - **`Test-PsakeTask`** — Executes a single named task with custom variable overrides. Great for unit-testing individual task logic in isolation.
