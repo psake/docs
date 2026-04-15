@@ -103,13 +103,12 @@ This is particularly valuable when psake is invoked by an LLM agent or AI coding
 $result = Invoke-psake -Quiet
 if (-not $result.Success) {
     # Full error records are available—no log scraping needed
-    $result.Tasks | Where-Object { $_.Error } | ForEach-Object {
-        Write-Host "Task '$($_.Name)' failed: $($_.Error.Message)"
-    }
+    Write-Host "Build failed: $($result.ErrorMessage)"
+    Write-Host $result.ErrorRecord.ScriptStackTrace
 }
 ```
 
-Rather than parsing wall-of-text build output, the agent can check `$result.Success`, iterate `$result.Tasks`, and read `$_.Error` directly—structured data that maps cleanly to a tool call response. Pair this with `-OutputFormat JSON` if you need to pass the result across a process boundary or into a prompt.
+Rather than parsing wall-of-text build output, the agent can check `$result.Success` and read `$result.ErrorMessage` for the formatted string or `$result.ErrorRecord` for the full `ErrorRecord`—including the complete script stack trace—directly. Pair this with `-OutputFormat JSON` if you need to pass the result across a process boundary or into a prompt.
 
 :::tip Using psake with an AI coding assistant?
 
