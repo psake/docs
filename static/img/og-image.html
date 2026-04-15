@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1200">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+  <title>psake.dev – Open Graph Image</title>
+  <style>
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      width: 1200px;
+      height: 630px;
+      overflow: hidden;
+      background-color: #0d0f14;
+      position: relative;
+    }
+
+    /* ── Grid overlay ── */
+    .grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(150, 188, 79, 0.055) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(102, 178, 142, 0.045) 1px, transparent 1px);
+      background-size: 42px 42px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── Radial glow from left ── */
+    .glow {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(
+        ellipse 680px 520px at -60px 315px,
+        rgba(102, 178, 142, 0.18) 0%,
+        rgba(150, 188, 79, 0.09) 38%,
+        transparent 68%
+      );
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* ── Top accent bar ── */
+    .top-bar {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #96BC4F 0%, #66B28E 35%, rgba(102,178,142,0.3) 65%, transparent 100%);
+      z-index: 10;
+    }
+
+    /* ── Left vertical accent line ── */
+    .left-accent {
+      position: absolute;
+      top: 44px;
+      left: 50px;
+      bottom: 44px;
+      width: 2px;
+      background: linear-gradient(
+        180deg,
+        rgba(102, 178, 142, 0.9) 0%,
+        rgba(102, 178, 142, 0.5) 50%,
+        rgba(102, 178, 142, 0.1) 100%
+      );
+      z-index: 2;
+    }
+
+    /* ── Left content area ── */
+    .left-content {
+      position: absolute;
+      top: 0;
+      left: 76px;
+      width: 600px;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 0 24px;
+      z-index: 3;
+    }
+
+    .eyebrow {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12.5px;
+      font-weight: 400;
+      color: #66B28E;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      margin-bottom: 22px;
+      opacity: 0.9;
+    }
+
+    .wordmark {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 800;
+      font-size: 116px;
+      line-height: 0.95;
+      color: #ffffff;
+      letter-spacing: -0.025em;
+      margin-bottom: 30px;
+    }
+
+    .wordmark .s-highlight {
+      color: #96BC4F;
+    }
+
+    .tagline {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 19px;
+      color: #7a8a9e;
+      line-height: 1.55;
+      max-width: 430px;
+    }
+
+    /* ── URL bottom-left ── */
+    .site-url {
+      position: absolute;
+      bottom: 34px;
+      left: 76px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12.5px;
+      font-weight: 400;
+      color: #2e3d50;
+      letter-spacing: 0.06em;
+      z-index: 3;
+    }
+
+    /* ── Right code panel ── */
+    .code-panel {
+      position: absolute;
+      top: -4px;
+      right: 0;
+      bottom: -4px;
+      width: 510px;
+      background: #141820;
+      border-left: 1px solid rgba(102, 178, 142, 0.22);
+      border-top: 1px solid rgba(102, 178, 142, 0.16);
+      border-bottom: 1px solid rgba(102, 178, 142, 0.10);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      z-index: 5;
+      /* subtle inner glow on the left edge */
+      box-shadow: -8px 0 40px rgba(102, 178, 142, 0.06);
+    }
+
+    /* Panel header – macOS style */
+    .panel-header {
+      display: flex;
+      align-items: center;
+      padding: 13px 18px;
+      background: #0f1318;
+      border-bottom: 1px solid rgba(102, 178, 142, 0.12);
+      flex-shrink: 0;
+      gap: 0;
+    }
+
+    .traffic-lights {
+      display: flex;
+      gap: 7px;
+      align-items: center;
+      margin-right: 14px;
+    }
+
+    .dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+    .dot-red    { background: #ff5f57; }
+    .dot-yellow { background: #febc2e; }
+    .dot-green  { background: #28c840; }
+
+    .panel-filename {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      font-weight: 400;
+      color: #4e5f72;
+      letter-spacing: 0.02em;
+    }
+
+    /* Code body */
+    .code-body {
+      flex: 1;
+      padding: 20px 0 20px 0;
+      overflow: hidden;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      line-height: 1.72;
+    }
+
+    .code-line {
+      display: flex;
+      align-items: baseline;
+      padding: 0 22px;
+      white-space: pre;
+    }
+
+    .code-line:hover {
+      background: rgba(255,255,255,0.02);
+    }
+
+    .ln {
+      min-width: 28px;
+      color: #253040;
+      font-size: 11px;
+      text-align: right;
+      margin-right: 20px;
+      user-select: none;
+      flex-shrink: 0;
+    }
+
+    /* Syntax highlighting */
+    .kw   { color: #96BC4F; }         /* Task keyword */
+    .flag { color: #66B28E; }         /* -Depends, -Path, -ForegroundColor */
+    .str  { color: #c3e88d; }         /* strings */
+    .cmd  { color: #f07178; }         /* Write-Host, Invoke-Pester, netlify */
+    .cmt  { color: #4a6070; font-style: italic; }  /* comments */
+    .def  { color: #cdd6e8; }         /* default identifiers */
+    .brace { color: #7a8a9e; }        /* { } */
+    .sep  { color: #5e6e82; }         /* , ; = */
+  </style>
+</head>
+<body>
+
+  <!-- Background layers -->
+  <div class="grid"></div>
+  <div class="glow"></div>
+
+  <!-- Top accent bar -->
+  <div class="top-bar"></div>
+
+  <!-- Left vertical accent line -->
+  <div class="left-accent"></div>
+
+  <!-- Left branding content -->
+  <div class="left-content">
+    <div class="eyebrow">&gt;&nbsp;POWERSHELL BUILD AUTOMATION</div>
+    <div class="wordmark">p<span class="s-highlight">s</span>ake</div>
+    <div class="tagline">Define tasks. Declare dependencies.<br>Ship with confidence.</div>
+  </div>
+
+  <!-- URL badge bottom-left -->
+  <div class="site-url">psake.dev</div>
+
+  <!-- Right code panel -->
+  <div class="code-panel">
+    <div class="panel-header">
+      <div class="traffic-lights">
+        <div class="dot dot-red"></div>
+        <div class="dot dot-yellow"></div>
+        <div class="dot dot-green"></div>
+      </div>
+      <span class="panel-filename">psakeFile.ps1</span>
+    </div>
+
+    <div class="code-body">
+
+      <div class="code-line"><span class="ln">1</span><span class="cmt"># Build automation for psake.dev</span></div>
+      <div class="code-line"><span class="ln">2</span></div>
+      <div class="code-line"><span class="ln">3</span><span class="kw">Task</span>&nbsp;<span class="def">Default</span>&nbsp;<span class="flag">-Depends</span>&nbsp;<span class="def">Test<span class="sep">,</span>&nbsp;Build</span></div>
+      <div class="code-line"><span class="ln">4</span></div>
+      <div class="code-line"><span class="ln">5</span><span class="kw">Task</span>&nbsp;<span class="def">Build</span>&nbsp;<span class="flag">-Depends</span>&nbsp;<span class="def">Init</span>&nbsp;<span class="brace">{</span></div>
+      <div class="code-line"><span class="ln">6</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="cmd">Write-Host</span>&nbsp;<span class="str">"Building site..."</span>&nbsp;<span class="flag">-ForegroundColor</span>&nbsp;<span class="def">Cyan</span></div>
+      <div class="code-line"><span class="ln">7</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="cmd">exec</span>&nbsp;<span class="brace">{</span>&nbsp;<span class="def">yarn run build</span>&nbsp;<span class="brace">}</span></div>
+      <div class="code-line"><span class="ln">8</span><span class="brace">}</span></div>
+      <div class="code-line"><span class="ln">9</span></div>
+      <div class="code-line"><span class="ln">10</span><span class="kw">Task</span>&nbsp;<span class="def">Test</span>&nbsp;<span class="flag">-Depends</span>&nbsp;<span class="def">Init</span>&nbsp;<span class="brace">{</span></div>
+      <div class="code-line"><span class="ln">11</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="cmd">Invoke-Pester</span>&nbsp;<span class="flag">-Path</span>&nbsp;<span class="str">./tests</span>&nbsp;<span class="flag">-Output</span>&nbsp;<span class="def">Detailed</span></div>
+      <div class="code-line"><span class="ln">12</span><span class="brace">}</span></div>
+      <div class="code-line"><span class="ln">13</span></div>
+      <div class="code-line"><span class="ln">14</span><span class="kw">Task</span>&nbsp;<span class="def">Deploy</span>&nbsp;<span class="flag">-Depends</span>&nbsp;<span class="def">Build</span>&nbsp;<span class="brace">{</span></div>
+      <div class="code-line"><span class="ln">15</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="cmd">Write-Host</span>&nbsp;<span class="str">"Deploying to production"</span></div>
+      <div class="code-line"><span class="ln">16</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="cmd">exec</span>&nbsp;<span class="brace">{</span>&nbsp;<span class="def">netlify deploy</span>&nbsp;<span class="flag">--prod</span>&nbsp;<span class="brace">}</span></div>
+      <div class="code-line"><span class="ln">17</span><span class="brace">}</span></div>
+      <div class="code-line"><span class="ln">18</span></div>
+      <div class="code-line"><span class="ln">19</span><span class="kw">Task</span>&nbsp;<span class="def">Init</span>&nbsp;<span class="brace">{</span></div>
+      <div class="code-line"><span class="ln">20</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="cmd">exec</span>&nbsp;<span class="brace">{</span>&nbsp;<span class="def">yarn install</span>&nbsp;<span class="brace">}</span></div>
+      <div class="code-line"><span class="ln">21</span><span class="brace">}</span></div>
+
+    </div>
+  </div>
+
+</body>
+</html>

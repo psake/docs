@@ -5,11 +5,11 @@ import type * as Preset from '@docusaurus/preset-classic';
 
 const config: Config = {
   title: 'psake',
-  tagline: 'A build automation tool written in PowerShell',
+  tagline: 'psake is a PowerShell build automation tool inspired by rake and bake. Define tasks, declare dependencies, and ship with confidence.',
   favicon: 'img/favicon.ico',
 
   // Set the production url of your site here
-  url: 'https://psake.netlify.app',
+  url: 'https://psake.dev',
   // Set the /<baseUrl>/ pathname under which your site is served
   // For GitHub pages deployment, it is often '/<projectName>/'
   baseUrl: '/',
@@ -71,8 +71,19 @@ const config: Config = {
   ],
 
   themeConfig: {
-    // Replace with your project's social card
-    image: 'img/social-card.png',
+    image: 'img/og-image.png',
+    colorMode: {
+      defaultMode: 'dark',
+      respectPrefersColorScheme: true,
+    },
+    metadata: [
+      { name: 'twitter:card', content: 'summary_large_image' },
+      { property: 'og:type', content: 'website' },
+    ],
+    tableOfContents: {
+      minHeadingLevel: 2,
+      maxHeadingLevel: 4,
+    },
     navbar: {
       title: 'psake',
       logo: {
