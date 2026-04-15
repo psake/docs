@@ -86,7 +86,7 @@
 
 @media screen and (max-width: 996px) {
   .codeOutputGrid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
@@ -96,6 +96,7 @@
   border-radius: 8px;
   overflow: hidden;
   border: 1px solid var(--ifm-color-emphasis-200);
+  min-width: 0;
 }
 
 [data-theme='dark'] .codeBlock,

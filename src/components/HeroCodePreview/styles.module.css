@@ -65,6 +65,7 @@
   padding: 0;
   max-height: 400px;
   overflow-y: auto;
+  overflow-x: auto;
 }
 
 .codeWrapper pre {
