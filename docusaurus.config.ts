@@ -143,7 +143,7 @@ const config: Config = {
             },
             {
               label: 'Command Reference',
-              to: '/docs/commands/Invoke-Psake',
+              to: '/docs/commands/Invoke-psake',
             },
             {
               label: 'Code of Conduct',

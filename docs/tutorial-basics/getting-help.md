@@ -95,6 +95,6 @@ Found a bug or have a feature request?
 
 For comprehensive guides and reference materials:
 
-- **[Command Reference](/docs/commands/Invoke-Psake)** - Detailed documentation for all psake commands
+- **[Command Reference](/docs/commands/Invoke-psake)** - Detailed documentation for all psake commands
 - **[Troubleshooting](/docs/troubleshooting/common-errors)** - Solutions to common problems
 - **[FAQ](/docs/troubleshooting/faq)** - Frequently asked questions
