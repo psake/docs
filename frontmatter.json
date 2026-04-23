@@ -610,5 +610,5 @@
   },
   "frontMatter.website.host": "https://psake.dev",
   "frontMatter.dashboard.openOnStart": true,
-  "frontMatter.framework.startCommand": "yarn start"
+  "frontMatter.framework.startCommand": "bun start"
 }

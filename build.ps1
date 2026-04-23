@@ -2,6 +2,16 @@
 param(
   # Build task(s) to execute
   [parameter(ParameterSetName = 'task', position = 0)]
+  [ArgumentCompleter( {
+      param($Command, $Parameter, $WordToComplete, $CommandAst, $FakeBoundParams)
+      try {
+        Get-PSakeScriptTasks -BuildFile './psakeFile.ps1' -ErrorAction 'Stop' |
+          Where-Object { $_.Name -like "$WordToComplete*" } |
+          Select-Object -ExpandProperty 'Name'
+      } catch {
+        @()
+      }
+    })]
   [string[]]$Task = 'default',
 
   # Bootstrap dependencies
@@ -41,6 +51,6 @@ if ($PSCmdlet.ParameterSetName -eq 'Help') {
   Get-PSakeScriptTasks -BuildFile $psakeFile |
     Format-Table -Property Name, Description, Alias, DependsOn
 } else {
-  Invoke-psake -buildFile $psakeFile -taskList $Task -nologo -properties $Properties -parameters $Parameters
+  Invoke-Psake -BuildFile $psakeFile -TaskList $Task -NoLogo -Properties $Properties -Parameters $Parameters
   exit ([int](-not $psake.build_success))
 }

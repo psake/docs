@@ -9,7 +9,7 @@ support versioned docs.
 ## Prerequisites
 
 - [Node.js](https://nodejs.org/) >= 18.0
-- [Yarn](https://classic.yarnpkg.com/) (`npm install -g yarn`)
+- [Bun](https://bun.sh/) (see bun.sh for install instructions)
 - [PowerShell 7+](https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell) (run `pwsh`)
 
 ## Installation
