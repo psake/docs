@@ -108,6 +108,6 @@ Ready to start using psake? Here's what to do next:
 1. **[Install psake](/docs/tutorial-basics/installing)** - Get psake set up on your system
 2. **[Run your first build](/docs/tutorial-basics/run-psake)** - Create and execute your first psake script
 3. **[Explore the Guides](/docs/tutorial-basics/default-build-files)** - Learn best practices and advanced techniques
-4. **[Check the Command Reference](/docs/commands/Invoke-psake)** - Look up specific commands and their parameters
+4. **[Check the Command Reference](/docs/commands/Invoke-Psake)** - Look up specific commands and their parameters
 
 Need help? Visit our [Troubleshooting](/docs/troubleshooting/common-errors) section or join the [PowerShell Discord](https://aka.ms/psdiscord) #psake channel.
