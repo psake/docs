@@ -1,0 +1,4 @@
+[build]
+  base    = "/"
+  command = "bun run build"
+  publish = "build"
