@@ -9,7 +9,7 @@ This is a **Docusaurus-based documentation site** for [psake](https://github.com
 - **Entry point**: `build.ps1` - main build orchestrator using psake tasks
 - **Task definitions**: `psakeFile.ps1` - contains all build tasks and automation
 - **Dependencies**: `requirements.psd1` - PowerShell module dependencies managed via PSDepend
-- **Key tasks**: `Init` (yarn install), `Build` (full site), `Server` (dev server), `Test` (Pester tests)
+- **Key tasks**: `Init` (bun install), `Build` (full site), `Server` (dev server), `Test` (Pester tests)
 
 ### Content Management
 - **Docs**: `/docs/` - structured tutorials and guides (Markdown)
@@ -140,5 +140,5 @@ tags:
 ## Dependencies
 - **Node.js**: >=18.0 (managed via package.json engines)
 - **PowerShell**: 7+ (required by psakeFile.ps1)
-- **Package manager**: Yarn (locked version in packageManager field)
+- **Package manager**: Bun (locked version in packageManager field)
 - **PowerShell modules**: Auto-installed via PSDepend on bootstrap

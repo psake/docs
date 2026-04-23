@@ -33,15 +33,15 @@ The build system uses **PowerShell + psake** for orchestration, with Docusaurus/
 .\build.ps1 -Help
 ```
 
-**Important**: The `Server` task runs `yarn serve` which serves the production build. For local development with hot-reload, use:
+**Important**: The `Server` task runs `bun run serve` which serves the production build. For local development with hot-reload, use:
 ```powershell
 .\build.ps1 -Task Init        # Install dependencies first
-yarn run start                # Then start dev server directly
+bun start                     # Then start dev server directly
 ```
 
 ### Key Build Tasks
 
-- **Init** - Runs `yarn install`
+- **Init** - Runs `bun install`
 - **Build** - Full site build (depends on Init, GenerateCommandReference, FrontMatterCMSSync)
 - **Server** - Serves production build
 - **Test** - Runs Pester tests
@@ -149,7 +149,7 @@ Run tests before committing:
 4. Verify tag handles exist in `blog/tags.yml`
 5. Include intro + `<!-- truncate -->` + main content
 6. Run `.\build.ps1 -Task Test` to validate
-7. Preview with `yarn run start`
+7. Preview with `bun start`
 
 ### New Author or Tag
 1. Add to `blog/authors.yml` or `blog/tags.yml`

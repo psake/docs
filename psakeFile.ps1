@@ -1,5 +1,7 @@
 #require -Version 7
 $ErrorView = 'Detailed'
+
+Version 5
 Properties {
   $script:OutputPath = $null
   $script:OutputFormat = 'Nunit'
@@ -44,22 +46,19 @@ FormatTaskName {
 Task Default -Depends Build
 
 Task Init -Description "Initial action to setup the further action." -Action {
-  yarn install
+  Exec { bun install }
 }
 
 Task Build -Depends Init, GenerateCommandReference, FrontMatterCMSSync {
-  yarn run build
-  if ($LastExitCode -ne 0) {
-    throw "NPM Build failed"
-  }
+  Exec { bun run build }
 }
 
 Task Server -Depends Build -Description "Run the docusaurus server." {
-  yarn run serve
+  Exec { bun run serve }
 }
 
 Task Test {
-  $configuration = [PesterConfiguration]::Default
+  $configuration = New-PesterConfiguration
   $configuration.Output.Verbosity = 'Detailed'
   $configuration.Run.PassThru = $true
   $configuration.Run.Path = "$PSScriptRoot\tests"
@@ -75,9 +74,9 @@ Task Test {
 }
 
 (Get-Content ".\package.json" | ConvertFrom-Json -AsHashtable).scripts.Keys | ForEach-Object {
-  $action = [scriptblock]::create("yarn run $($_)")
+  $action = [scriptblock]::create("exec { bun run $($_) }")
   $taskSplat = @{
-    name = "yarn_$($_)"
+    name = "bun_$($_)"
     action = $action
     depends = @('Init')
     description = "Automatic: A script defined in your package.json"
