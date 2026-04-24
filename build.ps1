@@ -21,6 +21,9 @@ param(
   [parameter(ParameterSetName = 'Help')]
   [switch]$Help,
 
+  # Suppress console output (returns structured PsakeBuildResult)
+  [switch]$Quiet,
+
   # Optional properties to pass to psake
   [hashtable]$Properties,
 
@@ -51,6 +54,6 @@ if ($PSCmdlet.ParameterSetName -eq 'Help') {
   Get-PSakeScriptTasks -BuildFile $psakeFile |
     Format-Table -Property Name, Description, Alias, DependsOn
 } else {
-  Invoke-Psake -BuildFile $psakeFile -TaskList $Task -NoLogo -Properties $Properties -Parameters $Parameters
-  exit ([int](-not $psake.build_success))
+  $result = Invoke-Psake -BuildFile $psakeFile -TaskList $Task -NoLogo -Properties $Properties -Parameters $Parameters -Quiet:$Quiet
+  exit ([int](-not $result.Success))
 }

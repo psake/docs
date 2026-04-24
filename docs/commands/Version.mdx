@@ -1,0 +1,95 @@
+---
+id: Version
+title: Version
+description: Help page for the PowerShell Psake "Version" command
+keywords:
+  - PowerShell
+  - Psake
+  - Help
+  - Documentation
+hide_title: false
+hide_table_of_contents: false
+custom_edit_url: null
+---
+
+:::info This page was generated
+Contributions are welcome in [Psake-repo](https://github.com/psake/psake).
+:::
+
+## SYNOPSIS
+
+Declares the required psake version for the build script.
+
+## SYNTAX
+
+```powershell
+Version [-RequiredVersion] <Int32> [-ProgressAction <ActionPreference>] [<CommonParameters>]
+```
+
+## DESCRIPTION
+
+Use this function at the top of a psake build script to declare which
+major version of psake the script requires.
+The compile phase will validate
+that the running psake version matches.
+
+## EXAMPLES
+
+### EXAMPLE 1
+
+```powershell
+Version 5
+```
+
+Declares that this build script requires psake v5.
+
+## PARAMETERS
+
+### -RequiredVersion
+
+The major version number required (e.g.
+5).
+
+```yaml
+Type: Int32
+Parameter Sets: (All)
+Aliases:
+
+Required: True
+Position: 1
+Default value: 0
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -ProgressAction
+
+\{\{ Fill ProgressAction Description \}\}
+
+```yaml
+Type: ActionPreference
+Parameter Sets: (All)
+Aliases: proga
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### CommonParameters
+
+This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see [about_CommonParameters](http://go.microsoft.com/fwlink/?LinkID=113216).
+
+## INPUTS
+
+## OUTPUTS
+
+## NOTES
+
+## RELATED LINKS
+
+## VERSION
+
+*This page was generated using comment-based help in [Psake 5.0.2](https://github.com/psake/psake).*

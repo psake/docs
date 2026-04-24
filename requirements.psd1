@@ -11,11 +11,8 @@
   'psake' = @{
     Version = '5.0.3'
   }
-  'PlatyPS' = @{
-    Version = '0.14.2'
-  }
-  'Alt3.Docusaurus.Powershell' = @{
-    Version = '1.0.36'
+  'Microsoft.PowerShell.PlatyPS' = @{
+    Version = 'latest'
   }
   'Yayaml' = @{
     Version = '0.6.0'

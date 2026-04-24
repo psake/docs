@@ -1,0 +1,204 @@
+---
+id: Execute
+title: Execute
+description: Help page for the PowerShell Psake "Execute" command
+keywords:
+  - PowerShell
+  - Psake
+  - Help
+  - Documentation
+hide_title: false
+hide_table_of_contents: false
+custom_edit_url: null
+---
+
+:::info This page was generated
+Contributions are welcome in [Psake-repo](https://github.com/psake/psake).
+:::
+
+## SYNOPSIS
+
+Helper function for executing command-line programs.
+
+## SYNTAX
+
+```powershell
+Execute [-Cmd] <ScriptBlock> [[-ErrorMessage] <String>] [[-MaxRetries] <Int32>]
+ [[-RetryTriggerErrorPattern] <String>] [[-WorkingDirectory] <String>] [-NewProcess]
+ [[-TimeoutSeconds] <Int32>] [-ProgressAction <ActionPreference>] [<CommonParameters>]
+```
+
+## DESCRIPTION
+
+This is a helper function that runs a scriptblock and checks the PS variable
+$lastexitcode to see if an error occured.
+
+If an error is detected then an exception is thrown.
+This function allows you to run command-line programs without having to
+explicitly check the $lastexitcode variable.
+
+## EXAMPLES
+
+### EXAMPLE 1
+
+```powershell
+Execute { svn info $repository_trunk } "Error executing SVN. Please verify SVN command-line client is installed"
+```
+
+This example calls the svn command-line client.
+
+## PARAMETERS
+
+### -Cmd
+
+The scriptblock to execute.
+This scriptblock will typically contain the
+command-line invocation.
+
+```yaml
+Type: ScriptBlock
+Parameter Sets: (All)
+Aliases:
+
+Required: True
+Position: 1
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -ErrorMessage
+
+The error message to display if the external command returned a non-zero
+exit code.
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: 2
+Default value: ($msgs.error_bad_command -f $Cmd.ToString().Trim())
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -MaxRetries
+
+The maximum number of times to retry the command before failing.
+
+```yaml
+Type: Int32
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: 3
+Default value: 0
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -RetryTriggerErrorPattern
+
+If the external command raises an exception, match the exception against
+this regex to determine if the command can be retried.
+If a match is found,
+the command will be retried provided [MaxRetries] has not been reached.
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: 4
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -WorkingDirectory
+
+The working directory to set before running the external command.
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases: wd
+
+Required: False
+Position: 5
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -NewProcess
+
+If set, the command will be executed in a new process.
+This can be used to
+isolate the command's environment from the current process.
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: False
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -TimeoutSeconds
+
+If set, the command will be terminated if it runs longer than this number of
+seconds.
+Defaults to 300 seconds (5 minutes).
+
+```yaml
+Type: Int32
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: 6
+Default value: 300
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -ProgressAction
+
+\{\{ Fill ProgressAction Description \}\}
+
+```yaml
+Type: ActionPreference
+Parameter Sets: (All)
+Aliases: proga
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### CommonParameters
+
+This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see [about_CommonParameters](http://go.microsoft.com/fwlink/?LinkID=113216).
+
+## INPUTS
+
+## OUTPUTS
+
+## NOTES
+
+## RELATED LINKS
+
+## VERSION
+
+*This page was generated using comment-based help in [Psake 5.0.2](https://github.com/psake/psake).*
