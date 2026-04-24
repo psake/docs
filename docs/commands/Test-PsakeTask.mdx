@@ -1,0 +1,140 @@
+---
+id: Test-PsakeTask
+title: Test-PsakeTask
+description: Help page for the PowerShell Psake "Test-PsakeTask" command
+keywords:
+  - PowerShell
+  - Psake
+  - Help
+  - Documentation
+hide_title: false
+hide_table_of_contents: false
+custom_edit_url: null
+---
+
+:::info This page was generated
+Contributions are welcome in [Psake-repo](https://github.com/psake/psake).
+:::
+
+## SYNOPSIS
+
+Runs a single task's Action in isolation, without triggering dependencies.
+
+## SYNTAX
+
+```powershell
+Test-PsakeTask [[-BuildFile] <String>] [-TaskName] <String> [[-Variables] <Hashtable>]
+ [-ProgressAction <ActionPreference>] [<CommonParameters>]
+```
+
+## DESCRIPTION
+
+Compiles the build file, finds the specified task, and executes only its
+Action scriptblock with the provided variables.
+Dependencies are NOT
+executed.This enables unit-testing individual tasks.
+
+## EXAMPLES
+
+### EXAMPLE 1
+
+```powershell
+$result = Test-PsakeTask -BuildFile './psakefile.ps1' -TaskName 'Build' -Variables @{
+    Configuration = 'Debug'
+    OutputDir = './test-output'
+}
+$result.Success | Should -BeTrue
+```
+
+This example runs the 'Build' task from 'psakefile.ps1' with two variables
+injected into the task's scope.
+The result object contains details about the
+execution, including success status, duration, and any error messages.
+
+## PARAMETERS
+
+### -BuildFile
+
+The path to the psake build script.
+Defaults to 'psakefile.ps1'.
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: 1
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -TaskName
+
+The name of the task to execute.
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: True
+Position: 2
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -Variables
+
+A hashtable of variables to inject into the task's execution scope.
+
+```yaml
+Type: Hashtable
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: 3
+Default value: @{}
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -ProgressAction
+
+\{\{ Fill ProgressAction Description \}\}
+
+```yaml
+Type: ActionPreference
+Parameter Sets: (All)
+Aliases: proga
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### CommonParameters
+
+This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see [about_CommonParameters](http://go.microsoft.com/fwlink/?LinkID=113216).
+
+## INPUTS
+
+## OUTPUTS
+
+## NOTES
+
+This function is intended for testing purposes and does not execute task
+dependencies or pre/post actions.
+It directly invokes the specified task's
+Action scriptblock in isolation.
+
+## RELATED LINKS
+
+## VERSION
+
+*This page was generated using comment-based help in [Psake 5.0.2](https://github.com/psake/psake).*

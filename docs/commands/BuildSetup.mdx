@@ -1,0 +1,106 @@
+---
+id: BuildSetup
+title: BuildSetup
+description: Help page for the PowerShell Psake "BuildSetup" command
+keywords:
+  - PowerShell
+  - Psake
+  - Help
+  - Documentation
+hide_title: false
+hide_table_of_contents: false
+custom_edit_url: null
+---
+
+:::info This page was generated
+Contributions are welcome in [Psake-repo](https://github.com/psake/psake).
+:::
+
+## SYNOPSIS
+
+Adds a scriptblock that will be executed once at the beginning of the build
+
+## SYNTAX
+
+```powershell
+BuildSetup [-Setup] <ScriptBlock> [-ProgressAction <ActionPreference>] [<CommonParameters>]
+```
+
+## DESCRIPTION
+
+This function will accept a scriptblock that will be executed once at the
+beginning of the build.
+
+## EXAMPLES
+
+### EXAMPLE 1
+
+```powershell
+Task default -Depends Test
+Task Test -Depends Compile, Clean {
+}
+Task Compile -Depends Clean {
+}
+Task Clean {
+}
+BuildSetup {
+    "Running 'BuildSetup'"
+}
+```
+
+The script above produces the following output:
+Running 'BuildSetup'
+Executing task, Clean...
+Executing task, Compile...
+Executing task, Test...
+Build Succeeded
+
+## PARAMETERS
+
+### -Setup
+
+A scriptblock to execute
+
+```yaml
+Type: ScriptBlock
+Parameter Sets: (All)
+Aliases:
+
+Required: True
+Position: 1
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -ProgressAction
+
+\{\{ Fill ProgressAction Description \}\}
+
+```yaml
+Type: ActionPreference
+Parameter Sets: (All)
+Aliases: proga
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### CommonParameters
+
+This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see [about_CommonParameters](http://go.microsoft.com/fwlink/?LinkID=113216).
+
+## INPUTS
+
+## OUTPUTS
+
+## NOTES
+
+## RELATED LINKS
+
+## VERSION
+
+*This page was generated using comment-based help in [Psake 5.0.2](https://github.com/psake/psake).*
