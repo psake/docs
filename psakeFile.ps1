@@ -35,6 +35,16 @@ Contributions are welcome in [Psake-repo](https://github.com/psake/psake).
 *This page was generated using comment-based help in [Psake $($psakeVersion)](https://github.com/psake/psake).*
 "@
     HelpVersion = "$($script:psakeVersion)"
+    CommandVersionMap = @{
+      'BuildSetup'            = '5.0'
+      'BuildTearDown'         = '5.0'
+      'Clear-PsakeCache'      = '5.0'
+      'Execute'               = '5.0'
+      'Get-PsakeBuildPlan'    = '5.0'
+      'Test-BuildEnvironment' = '5.0'
+      'Test-PsakeTask'        = '5.0'
+      'Version'               = '5.0'
+    }
   }
   $script:docsOutputFolder = Join-Path -Path $docusaurusOptions.DocsFolder -ChildPath $docusaurusOptions.Sidebar | Join-Path -ChildPath "*.*"
 
@@ -144,9 +154,9 @@ Task -Name 'GenerateCommandReference-Clean' -Action {
 
 Task -Name "GenerateCommandReference-Gen" -Depends 'GenerateCommandReference-Clean' {
   Write-Host "Generating new MDX files using Microsoft.PowerShell.PlatyPS" -ForegroundColor Magenta
-  . "$PSScriptRoot\scripts\New-PsakeDocusaurusHelp.ps1"
+  . "$PSScriptRoot\scripts\New-DocusaurusModuleHelp.ps1"
   Import-Module Microsoft.PowerShell.PlatyPS -Force
-  New-PsakeDocusaurusHelp @docusaurusOptions
+  New-DocusaurusModuleHelp @docusaurusOptions
 }
 #endregion Command Reference Generation Tasks
 
@@ -167,10 +177,10 @@ Task -Name 'GenerateCommandReferencePSB-Clean' -Action {
 Task -Name "GenerateCommandReferencePSB-Gen" -Depends 'GenerateCommandReferencePSB-Clean' {
   Write-Host "Generating new PSB MDX files using Microsoft.PowerShell.PlatyPS" -ForegroundColor Magenta
   New-Item -ItemType Directory -Path (Join-Path $psbOptions.DocsFolder $psbOptions.SideBar) -Force | Out-Null
-  . "$PSScriptRoot\scripts\New-PsakeDocusaurusHelp.ps1"
+  . "$PSScriptRoot\scripts\New-DocusaurusModuleHelp.ps1"
   Import-Module Microsoft.PowerShell.PlatyPS -Force
   Import-Module PowerShellBuild -Force
-  New-PsakeDocusaurusHelp @psbOptions
+  New-DocusaurusModuleHelp @psbOptions
 }
 #endregion PSB Command Reference Generation Tasks
 

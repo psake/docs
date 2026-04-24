@@ -9,7 +9,6 @@ module.exports = [
     'commands/BuildSetup',
     'commands/BuildTearDown',
     'commands/Clear-PsakeCache',
-    'commands/Exec',
     'commands/Execute',
     'commands/FormatTaskName',
     'commands/Framework',
