@@ -14,6 +14,9 @@
   'Microsoft.PowerShell.PlatyPS' = @{
     Version = 'latest'
   }
+  'PowerShellBuild' = @{
+    Version = 'latest'
+  }
   'Yayaml' = @{
     Version = '0.6.0'
   }
