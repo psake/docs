@@ -37,6 +37,37 @@ Contributions are welcome in [Psake-repo](https://github.com/psake/psake).
     HelpVersion = "$($script:psakeVersion)"
   }
   $script:docsOutputFolder = Join-Path -Path $docusaurusOptions.DocsFolder -ChildPath $docusaurusOptions.Sidebar | Join-Path -ChildPath "*.*"
+
+  # -----------------------------------------------------------------------------
+  # PowerShellBuild command reference options
+  # -----------------------------------------------------------------------------
+
+  $script:psbVersion = (Get-Module PowerShellBuild -ListAvailable | Sort-Object Version -Descending | Select-Object -First 1).Version
+  $script:psbOptions = @{
+    Module = "PowerShellBuild"
+    DocsFolder = "./docs"
+    SideBar = "psb-commands"
+    EditUrl = "null"
+    Exclude = @()
+    MetaDescription = 'Help page for the PowerShellBuild "%1" command'
+    MetaKeywords = @(
+      "PowerShell"
+      "PowerShellBuild"
+      "Help"
+      "Documentation"
+    )
+    PrependMarkdown = @"
+:::info This page was generated
+Contributions are welcome in [PowerShellBuild-repo](https://github.com/psake/PowerShellBuild).
+:::
+"@
+    AppendMarkdown = @"
+## VERSION
+*This page was generated using comment-based help in [PowerShellBuild $($psbVersion)](https://github.com/psake/PowerShellBuild).*
+"@
+    HelpVersion = "$($script:psbVersion)"
+  }
+  $script:psbOutputFolder = Join-Path -Path $psbOptions.DocsFolder -ChildPath $psbOptions.Sidebar | Join-Path -ChildPath "*.*"
 }
 
 FormatTaskName {
@@ -56,7 +87,7 @@ Task 'Init' @{
 
 Task 'Build' @{
   Description = 'Full production site build.'
-  DependsOn   = @('Init', 'GenerateCommandReference', 'FrontMatterCMSSync')
+  DependsOn   = @('Init', 'GenerateCommandReference', 'GenerateCommandReferencePSB', 'FrontMatterCMSSync')
   Action      = { exec { bun run build } }
 }
 
@@ -118,6 +149,30 @@ Task -Name "GenerateCommandReference-Gen" -Depends 'GenerateCommandReference-Cle
   New-PsakeDocusaurusHelp @docusaurusOptions
 }
 #endregion Command Reference Generation Tasks
+
+#region PSB Command Reference Generation Tasks
+$taskSplat = @{
+  description = "Use Microsoft.PowerShell.PlatyPS to generate PowerShellBuild command reference docs."
+  depends = 'GenerateCommandReferencePSB-Gen'
+}
+Task -Name 'GenerateCommandReferencePSB' @taskSplat
+
+Task -Name 'GenerateCommandReferencePSB-Clean' -Action {
+  Write-Host "Removing existing PSB MDX files" -ForegroundColor Magenta
+  if (Test-Path -Path $script:psbOutputFolder) {
+    Remove-Item -Path $script:psbOutputFolder
+  }
+}
+
+Task -Name "GenerateCommandReferencePSB-Gen" -Depends 'GenerateCommandReferencePSB-Clean' {
+  Write-Host "Generating new PSB MDX files using Microsoft.PowerShell.PlatyPS" -ForegroundColor Magenta
+  New-Item -ItemType Directory -Path (Join-Path $psbOptions.DocsFolder $psbOptions.SideBar) -Force | Out-Null
+  . "$PSScriptRoot\scripts\New-PsakeDocusaurusHelp.ps1"
+  Import-Module Microsoft.PowerShell.PlatyPS -Force
+  Import-Module PowerShellBuild -Force
+  New-PsakeDocusaurusHelp @psbOptions
+}
+#endregion PSB Command Reference Generation Tasks
 
 #region Sync Front Matter Data
 Task -Name 'FrontMatterCMSSync' {
