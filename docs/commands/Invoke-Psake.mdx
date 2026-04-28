@@ -51,25 +51,37 @@ execution phase to resolve properties, setup, and teardown blocks.
 
 ### EXAMPLE 1
 
+```powershell
 Invoke-psake
+```
+
 
 Runs the 'default' task in the 'psakefile.ps1' build script
 
 ### EXAMPLE 2
 
+```powershell
 Invoke-psake '.\build.ps1' Tests,Package
+```
+
 
 Runs the 'Tests' and 'Package' tasks in the 'build.ps1' build script
 
 ### EXAMPLE 3
 
+```powershell
 Invoke-psake -CompileOnly
+```
+
 
 Returns the build plan without executing any tasks.
 
 ### EXAMPLE 4
 
+```powershell
 Get-PsakeBuildPlan | Invoke-Psake
+```
+
 
 Compiles the build plan then executes it.
 The build file is re-loaded
@@ -77,7 +89,10 @@ during the execution phase.
 
 ### EXAMPLE 5
 
+```powershell
 Invoke-psake -OutputFormat JSON
+```
+
 
 Runs the build and outputs the result as JSON.
 

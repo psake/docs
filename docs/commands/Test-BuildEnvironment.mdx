@@ -83,23 +83,32 @@ rest of test
 
 ### EXAMPLE 1
 
+```powershell
 Test-BuildEnvironment -Framework '4.8'
+```
+
 
 Returns $true when MSBuild 17.0 or 16.0 and the v4.0.30319 runtime
 directory are both present.
 
 ### EXAMPLE 2
 
+```powershell
 Test-BuildEnvironment -BuildFile './psakefile.ps1'
+```
+
 
 Loads the build file, reads its Framework setting, and returns $true if
 that framework is installed.
 
 ### EXAMPLE 3
 
-if (-not (Test-BuildEnvironment)) \{
+```powershell
+if (-not (Test-BuildEnvironment)) {
     Write-Warning "Build environment not ready for current framework"
-\}
+}
+```
+
 
 Tests the framework configured in the active psake context.
 

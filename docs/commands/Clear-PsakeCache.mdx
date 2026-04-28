@@ -46,13 +46,19 @@ This forces all tasks to re-execute on the next build.
 
 ### EXAMPLE 1
 
+```powershell
 Clear-PsakeCache
+```
+
 
 Clears all cached task state in the current directory.
 
 ### EXAMPLE 2
 
+```powershell
 Clear-PsakeCache -TaskName 'Build'
+```
+
 
 Clears cached state for the 'Build' task only.
 

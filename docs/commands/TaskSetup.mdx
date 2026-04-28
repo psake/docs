@@ -43,16 +43,19 @@ The scriptblock accepts an optional parameter which describes the Task being set
 
 ### EXAMPLE 1
 
+```powershell
 Task default -Depends Test
-Task Test -Depends Compile, Clean \{
-\}
-Task Compile -Depends Clean \{
-\}
-Task Clean \{
-\}
-TaskSetup \{
+Task Test -Depends Compile, Clean {
+}
+Task Compile -Depends Clean {
+}
+Task Clean {
+}
+TaskSetup {
     "Running 'TaskSetup' for task $context.Peek().currentTaskName"
-\}
+}
+```
+
 
 The script above produces the following output:
 
@@ -67,15 +70,18 @@ Build Succeeded
 
 ### EXAMPLE 2
 
+```powershell
 Task default -Depends Test
-Task Test -Depends Compile, Clean \{
-\}
-Task Compile -Depends Clean \{
-\}
-Task Clean \{
-\}
-TaskSetup \{
+Task Test -Depends Compile, Clean {
+}
+Task Compile -Depends Clean {
+}
+Task Clean {
+}
+TaskSetup {
     param($task)
+```
+
 
 "Running 'TaskSetup' for task $($task.Name)"
 \}

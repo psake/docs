@@ -45,17 +45,20 @@ torn down.
 
 ### EXAMPLE 1
 
+```powershell
 Task default -Depends Test
-Task Test -Depends Compile, Clean \{
-\}
-Task Compile -Depends Clean \{
-\}
-Task Clean \{
-\}
-TaskTearDown \{
+Task Test -Depends Compile, Clean {
+}
+Task Compile -Depends Clean {
+}
+Task Clean {
+}
+TaskTearDown {
     "Running 'TaskTearDown' for task $context.Peek().currentTaskName"
-\}
+}
 The script above produces the following output:
+```
+
 
 Executing task, Clean...
 Running 'TaskTearDown' for task Clean
@@ -68,15 +71,18 @@ Build Succeeded
 
 ### EXAMPLE 2
 
+```powershell
 Task default -Depends Test
-Task Test -Depends Compile, Clean \{
-\}
-Task Compile -Depends Clean \{
-\}
-Task Clean \{
-\}
-TaskTearDown \{
+Task Test -Depends Compile, Clean {
+}
+Task Compile -Depends Clean {
+}
+Task Clean {
+}
+TaskTearDown {
     param($task)
+```
+
 
 if ($task.Success) \{
         "Running 'TaskTearDown' for task $($task.Name) - success!"

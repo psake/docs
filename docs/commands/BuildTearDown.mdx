@@ -46,16 +46,19 @@ end of the build, regardless of success or failure
 
 ### EXAMPLE 1
 
+```powershell
 Task default -Depends Test
-Task Test -Depends Compile, Clean \{
-\}
-Task Compile -Depends Clean \{
-\}
-Task Clean \{
-\}
-BuildTearDown \{
+Task Test -Depends Compile, Clean {
+}
+Task Compile -Depends Clean {
+}
+Task Clean {
+}
+BuildTearDown {
     "Running 'BuildTearDown'"
-\}
+}
+```
+
 
 The script above produces the following output:
 Executing task, Clean...
@@ -66,17 +69,20 @@ Build Succeeded
 
 ### EXAMPLE 2
 
+```powershell
 Task default -Depends Test
-Task Test -Depends Compile, Clean \{
+Task Test -Depends Compile, Clean {
     throw "forced error"
-\}
-Task Compile -Depends Clean \{
-\}
-Task Clean \{
-\}
-BuildTearDown \{
+}
+Task Compile -Depends Clean {
+}
+Task Clean {
+}
+BuildTearDown {
     "Running 'BuildTearDown'"
-\}
+}
+```
+
 
 The script above produces the following output:
 Executing task, Clean...

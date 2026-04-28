@@ -47,11 +47,14 @@ the PowerShell process.
 
 ### EXAMPLE 1
 
+```powershell
 Framework "4.0"
 Task default -depends Compile
-Task Compile -depends Clean \{
+Task Compile -depends Clean {
     msbuild /version
-\}
+}
+```
+
 
 The script above will output detailed version of msbuid v4
 

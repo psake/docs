@@ -62,16 +62,19 @@ Note: There must be at least one task called 'default' in the build script
 
 ### EXAMPLE 1
 
+```powershell
 Task default -Depends Test
-Task Test -Depends Compile, Clean \{
+Task Test -Depends Compile, Clean {
     "This is a test"
-\}
-Task Compile -Depends Clean \{
+}
+Task Compile -Depends Clean {
     "Compile"
-\}
-Task Clean \{
+}
+Task Clean {
     "Clean"
-\}
+}
+```
+
 
 The 'default' task is required and should not contain an 'Action' parameter.
 It uses the 'Depends' parameter to specify that 'Test' is a dependency

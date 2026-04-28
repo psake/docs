@@ -113,6 +113,20 @@ function ConvertTo-DocusaurusMdx {
     # Convert markdown parameter tables to yaml fenced blocks
     $body = Convert-ParameterTablesToYamlFences -Body $body
 
+    # Wrap example code in powershell fenced blocks.
+    # PlatyPS v2 outputs example code as plain text; detect the first paragraph of each
+    # ### EXAMPLE section (before the first blank line) and wrap it. Skip if already fenced.
+    $body = [System.Text.RegularExpressions.Regex]::Replace(
+        $body,
+        '(?m)^(### EXAMPLE [^\r\n]+)\r?\n\r?\n(?!```)([^\r\n][^\r\n]*(?:\r?\n(?!\r?\n)[^\r\n][^\r\n]*)*)',
+        {
+            param($m)
+            $header = $m.Groups[1].Value
+            $code   = $m.Groups[2].Value.TrimEnd()
+            "$header`n`n``````powershell`n$code`n```````n"
+        }
+    )
+
     # Fix RELATED LINKS: [Name]() -> [Name](/docs/<sidebar>/Name) for known commands, strip unknown
     foreach ($cmd in $AllCommandNames) {
         $escaped = [regex]::Escape($cmd)

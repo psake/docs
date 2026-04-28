@@ -52,14 +52,17 @@ after code from build script.
 
 ### EXAMPLE 1
 
+```powershell
 Include ".\build_utils.ps1"
 Task default -depends Test
-Task Test -depends Compile, Clean \{
-\}
-Task Compile -depends Clean \{
-\}
-Task Clean \{
-\}
+Task Test -depends Compile, Clean {
+}
+Task Compile -depends Clean {
+}
+Task Clean {
+}
+```
+
 
 The script above includes all the functions and variables defined in the ".\build_utils.ps1" script into the current build script's scope
 
@@ -67,8 +70,11 @@ Note: You can have more than 1 "Include" function defined in the build script.
 
 ### EXAMPLE 2
 
+```powershell
 @("File1.ps1","File2.ps1") | Include
 Get-ChildItem | Include
+```
+
 
 Strings or FileInfo objects can be piped to the Include function
 

@@ -46,16 +46,19 @@ beginning of the build.
 
 ### EXAMPLE 1
 
+```powershell
 Task default -Depends Test
-Task Test -Depends Compile, Clean \{
-\}
-Task Compile -Depends Clean \{
-\}
-Task Clean \{
-\}
-BuildSetup \{
+Task Test -Depends Compile, Clean {
+}
+Task Compile -Depends Clean {
+}
+Task Clean {
+}
+BuildSetup {
     "Running 'BuildSetup'"
-\}
+}
+```
+
 
 The script above produces the following output:
 Running 'BuildSetup'

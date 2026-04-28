@@ -49,11 +49,14 @@ executed.This enables unit-testing individual tasks.
 
 ### EXAMPLE 1
 
-$result = Test-PsakeTask -BuildFile './psakefile.ps1' -TaskName 'Build' -Variables @\{
+```powershell
+$result = Test-PsakeTask -BuildFile './psakefile.ps1' -TaskName 'Build' -Variables @{
     Configuration = 'Debug'
     OutputDir = './test-output'
-\}
+}
 $result.Success | Should -BeTrue
+```
+
 
 This example runs the 'Build' task from 'psakefile.ps1' with two variables
 injected into the task's scope.

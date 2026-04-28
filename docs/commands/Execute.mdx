@@ -52,7 +52,10 @@ explicitly check the $lastexitcode variable.
 
 ### EXAMPLE 1
 
-Execute \{ svn info $repository_trunk \} "Error executing SVN. Please verify SVN command-line client is installed"
+```powershell
+Execute { svn info $repository_trunk } "Error executing SVN. Please verify SVN command-line client is installed"
+```
+
 
 This example calls the svn command-line client.
 
