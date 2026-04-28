@@ -46,16 +46,19 @@ This command was introduced in $Module $sinceVersion and is not available in ear
 "@
             }
 
-            $mdxContent = ConvertTo-DocusaurusMdx `
-                -SourceFile      $mdFile `
-                -CommandName     $commandName `
-                -MetaDescription $MetaDescription `
-                -MetaKeywords    $MetaKeywords `
-                -EditUrl         $EditUrl `
-                -PrependMarkdown $PrependMarkdown `
-                -AppendMarkdown  $AppendMarkdown `
-                -AllCommandNames $allCommandNames `
-                -SinceBadge      $sinceBadge
+            $mdxSplat = @{
+                SourceFile      = $mdFile
+                CommandName     = $commandName
+                MetaDescription = $MetaDescription
+                MetaKeywords    = $MetaKeywords
+                EditUrl         = $EditUrl
+                PrependMarkdown = $PrependMarkdown
+                AppendMarkdown  = $AppendMarkdown
+                AllCommandNames = $allCommandNames
+                SinceBadge      = $sinceBadge
+                SideBar         = $SideBar
+            }
+            $mdxContent = ConvertTo-DocusaurusMdx @mdxSplat
 
             $outputPath = Join-Path $outputFolder "$commandName.mdx"
             Set-Content -Path $outputPath -Value $mdxContent -Encoding UTF8 -NoNewline
@@ -95,7 +98,8 @@ function ConvertTo-DocusaurusMdx {
         [string]   $PrependMarkdown,
         [string]   $AppendMarkdown,
         [string[]] $AllCommandNames,
-        [string]   $SinceBadge = ''
+        [string]   $SinceBadge = '',
+        [string]   $SideBar = 'commands'
     )
 
     $raw = Get-Content -Path $SourceFile.FullName -Raw
@@ -109,10 +113,10 @@ function ConvertTo-DocusaurusMdx {
     # Convert markdown parameter tables to yaml fenced blocks
     $body = Convert-ParameterTablesToYamlFences -Body $body
 
-    # Fix RELATED LINKS: [Name]() -> [Name](Name.mdx) for known commands, strip unknown
+    # Fix RELATED LINKS: [Name]() -> [Name](/docs/<sidebar>/Name) for known commands, strip unknown
     foreach ($cmd in $AllCommandNames) {
         $escaped = [regex]::Escape($cmd)
-        $body = $body -replace "\[$escaped\]\(\)", "[$cmd]($cmd.mdx)"
+        $body = $body -replace "\[$escaped\]\(\)", "[$cmd](/docs/$SideBar/$cmd)"
     }
     $body = $body -replace '\[([^\]]+)\]\(\)', '$1'
 
