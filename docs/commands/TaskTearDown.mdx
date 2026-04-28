@@ -22,39 +22,39 @@ Adds a scriptblock to the build that will be executed after each task
 
 ## SYNTAX
 
-```powershell
-TaskTearDown [-teardown] <ScriptBlock> [-ProgressAction <ActionPreference>] [<CommonParameters>]
+### __AllParameterSets
+
 ```
+TaskTearDown [-TearDown] <scriptblock> [<CommonParameters>]
+```
+
+## ALIASES
+
+This cmdlet has the following aliases,
+  \{\{Insert list of aliases\}\}
 
 ## DESCRIPTION
 
-This function will accept a scriptblock that will be executed after each task in the build script.
+This function will accept a scriptblock that will be executed after each
+task in the build script.
 
-The scriptblock accepts an optional parameter which describes the Task being torn down.
+The scriptblock accepts an optional parameter which describes the Task being
+torn down.
 
 ## EXAMPLES
 
 ### EXAMPLE 1
 
-```powershell
-A sample build script is shown below:
-```
-
-Task default -depends Test
-
-Task Test -depends Compile, Clean \{
+Task default -Depends Test
+Task Test -Depends Compile, Clean \{
 \}
-
-Task Compile -depends Clean \{
+Task Compile -Depends Clean \{
 \}
-
 Task Clean \{
 \}
-
 TaskTearDown \{
     "Running 'TaskTearDown' for task $context.Peek().currentTaskName"
 \}
-
 The script above produces the following output:
 
 Executing task, Clean...
@@ -68,25 +68,17 @@ Build Succeeded
 
 ### EXAMPLE 2
 
-```powershell
-A sample build script demonstrating access to the task context is shown below:
-```
-
-Task default -depends Test
-
-Task Test -depends Compile, Clean \{
+Task default -Depends Test
+Task Test -Depends Compile, Clean \{
 \}
-
-Task Compile -depends Clean \{
+Task Compile -Depends Clean \{
 \}
-
 Task Clean \{
 \}
-
 TaskTearDown \{
     param($task)
 
-    if ($task.Success) \{
+if ($task.Success) \{
         "Running 'TaskTearDown' for task $($task.Name) - success!"
     \} else \{
         "Running 'TaskTearDown' for task $($task.Name) - failed: $($task.ErrorMessage)"
@@ -106,41 +98,33 @@ Build Succeeded
 
 ## PARAMETERS
 
-### -teardown
+### -TearDown
 
 A scriptblock to execute
 
 ```yaml
-Type: ScriptBlock
-Parameter Sets: (All)
-Aliases:
-
-Required: True
-Position: 1
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -ProgressAction
-
-\{\{ Fill ProgressAction Description \}\}
-
-```yaml
-Type: ActionPreference
-Parameter Sets: (All)
-Aliases: proga
-
-Required: False
-Position: Named
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
+Type: System.Management.Automation.ScriptBlock
+DefaultValue: ''
+SupportsWildcards: false
+Aliases: []
+ParameterSets:
+- Name: (All)
+  Position: 0
+  IsRequired: true
+  ValueFromPipeline: false
+  ValueFromPipelineByPropertyName: false
+  ValueFromRemainingArguments: false
+DontShow: false
+AcceptedValues: []
+HelpMessage: ''
 ```
 
 ### CommonParameters
 
-This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see [about_CommonParameters](http://go.microsoft.com/fwlink/?LinkID=113216).
+This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable,
+-InformationAction, -InformationVariable, -OutBuffer, -OutVariable, -PipelineVariable,
+-ProgressAction, -Verbose, -WarningAction, and -WarningVariable. For more information, see
+[about_CommonParameters](https://go.microsoft.com/fwlink/?LinkID=113216).
 
 ## INPUTS
 
@@ -150,26 +134,18 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 
 ## RELATED LINKS
 
-[Assert](Assert.mdx)
+\{\{ Fill in the related links here \}\}
+```yaml
+Type: None
+Parameter Sets: (All)
+Aliases: 
 
-[Exec](Exec.mdx)
-
-[FormatTaskName](FormatTaskName.mdx)
-
-[Framework](Framework.mdx)
-
-[Get-PSakeScriptTasks](Get-PSakeScriptTasks.mdx)
-
-[Include](Include.mdx)
-
-[Invoke-psake](Invoke-psake.mdx)
-
-[Properties](Properties.mdx)
-
-[Task](Task.mdx)
-
-[TaskSetup](TaskSetup.mdx)
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
 
 ## VERSION
-
-*This page was generated using comment-based help in [Psake 4.9.0](https://github.com/psake/psake).*
+*This page was generated using comment-based help in [Psake 5.0.3](https://github.com/psake/psake).*

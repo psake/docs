@@ -1,7 +1,7 @@
 ---
-id: Invoke-psake
-title: Invoke-psake
-description: Help page for the PowerShell Psake "Invoke-psake" command
+id: Invoke-Psake
+title: Invoke-Psake
+description: Help page for the PowerShell Psake "Invoke-Psake" command
 keywords:
   - PowerShell
   - Psake
@@ -22,172 +22,581 @@ Runs a psake build script.
 
 ## SYNTAX
 
-```powershell
-Invoke-psake [[-buildFile] <String>] [[-taskList] <String[]>] [[-framework] <String>] [-docs]
- [[-parameters] <Hashtable>] [[-properties] <Hashtable>] [[-initialization] <ScriptBlock>] [-nologo]
- [-detailedDocs] [-notr] [-ProgressAction <ActionPreference>] [<CommonParameters>]
+### __AllParameterSets
+
 ```
+Invoke-Psake [[-BuildFile] <string>] [[-TaskList] <string[]>] [[-Framework] <string>] [-Docs]
+ [[-Parameters] <hashtable>] [[-Properties] <hashtable>] [[-Initialization] <scriptblock>] [-NoLogo]
+ [-DetailedDocs] [-NoTimeReport] [-OutputFormat <string>] [-NoCache] [-CompileOnly] [-Quiet]
+ [-BuildPlan <PsakeBuildPlan>] [<CommonParameters>]
+```
+
+## ALIASES
+
+This cmdlet has the following aliases,
+  \{\{Insert list of aliases\}\}
 
 ## DESCRIPTION
 
-This function runs a psake build script
+This function runs a psake build script using a two-phase compile/run model.
+The compile phase loads the build file and validates the dependency graph.
+The run phase executes tasks in the resolved order.
+
+A pre-compiled [PsakeBuildPlan] from Get-PsakeBuildPlan can be piped in to
+skip the compile phase.
+When doing so, the build file is re-loaded for the
+execution phase to resolve properties, setup, and teardown blocks.
 
 ## EXAMPLES
 
 ### EXAMPLE 1
 
-```powershell
 Invoke-psake
-```
 
-Runs the 'default' task in the '.build.ps1' build script
+Runs the 'default' task in the 'psakefile.ps1' build script
 
 ### EXAMPLE 2
 
-```powershell
 Invoke-psake '.\build.ps1' Tests,Package
-```
 
-Runs the 'Tests' and 'Package' tasks in the '.build.ps1' build script
+Runs the 'Tests' and 'Package' tasks in the 'build.ps1' build script
 
 ### EXAMPLE 3
 
-```powershell
-Invoke-psake Tests
-```
+Invoke-psake -CompileOnly
 
-This example will run the 'Tests' tasks in the 'psakefile.ps1' build script.
-The 'psakefile.ps1' is assumed to be in the current directory.
+Returns the build plan without executing any tasks.
 
 ### EXAMPLE 4
 
-```powershell
-Invoke-psake 'Tests, Package'
-```
+Get-PsakeBuildPlan | Invoke-Psake
 
-This example will run the 'Tests' and 'Package' tasks in the 'psakefile.ps1' build script.
-The 'psakefile.ps1' is assumed to be in the current directory.
+Compiles the build plan then executes it.
+The build file is re-loaded
+during the execution phase.
 
 ### EXAMPLE 5
 
-```powershell
-Invoke-psake .\build.ps1 -docs
-```
+Invoke-psake -OutputFormat JSON
 
-Prints a report of all the tasks and their dependencies and descriptions and then exits
-
-### EXAMPLE 6
-
-```powershell
-Invoke-psake .\parameters.ps1 -parameters @{"p1"="v1";"p2"="v2"}
-```
-
-Runs the build script called 'parameters.ps1' and passes in parameters 'p1' and 'p2' with values 'v1' and 'v2'
-
-Here's the .\parameters.ps1 build script:
-
-properties \{
-    $my_property = $p1 + $p2
-\}
-
-task default -depends TestParams
-
-task TestParams \{
-    Assert ($my_property -ne $null) '$my_property should not be null'
-\}
-
-Notice how you can refer to the parameters that were passed into the script from within the "properties" function.
-The value of the $p1 variable should be the string "v1" and the value of the $p2 variable should be "v2".
-
-### EXAMPLE 7
-
-```powershell
-Invoke-psake .\properties.ps1 -properties @{"x"="1";"y"="2"}
-```
-
-Runs the build script called 'properties.ps1' and passes in parameters 'x' and 'y' with values '1' and '2'
-
-This feature allows you to override existing properties in your build script.
-
-Here's the .\properties.ps1 build script:
-
-properties \{
-    $x = $null
-    $y = $null
-    $z = $null
-\}
-
-task default -depends TestProperties
-
-task TestProperties \{
-    Assert ($x -ne $null) "x should not be null"
-    Assert ($y -ne $null) "y should not be null"
-    Assert ($z -eq $null) "z should be null"
-\}
+Runs the build and outputs the result as JSON.
 
 ## PARAMETERS
 
-### -buildFile
+### -BuildFile
 
 The path to the psake build script to execute
 
 ```yaml
-Type: String
+Type: System.String
+DefaultValue: ''
+SupportsWildcards: false
+Aliases: []
+ParameterSets:
+- Name: (All)
+  Position: 0
+  IsRequired: false
+  ValueFromPipeline: false
+  ValueFromPipelineByPropertyName: false
+  ValueFromRemainingArguments: false
+DontShow: false
+AcceptedValues: []
+HelpMessage: ''
+```
+```yaml
+Type: None
 Parameter Sets: (All)
-Aliases:
+Aliases: 
 
 Required: False
-Position: 1
+Position: Named
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
+### -BuildPlan
 
-### -taskList
-
-A comma-separated list of task names to execute
+A pre-compiled [PsakeBuildPlan] to execute, typically from Get-PsakeBuildPlan
+via the pipeline.
+Compile-phase parameters (BuildFile, TaskList, Framework,
+Docs, DetailedDocs, CompileOnly) are ignored when a plan is provided.
+Note: the build file is re-loaded during the execution phase.
 
 ```yaml
-Type: String[]
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: 2
-Default value: @()
-Accept pipeline input: False
-Accept wildcard characters: False
+Type: PsakeBuildPlan
+DefaultValue: ''
+SupportsWildcards: false
+Aliases: []
+ParameterSets:
+- Name: (All)
+  Position: Named
+  IsRequired: false
+  ValueFromPipeline: true
+  ValueFromPipelineByPropertyName: false
+  ValueFromRemainingArguments: false
+DontShow: false
+AcceptedValues: []
+HelpMessage: ''
 ```
-
-### -framework
-
-The version of the .NET framework you want to use during build.
-You can append x86 or x64 to force a specific framework.
-If not specified, x86 or x64 will be detected based on the bitness of the PowerShell process.
-Possible values: '1.0', '1.1', '2.0', '2.0x86', '2.0x64', '3.0', '3.0x86', '3.0x64', '3.5', '3.5x86', '3.5x64', '4.0', '4.0x86', '4.0x64', '4.5', '4.5x86', '4.5x64', '4.5.1', '4.5.1x86', '4.5.1x64'
-
 ```yaml
-Type: String
+Type: None
 Parameter Sets: (All)
-Aliases:
+Aliases: 
 
 Required: False
-Position: 3
+Position: Named
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
+### -CompileOnly
 
-### -docs
+Return the build plan without executing any tasks.
+Delegates to
+Get-PsakeBuildPlan.
+Useful for tooling and testing.
+
+```yaml
+Type: System.Management.Automation.SwitchParameter
+DefaultValue: False
+SupportsWildcards: false
+Aliases: []
+ParameterSets:
+- Name: (All)
+  Position: Named
+  IsRequired: false
+  ValueFromPipeline: false
+  ValueFromPipelineByPropertyName: false
+  ValueFromRemainingArguments: false
+DontShow: false
+AcceptedValues: []
+HelpMessage: ''
+```
+```yaml
+Type: None
+Parameter Sets: (All)
+Aliases: 
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+### -DetailedDocs
+
+Prints a more descriptive list of tasks and their descriptions.
+
+```yaml
+Type: System.Management.Automation.SwitchParameter
+DefaultValue: False
+SupportsWildcards: false
+Aliases: []
+ParameterSets:
+- Name: (All)
+  Position: 8
+  IsRequired: false
+  ValueFromPipeline: false
+  ValueFromPipelineByPropertyName: false
+  ValueFromRemainingArguments: false
+DontShow: false
+AcceptedValues: []
+HelpMessage: ''
+```
+```yaml
+Type: None
+Parameter Sets: (All)
+Aliases: 
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+### -Docs
 
 Prints a list of tasks and their descriptions
 
 ```yaml
-Type: SwitchParameter
+Type: System.Management.Automation.SwitchParameter
+DefaultValue: False
+SupportsWildcards: false
+Aliases: []
+ParameterSets:
+- Name: (All)
+  Position: 3
+  IsRequired: false
+  ValueFromPipeline: false
+  ValueFromPipelineByPropertyName: false
+  ValueFromRemainingArguments: false
+DontShow: false
+AcceptedValues: []
+HelpMessage: ''
+```
+```yaml
+Type: None
 Parameter Sets: (All)
-Aliases:
+Aliases: 
 
 Required: False
-Position: 4
-Default value: False
-Acc
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+### -Framework
+
+The version of the .NET framework you want to use during build.
+You can
+append x86 or x64 to force a specific framework.
+If not specified, x86 or
+x64 will be detected based on the bitness of the PowerShell process.
+Possible values: '4.0', '4.0x86', '4.0x64', '4.5', '4.5x86', '4.5x64',
+'4.5.1', '4.5.1x86', '4.5.1x64', '4.6', '4.6.1', '4.6.2', '4.7', '4.7.1',
+'4.7.2', '4.8', '4.8.1'
+
+```yaml
+Type: System.String
+DefaultValue: ''
+SupportsWildcards: false
+Aliases: []
+ParameterSets:
+- Name: (All)
+  Position: 2
+  IsRequired: false
+  ValueFromPipeline: false
+  ValueFromPipelineByPropertyName: false
+  ValueFromRemainingArguments: false
+DontShow: false
+AcceptedValues: []
+HelpMessage: ''
+```
+```yaml
+Type: None
+Parameter Sets: (All)
+Aliases: 
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+### -Initialization
+
+A script block that will be executed before the tasks are executed.
+
+```yaml
+Type: System.Management.Automation.ScriptBlock
+DefaultValue: '{}'
+SupportsWildcards: false
+Aliases:
+- init
+ParameterSets:
+- Name: (All)
+  Position: 6
+  IsRequired: false
+  ValueFromPipeline: false
+  ValueFromPipelineByPropertyName: false
+  ValueFromRemainingArguments: false
+DontShow: false
+AcceptedValues: []
+HelpMessage: ''
+```
+```yaml
+Type: None
+Parameter Sets: (All)
+Aliases: 
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+### -NoCache
+
+Bypass task caching.
+All tasks will execute regardless of cache state.
+
+```yaml
+Type: System.Management.Automation.SwitchParameter
+DefaultValue: False
+SupportsWildcards: false
+Aliases: []
+ParameterSets:
+- Name: (All)
+  Position: Named
+  IsRequired: false
+  ValueFromPipeline: false
+  ValueFromPipelineByPropertyName: false
+  ValueFromRemainingArguments: false
+DontShow: false
+AcceptedValues: []
+HelpMessage: ''
+```
+```yaml
+Type: None
+Parameter Sets: (All)
+Aliases: 
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+### -NoLogo
+
+Do not display the startup banner and copyright message.
+
+```yaml
+Type: System.Management.Automation.SwitchParameter
+DefaultValue: False
+SupportsWildcards: false
+Aliases: []
+ParameterSets:
+- Name: (All)
+  Position: 7
+  IsRequired: false
+  ValueFromPipeline: false
+  ValueFromPipelineByPropertyName: false
+  ValueFromRemainingArguments: false
+DontShow: false
+AcceptedValues: []
+HelpMessage: ''
+```
+```yaml
+Type: None
+Parameter Sets: (All)
+Aliases: 
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+### -NoTimeReport
+
+Do not display the time report.
+
+```yaml
+Type: System.Management.Automation.SwitchParameter
+DefaultValue: False
+SupportsWildcards: false
+Aliases:
+- notr
+ParameterSets:
+- Name: (All)
+  Position: 9
+  IsRequired: false
+  ValueFromPipeline: false
+  ValueFromPipelineByPropertyName: false
+  ValueFromRemainingArguments: false
+DontShow: false
+AcceptedValues: []
+HelpMessage: ''
+```
+```yaml
+Type: None
+Parameter Sets: (All)
+Aliases: 
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+### -OutputFormat
+
+The output format.
+'Default' for console output, 'JSON' for JSON to stdout,
+'GitHubActions' for GitHub Actions workflow annotations (::error::, ::warning::, ::debug::),
+'Annotated' for colored console output plus annotation lines for errors/warnings (VS Code problem matcher).
+If not specified, the PSAKE_OUTPUT_FORMAT environment variable is checked as a fallback.
+
+```yaml
+Type: System.String
+DefaultValue: Default
+SupportsWildcards: false
+Aliases: []
+ParameterSets:
+- Name: (All)
+  Position: Named
+  IsRequired: false
+  ValueFromPipeline: false
+  ValueFromPipelineByPropertyName: false
+  ValueFromRemainingArguments: false
+DontShow: false
+AcceptedValues: []
+HelpMessage: ''
+```
+```yaml
+Type: None
+Parameter Sets: (All)
+Aliases: 
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+### -Parameters
+
+A hashtable containing parameters to be passed into the current build
+script.
+These parameters will be processed before the 'Properties' function
+of the script is processed.
+
+```yaml
+Type: System.Collections.Hashtable
+DefaultValue: '@{}'
+SupportsWildcards: false
+Aliases: []
+ParameterSets:
+- Name: (All)
+  Position: 4
+  IsRequired: false
+  ValueFromPipeline: false
+  ValueFromPipelineByPropertyName: false
+  ValueFromRemainingArguments: false
+DontShow: false
+AcceptedValues: []
+HelpMessage: ''
+```
+```yaml
+Type: None
+Parameter Sets: (All)
+Aliases: 
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+### -Properties
+
+A hashtable containing properties to be passed into the current build
+script.
+These properties will override matching properties that are found in
+the 'Properties' function of the script.
+
+```yaml
+Type: System.Collections.Hashtable
+DefaultValue: '@{}'
+SupportsWildcards: false
+Aliases: []
+ParameterSets:
+- Name: (All)
+  Position: 5
+  IsRequired: false
+  ValueFromPipeline: false
+  ValueFromPipelineByPropertyName: false
+  ValueFromRemainingArguments: false
+DontShow: false
+AcceptedValues: []
+HelpMessage: ''
+```
+```yaml
+Type: None
+Parameter Sets: (All)
+Aliases: 
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+### -Quiet
+
+Suppress all console output.
+The PsakeBuildResult is still returned.
+
+```yaml
+Type: System.Management.Automation.SwitchParameter
+DefaultValue: False
+SupportsWildcards: false
+Aliases: []
+ParameterSets:
+- Name: (All)
+  Position: Named
+  IsRequired: false
+  ValueFromPipeline: false
+  ValueFromPipelineByPropertyName: false
+  ValueFromRemainingArguments: false
+DontShow: false
+AcceptedValues: []
+HelpMessage: ''
+```
+```yaml
+Type: None
+Parameter Sets: (All)
+Aliases: 
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+### -TaskList
+
+A comma-separated list of task names to execute
+
+```yaml
+Type: System.String[]
+DefaultValue: "@('default')"
+SupportsWildcards: false
+Aliases: []
+ParameterSets:
+- Name: (All)
+  Position: 1
+  IsRequired: false
+  ValueFromPipeline: false
+  ValueFromPipelineByPropertyName: false
+  ValueFromRemainingArguments: false
+DontShow: false
+AcceptedValues: []
+HelpMessage: ''
+```
+
+### CommonParameters
+
+This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable,
+-InformationAction, -InformationVariable, -OutBuffer, -OutVariable, -PipelineVariable,
+-ProgressAction, -Verbose, -WarningAction, and -WarningVariable. For more information, see
+[about_CommonParameters](https://go.microsoft.com/fwlink/?LinkID=113216).
+
+## INPUTS
+
+### PsakeBuildPlan
+
+\{\{ Fill in the Description \}\}
+
+## OUTPUTS
+
+## NOTES
+
+## RELATED LINKS
+
+\{\{ Fill in the related links here \}\}
+```yaml
+Type: None
+Parameter Sets: (All)
+Aliases: 
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+## VERSION
+*This page was generated using comment-based help in [Psake 5.0.3](https://github.com/psake/psake).*

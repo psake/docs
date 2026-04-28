@@ -16,6 +16,10 @@ custom_edit_url: null
 Contributions are welcome in [Psake-repo](https://github.com/psake/psake).
 :::
 
+:::note Since Psake 5.0
+This command was introduced in Psake 5.0 and is not available in earlier versions.
+:::
+
 ## SYNOPSIS
 
 Tests whether the .NET framework required by a build is available on the
@@ -25,15 +29,20 @@ current machine.
 
 ### Framework (Default)
 
-```powershell
-Test-BuildEnvironment [[-Framework] <String>] [-ProgressAction <ActionPreference>] [<CommonParameters>]
+```
+Test-BuildEnvironment [[-Framework] <string>] [<CommonParameters>]
 ```
 
 ### BuildFile
 
-```powershell
-Test-BuildEnvironment -BuildFile <String> [-ProgressAction <ActionPreference>] [<CommonParameters>]
 ```
+Test-BuildEnvironment -BuildFile <string> [<CommonParameters>]
+```
+
+## ALIASES
+
+This cmdlet has the following aliases,
+  \{\{Insert list of aliases\}\}
 
 ## DESCRIPTION
 
@@ -74,51 +83,27 @@ rest of test
 
 ### EXAMPLE 1
 
-```powershell
 Test-BuildEnvironment -Framework '4.8'
-```
 
 Returns $true when MSBuild 17.0 or 16.0 and the v4.0.30319 runtime
 directory are both present.
 
 ### EXAMPLE 2
 
-```powershell
 Test-BuildEnvironment -BuildFile './psakefile.ps1'
-```
 
 Loads the build file, reads its Framework setting, and returns $true if
 that framework is installed.
 
 ### EXAMPLE 3
 
-```powershell
-if (-not (Test-BuildEnvironment)) {
+if (-not (Test-BuildEnvironment)) \{
     Write-Warning "Build environment not ready for current framework"
-}
-```
+\}
 
 Tests the framework configured in the active psake context.
 
 ## PARAMETERS
-
-### -Framework
-
-The .NET framework version string to test (e.g.
-'4.8', '3.5', '4.7.2x64').
-Takes precedence over -BuildFile and the active context.
-
-```yaml
-Type: String
-Parameter Sets: Framework
-Aliases:
-
-Required: False
-Position: 1
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
 
 ### -BuildFile
 
@@ -128,25 +113,83 @@ and tested.
 Ignored when -Framework is also supplied.
 
 ```yaml
-Type: String
-Parameter Sets: BuildFile
-Aliases:
+Type: System.String
+DefaultValue: ''
+SupportsWildcards: false
+Aliases: []
+ParameterSets:
+- Name: BuildFile
+  Position: Named
+  IsRequired: true
+  ValueFromPipeline: false
+  ValueFromPipelineByPropertyName: false
+  ValueFromRemainingArguments: false
+DontShow: false
+AcceptedValues: []
+HelpMessage: ''
+```
+```yaml
+Type: None
+Parameter Sets: (All)
+Aliases: 
 
-Required: True
+Required: False
 Position: Named
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
+### -Framework
 
-### -ProgressAction
-
-\{\{ Fill ProgressAction Description \}\}
+The .NET framework version string to test (e.g.
+'4.8', '3.5', '4.7.2x64').
+Takes precedence over -BuildFile and the active context.
 
 ```yaml
-Type: ActionPreference
+Type: System.String
+DefaultValue: ''
+SupportsWildcards: false
+Aliases: []
+ParameterSets:
+- Name: Framework
+  Position: 0
+  IsRequired: false
+  ValueFromPipeline: false
+  ValueFromPipelineByPropertyName: false
+  ValueFromRemainingArguments: false
+DontShow: false
+AcceptedValues: []
+HelpMessage: ''
+```
+
+### CommonParameters
+
+This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable,
+-InformationAction, -InformationVariable, -OutBuffer, -OutVariable, -PipelineVariable,
+-ProgressAction, -Verbose, -WarningAction, and -WarningVariable. For more information, see
+[about_CommonParameters](https://go.microsoft.com/fwlink/?LinkID=113216).
+
+## INPUTS
+
+## OUTPUTS
+
+### [bool]
+
+\{\{ Fill in the Description \}\}
+
+### System.Boolean
+
+\{\{ Fill in the Description \}\}
+
+## NOTES
+
+## RELATED LINKS
+
+\{\{ Fill in the related links here \}\}
+```yaml
+Type: None
 Parameter Sets: (All)
-Aliases: proga
+Aliases: 
 
 Required: False
 Position: Named
@@ -155,20 +198,5 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### CommonParameters
-
-This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see [about_CommonParameters](http://go.microsoft.com/fwlink/?LinkID=113216).
-
-## INPUTS
-
-## OUTPUTS
-
-### [bool]
-
-## NOTES
-
-## RELATED LINKS
-
 ## VERSION
-
-*This page was generated using comment-based help in [Psake 5.0.2](https://github.com/psake/psake).*
+*This page was generated using comment-based help in [Psake 5.0.3](https://github.com/psake/psake).*

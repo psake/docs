@@ -22,10 +22,16 @@ Helper function for "Design by Contract" assertion checking.
 
 ## SYNTAX
 
-```powershell
-Assert [-conditionToCheck] <Object> [-failureMessage] <String> [-ProgressAction <ActionPreference>]
- [<CommonParameters>]
+### __AllParameterSets
+
 ```
+Assert [-ConditionToCheck] <Object> [-FailureMessage] <string> [<CommonParameters>]
+```
+
+## ALIASES
+
+This cmdlet has the following aliases,
+  \{\{Insert list of aliases\}\}
 
 ## DESCRIPTION
 
@@ -35,23 +41,19 @@ This is a helper function that makes the code less noisy by eliminating many of 
 
 ### EXAMPLE 1
 
-```powershell
 Assert $false "This always throws an exception"
-```
 
 Example of an assertion that will always fail.
 
 ### EXAMPLE 2
 
-```powershell
 Assert ( ($i % 2) -eq 0 ) "$i is not an even number"
-```
 
 This exmaple may throw an exception if $i is not an even number
 
 Note:
 It might be necessary to wrap the condition with paranthesis to force PS to evaluate the condition
-so that a boolean value is calculated and passed into the 'conditionToCheck' parameter.
+so that a boolean value is calculated and passed into the 'ConditionToCheck' parameter.
 
 Example:
     Assert 1 -eq 2 "1 doesn't equal 2"
@@ -65,46 +67,30 @@ Assert (1 -eq 2) "1 doesn't equal 2"
 
 ## PARAMETERS
 
-### -conditionToCheck
+### -ConditionToCheck
 
 The boolean condition to evaluate
 
 ```yaml
-Type: Object
-Parameter Sets: (All)
-Aliases:
-
-Required: True
-Position: 1
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
+Type: System.Object
+DefaultValue: ''
+SupportsWildcards: false
+Aliases: []
+ParameterSets:
+- Name: (All)
+  Position: 0
+  IsRequired: true
+  ValueFromPipeline: false
+  ValueFromPipelineByPropertyName: false
+  ValueFromRemainingArguments: false
+DontShow: false
+AcceptedValues: []
+HelpMessage: ''
 ```
-
-### -failureMessage
-
-The error message used for the exception if the conditionToCheck parameter is false
-
 ```yaml
-Type: String
+Type: None
 Parameter Sets: (All)
-Aliases:
-
-Required: True
-Position: 2
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -ProgressAction
-
-\{\{ Fill ProgressAction Description \}\}
-
-```yaml
-Type: ActionPreference
-Parameter Sets: (All)
-Aliases: proga
+Aliases: 
 
 Required: False
 Position: Named
@@ -112,10 +98,33 @@ Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
+### -FailureMessage
+
+The error message used for the exception if the ConditionToCheck parameter is false
+
+```yaml
+Type: System.String
+DefaultValue: ''
+SupportsWildcards: false
+Aliases: []
+ParameterSets:
+- Name: (All)
+  Position: 1
+  IsRequired: true
+  ValueFromPipeline: false
+  ValueFromPipelineByPropertyName: false
+  ValueFromRemainingArguments: false
+DontShow: false
+AcceptedValues: []
+HelpMessage: ''
+```
 
 ### CommonParameters
 
-This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see [about_CommonParameters](http://go.microsoft.com/fwlink/?LinkID=113216).
+This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable,
+-InformationAction, -InformationVariable, -OutBuffer, -OutVariable, -PipelineVariable,
+-ProgressAction, -Verbose, -WarningAction, and -WarningVariable. For more information, see
+[about_CommonParameters](https://go.microsoft.com/fwlink/?LinkID=113216).
 
 ## INPUTS
 
@@ -125,26 +134,18 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 
 ## RELATED LINKS
 
-[Exec](Exec.mdx)
+\{\{ Fill in the related links here \}\}
+```yaml
+Type: None
+Parameter Sets: (All)
+Aliases: 
 
-[FormatTaskName](FormatTaskName.mdx)
-
-[Framework](Framework.mdx)
-
-[Get-PSakeScriptTasks](Get-PSakeScriptTasks.mdx)
-
-[Include](Include.mdx)
-
-[Invoke-psake](Invoke-psake.mdx)
-
-[Properties](Properties.mdx)
-
-[Task](Task.mdx)
-
-[TaskSetup](TaskSetup.mdx)
-
-[TaskTearDown](TaskTearDown.mdx)
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
 
 ## VERSION
-
-*This page was generated using comment-based help in [Psake 4.9.0](https://github.com/psake/psake).*
+*This page was generated using comment-based help in [Psake 5.0.3](https://github.com/psake/psake).*

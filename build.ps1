@@ -2,7 +2,7 @@
 param(
   # Build task(s) to execute
   [parameter(ParameterSetName = 'task', position = 0)]
-  [ArgumentCompleter( {
+  [ArgumentCompleter({
       param($Command, $Parameter, $WordToComplete, $CommandAst, $FakeBoundParams)
       try {
         Get-PSakeScriptTasks -BuildFile './psakeFile.ps1' -ErrorAction 'Stop' |
@@ -12,32 +12,40 @@ param(
         @()
       }
     })]
-  [string[]]$Task = 'default',
+  [string[]] $Task = 'default',
 
   # Bootstrap dependencies
-  [switch]$Bootstrap,
+  [switch] $Bootstrap,
 
   # List available build tasks
   [parameter(ParameterSetName = 'Help')]
-  [switch]$Help,
+  [switch] $Help,
 
-  # Suppress console output (returns structured PsakeBuildResult)
-  [switch]$Quiet,
+  # Suppress console output; returns structured PsakeBuildResult.
+  # LLM should prefer this option.
+  [switch] $Quiet,
+
+  # Bypass task caching for this run
+  [switch] $NoCache,
+
+  # Output format for CI integration
+  [ValidateSet('Default', 'JSON', 'GitHubActions')]
+  [string] $OutputFormat = 'Default',
 
   # Optional properties to pass to psake
-  [hashtable]$Properties,
+  [hashtable] $Properties,
 
   # Optional parameters to pass to psake
-  [hashtable]$Parameters
+  [hashtable] $Parameters
 )
 
 $ErrorActionPreference = 'Stop'
 
 # Bootstrap dependencies
-if ($Bootstrap.IsPresent) {
+if ($Bootstrap) {
   PackageManagement\Get-PackageProvider -Name Nuget -ForceBootstrap | Out-Null
   Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
-  if ((Test-Path -Path ./requirements.psd1)) {
+  if (Test-Path -Path './requirements.psd1') {
     if (-not (Get-Module -Name PSDepend -ListAvailable)) {
       Install-Module -Name PSDepend -Repository PSGallery -Scope CurrentUser -Force
     }
@@ -54,6 +62,16 @@ if ($PSCmdlet.ParameterSetName -eq 'Help') {
   Get-PSakeScriptTasks -BuildFile $psakeFile |
     Format-Table -Property Name, Description, Alias, DependsOn
 } else {
-  $result = Invoke-Psake -BuildFile $psakeFile -TaskList $Task -NoLogo -Properties $Properties -Parameters $Parameters -Quiet:$Quiet
+  $invokeSplat = @{
+    BuildFile = $psakeFile
+    TaskList = $Task
+    NoLogo = $true
+    Properties = $Properties
+    Parameters = $Parameters
+    Quiet = $Quiet
+    NoCache = $NoCache
+    OutputFormat = $OutputFormat
+  }
+  $result = Invoke-Psake @invokeSplat
   exit ([int](-not $result.Success))
 }

@@ -16,16 +16,26 @@ custom_edit_url: null
 Contributions are welcome in [Psake-repo](https://github.com/psake/psake).
 :::
 
+:::note Since Psake 5.0
+This command was introduced in Psake 5.0 and is not available in earlier versions.
+:::
+
 ## SYNOPSIS
 
 Clears the psake build cache.
 
 ## SYNTAX
 
-```powershell
-Clear-PsakeCache [[-Path] <String>] [[-TaskName] <String>] [-ProgressAction <ActionPreference>]
- [<CommonParameters>]
+### __AllParameterSets
+
 ```
+Clear-PsakeCache [[-Path] <string>] [[-TaskName] <string>] [<CommonParameters>]
+```
+
+## ALIASES
+
+This cmdlet has the following aliases,
+  \{\{Insert list of aliases\}\}
 
 ## DESCRIPTION
 
@@ -36,17 +46,13 @@ This forces all tasks to re-execute on the next build.
 
 ### EXAMPLE 1
 
-```powershell
 Clear-PsakeCache
-```
 
 Clears all cached task state in the current directory.
 
 ### EXAMPLE 2
 
-```powershell
 Clear-PsakeCache -TaskName 'Build'
-```
 
 Clears cached state for the 'Build' task only.
 
@@ -59,41 +65,25 @@ Defaults to the current
 directory.
 
 ```yaml
-Type: String
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: 1
-Default value: .
-Accept pipeline input: False
-Accept wildcard characters: False
+Type: System.String
+DefaultValue: .
+SupportsWildcards: false
+Aliases: []
+ParameterSets:
+- Name: (All)
+  Position: 0
+  IsRequired: false
+  ValueFromPipeline: false
+  ValueFromPipelineByPropertyName: false
+  ValueFromRemainingArguments: false
+DontShow: false
+AcceptedValues: []
+HelpMessage: ''
 ```
-
-### -TaskName
-
-Optional: clear cache for a specific task only.
-
 ```yaml
-Type: String
+Type: None
 Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: 2
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -ProgressAction
-
-\{\{ Fill ProgressAction Description \}\}
-
-```yaml
-Type: ActionPreference
-Parameter Sets: (All)
-Aliases: proga
+Aliases: 
 
 Required: False
 Position: Named
@@ -101,10 +91,33 @@ Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
+### -TaskName
+
+Optional: clear cache for a specific task only.
+
+```yaml
+Type: System.String
+DefaultValue: ''
+SupportsWildcards: false
+Aliases: []
+ParameterSets:
+- Name: (All)
+  Position: 1
+  IsRequired: false
+  ValueFromPipeline: false
+  ValueFromPipelineByPropertyName: false
+  ValueFromRemainingArguments: false
+DontShow: false
+AcceptedValues: []
+HelpMessage: ''
+```
 
 ### CommonParameters
 
-This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see [about_CommonParameters](http://go.microsoft.com/fwlink/?LinkID=113216).
+This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable,
+-InformationAction, -InformationVariable, -OutBuffer, -OutVariable, -PipelineVariable,
+-ProgressAction, -Verbose, -WarningAction, and -WarningVariable. For more information, see
+[about_CommonParameters](https://go.microsoft.com/fwlink/?LinkID=113216).
 
 ## INPUTS
 
@@ -114,8 +127,18 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 
 ## RELATED LINKS
 
-[Invoke-psake](Invoke-psake.mdx)
+- [Invoke-Psake](Invoke-Psake.mdx)
+```yaml
+Type: None
+Parameter Sets: (All)
+Aliases: 
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
 
 ## VERSION
-
-*This page was generated using comment-based help in [Psake 5.0.2](https://github.com/psake/psake).*
+*This page was generated using comment-based help in [Psake 5.0.3](https://github.com/psake/psake).*

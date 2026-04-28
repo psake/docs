@@ -9,7 +9,7 @@
     }
   }
   'psake' = @{
-    Version = '5.0.3'
+    Version = 'latest'
   }
   'Microsoft.PowerShell.PlatyPS' = @{
     Version = 'latest'

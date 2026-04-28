@@ -16,17 +16,28 @@ custom_edit_url: null
 Contributions are welcome in [Psake-repo](https://github.com/psake/psake).
 :::
 
+:::note Since Psake 5.0
+This command was introduced in Psake 5.0 and is not available in earlier versions.
+:::
+
 ## SYNOPSIS
 
 Helper function for executing command-line programs.
 
 ## SYNTAX
 
-```powershell
-Execute [-Cmd] <ScriptBlock> [[-ErrorMessage] <String>] [[-MaxRetries] <Int32>]
- [[-RetryTriggerErrorPattern] <String>] [[-WorkingDirectory] <String>] [-NewProcess]
- [[-TimeoutSeconds] <Int32>] [-ProgressAction <ActionPreference>] [<CommonParameters>]
+### __AllParameterSets
+
 ```
+Execute [-Cmd] <scriptblock> [[-ErrorMessage] <string>] [[-MaxRetries] <int>]
+ [[-RetryTriggerErrorPattern] <string>] [[-WorkingDirectory] <string>] [[-TimeoutSeconds] <int>]
+ [-NewProcess] [<CommonParameters>]
+```
+
+## ALIASES
+
+This cmdlet has the following aliases,
+  \{\{Insert list of aliases\}\}
 
 ## DESCRIPTION
 
@@ -41,9 +52,7 @@ explicitly check the $lastexitcode variable.
 
 ### EXAMPLE 1
 
-```powershell
-Execute { svn info $repository_trunk } "Error executing SVN. Please verify SVN command-line client is installed"
-```
+Execute \{ svn info $repository_trunk \} "Error executing SVN. Please verify SVN command-line client is installed"
 
 This example calls the svn command-line client.
 
@@ -56,50 +65,128 @@ This scriptblock will typically contain the
 command-line invocation.
 
 ```yaml
-Type: ScriptBlock
+Type: System.Management.Automation.ScriptBlock
+DefaultValue: ''
+SupportsWildcards: false
+Aliases: []
+ParameterSets:
+- Name: (All)
+  Position: 0
+  IsRequired: true
+  ValueFromPipeline: false
+  ValueFromPipelineByPropertyName: false
+  ValueFromRemainingArguments: false
+DontShow: false
+AcceptedValues: []
+HelpMessage: ''
+```
+```yaml
+Type: None
 Parameter Sets: (All)
-Aliases:
+Aliases: 
 
-Required: True
-Position: 1
+Required: False
+Position: Named
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
-
 ### -ErrorMessage
 
 The error message to display if the external command returned a non-zero
 exit code.
 
 ```yaml
-Type: String
+Type: System.String
+DefaultValue: ($msgs.error_bad_command -f $Cmd.ToString().Trim())
+SupportsWildcards: false
+Aliases: []
+ParameterSets:
+- Name: (All)
+  Position: 1
+  IsRequired: false
+  ValueFromPipeline: false
+  ValueFromPipelineByPropertyName: false
+  ValueFromRemainingArguments: false
+DontShow: false
+AcceptedValues: []
+HelpMessage: ''
+```
+```yaml
+Type: None
 Parameter Sets: (All)
-Aliases:
+Aliases: 
 
 Required: False
-Position: 2
-Default value: ($msgs.error_bad_command -f $Cmd.ToString().Trim())
+Position: Named
+Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
-
 ### -MaxRetries
 
 The maximum number of times to retry the command before failing.
 
 ```yaml
-Type: Int32
+Type: System.Int32
+DefaultValue: 0
+SupportsWildcards: false
+Aliases: []
+ParameterSets:
+- Name: (All)
+  Position: 2
+  IsRequired: false
+  ValueFromPipeline: false
+  ValueFromPipelineByPropertyName: false
+  ValueFromRemainingArguments: false
+DontShow: false
+AcceptedValues: []
+HelpMessage: ''
+```
+```yaml
+Type: None
 Parameter Sets: (All)
-Aliases:
+Aliases: 
 
 Required: False
-Position: 3
-Default value: 0
+Position: Named
+Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
+### -NewProcess
 
+If set, the command will be executed in a new process.
+This can be used to
+isolate the command's environment from the current process.
+
+```yaml
+Type: System.Management.Automation.SwitchParameter
+DefaultValue: False
+SupportsWildcards: false
+Aliases: []
+ParameterSets:
+- Name: (All)
+  Position: Named
+  IsRequired: false
+  ValueFromPipeline: false
+  ValueFromPipelineByPropertyName: false
+  ValueFromRemainingArguments: false
+DontShow: false
+AcceptedValues: []
+HelpMessage: ''
+```
+```yaml
+Type: None
+Parameter Sets: (All)
+Aliases: 
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
 ### -RetryTriggerErrorPattern
 
 If the external command raises an exception, match the exception against
@@ -108,51 +195,32 @@ If a match is found,
 the command will be retried provided [MaxRetries] has not been reached.
 
 ```yaml
-Type: String
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: 4
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
+Type: System.String
+DefaultValue: ''
+SupportsWildcards: false
+Aliases: []
+ParameterSets:
+- Name: (All)
+  Position: 3
+  IsRequired: false
+  ValueFromPipeline: false
+  ValueFromPipelineByPropertyName: false
+  ValueFromRemainingArguments: false
+DontShow: false
+AcceptedValues: []
+HelpMessage: ''
 ```
-
-### -WorkingDirectory
-
-The working directory to set before running the external command.
-
 ```yaml
-Type: String
+Type: None
 Parameter Sets: (All)
-Aliases: wd
-
-Required: False
-Position: 5
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -NewProcess
-
-If set, the command will be executed in a new process.
-This can be used to
-isolate the command's environment from the current process.
-
-```yaml
-Type: SwitchParameter
-Parameter Sets: (All)
-Aliases:
+Aliases: 
 
 Required: False
 Position: Named
-Default value: False
+Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
-
 ### -TimeoutSeconds
 
 If set, the command will be terminated if it runs longer than this number of
@@ -160,25 +228,25 @@ seconds.
 Defaults to 300 seconds (5 minutes).
 
 ```yaml
-Type: Int32
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: 6
-Default value: 300
-Accept pipeline input: False
-Accept wildcard characters: False
+Type: System.Int32
+DefaultValue: 300
+SupportsWildcards: false
+Aliases: []
+ParameterSets:
+- Name: (All)
+  Position: 5
+  IsRequired: false
+  ValueFromPipeline: false
+  ValueFromPipelineByPropertyName: false
+  ValueFromRemainingArguments: false
+DontShow: false
+AcceptedValues: []
+HelpMessage: ''
 ```
-
-### -ProgressAction
-
-\{\{ Fill ProgressAction Description \}\}
-
 ```yaml
-Type: ActionPreference
+Type: None
 Parameter Sets: (All)
-Aliases: proga
+Aliases: 
 
 Required: False
 Position: Named
@@ -186,10 +254,34 @@ Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
+### -WorkingDirectory
+
+The working directory to set before running the external command.
+
+```yaml
+Type: System.String
+DefaultValue: ''
+SupportsWildcards: false
+Aliases:
+- wd
+ParameterSets:
+- Name: (All)
+  Position: 4
+  IsRequired: false
+  ValueFromPipeline: false
+  ValueFromPipelineByPropertyName: false
+  ValueFromRemainingArguments: false
+DontShow: false
+AcceptedValues: []
+HelpMessage: ''
+```
 
 ### CommonParameters
 
-This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see [about_CommonParameters](http://go.microsoft.com/fwlink/?LinkID=113216).
+This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable,
+-InformationAction, -InformationVariable, -OutBuffer, -OutVariable, -PipelineVariable,
+-ProgressAction, -Verbose, -WarningAction, and -WarningVariable. For more information, see
+[about_CommonParameters](https://go.microsoft.com/fwlink/?LinkID=113216).
 
 ## INPUTS
 
@@ -199,6 +291,18 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 
 ## RELATED LINKS
 
-## VERSION
+\{\{ Fill in the related links here \}\}
+```yaml
+Type: None
+Parameter Sets: (All)
+Aliases: 
 
-*This page was generated using comment-based help in [Psake 5.0.2](https://github.com/psake/psake).*
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+## VERSION
+*This page was generated using comment-based help in [Psake 5.0.3](https://github.com/psake/psake).*

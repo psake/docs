@@ -24,46 +24,51 @@ Defines a build task to be executed by psake
 
 ### Normal (Default)
 
-```powershell
-Task [-name] <String> [[-action] <ScriptBlock>] [[-preaction] <ScriptBlock>] [[-postaction] <ScriptBlock>]
- [[-precondition] <ScriptBlock>] [[-postcondition] <ScriptBlock>] [-continueOnError] [[-depends] <String[]>]
- [[-requiredVariables] <String[]>] [[-description] <String>] [[-alias] <String>]
- [-ProgressAction <ActionPreference>] [<CommonParameters>]
+```
+Task [-Name] <string> [[-Action] <scriptblock>] [-PreAction <scriptblock>]
+ [-PostAction <scriptblock>] [-PreCondition <scriptblock>] [-PostCondition <scriptblock>]
+ [-ContinueOnError] [-Depends <string[]>] [-RequiredVariables <string[]>] [-Description <string>]
+ [-Alias <string>] [<CommonParameters>]
 ```
 
 ### SharedTask
 
-```powershell
-Task [-name] <String> [[-action] <ScriptBlock>] [[-preaction] <ScriptBlock>] [[-postaction] <ScriptBlock>]
- [[-precondition] <ScriptBlock>] [[-postcondition] <ScriptBlock>] [-continueOnError] [[-depends] <String[]>]
- [[-requiredVariables] <String[]>] [[-description] <String>] [[-alias] <String>] [-FromModule] <String>
- [[-requiredVersion] <String>] [[-minimumVersion] <String>] [[-maximumVersion] <String>]
- [[-lessThanVersion] <String>] [-ProgressAction <ActionPreference>] [<CommonParameters>]
 ```
+Task [-Name] <string> [[-Action] <scriptblock>] -FromModule <string> [-PreAction <scriptblock>]
+ [-PostAction <scriptblock>] [-PreCondition <scriptblock>] [-PostCondition <scriptblock>]
+ [-ContinueOnError] [-Depends <string[]>] [-RequiredVariables <string[]>] [-Description <string>]
+ [-Alias <string>] [-RequiredVersion <string>] [-MinimumVersion <string>] [-MaximumVersion <string>]
+ [-LessThanVersion <string>] [<CommonParameters>]
+```
+
+### Declarative
+
+```
+Task [-Name] <string> [[-Definition] <hashtable>] [<CommonParameters>]
+```
+
+## ALIASES
+
+This cmdlet has the following aliases,
+  \{\{Insert list of aliases\}\}
 
 ## DESCRIPTION
 
-This function creates a 'task' object that will be used by the psake engine to execute a build task.
+This function creates a 'task' object that will be used by the psake engine
+to execute a build task.
 Note: There must be at least one task called 'default' in the build script
 
 ## EXAMPLES
 
 ### EXAMPLE 1
 
-```powershell
-A sample build script is shown below:
-```
-
 Task default -Depends Test
-
 Task Test -Depends Compile, Clean \{
     "This is a test"
 \}
-
 Task Compile -Depends Clean \{
     "Compile"
 \}
-
 Task Clean \{
     "Clean"
 \}
@@ -71,11 +76,13 @@ Task Clean \{
 The 'default' task is required and should not contain an 'Action' parameter.
 It uses the 'Depends' parameter to specify that 'Test' is a dependency
 
-The 'Test' task uses the 'Depends' parameter to specify that 'Compile' and 'Clean' are dependencies
+The 'Test' task uses the 'Depends' parameter to specify that 'Compile' and
+'Clean' are dependencies
 The 'Compile' task depends on the 'Clean' task.
 
 Note:
-The 'Action' parameter is defaulted to the script block following the 'Clean' task.
+The 'Action' parameter is defaulted to the script block following the
+'Clean' task.
 
 An equivalent 'Test' task is shown below:
 
@@ -106,80 +113,636 @@ Total:  00:00:00.0782496
 
 ## PARAMETERS
 
-### -name
-
-The name of the task
-
-```yaml
-Type: String
-Parameter Sets: (All)
-Aliases:
-
-Required: True
-Position: 1
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -action
+### -Action
 
 A scriptblock containing the statements to execute for the task.
 
 ```yaml
-Type: ScriptBlock
+Type: System.Management.Automation.ScriptBlock
+DefaultValue: ''
+SupportsWildcards: false
+Aliases: []
+ParameterSets:
+- Name: SharedTask
+  Position: 1
+  IsRequired: false
+  ValueFromPipeline: false
+  ValueFromPipelineByPropertyName: false
+  ValueFromRemainingArguments: false
+- Name: Normal
+  Position: 1
+  IsRequired: false
+  ValueFromPipeline: false
+  ValueFromPipelineByPropertyName: false
+  ValueFromRemainingArguments: false
+DontShow: false
+AcceptedValues: []
+HelpMessage: ''
+```
+```yaml
+Type: None
 Parameter Sets: (All)
-Aliases:
+Aliases: 
 
 Required: False
-Position: 2
+Position: Named
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
+### -Alias
 
-### -preaction
-
-A scriptblock to be executed before the 'Action' scriptblock.
-Note: This parameter is ignored if the 'Action' scriptblock is not defined.
+An alternate name for the task.
 
 ```yaml
-Type: ScriptBlock
+Type: System.String
+DefaultValue: ''
+SupportsWildcards: false
+Aliases: []
+ParameterSets:
+- Name: SharedTask
+  Position: Named
+  IsRequired: false
+  ValueFromPipeline: false
+  ValueFromPipelineByPropertyName: false
+  ValueFromRemainingArguments: false
+- Name: Normal
+  Position: Named
+  IsRequired: false
+  ValueFromPipeline: false
+  ValueFromPipelineByPropertyName: false
+  ValueFromRemainingArguments: false
+DontShow: false
+AcceptedValues: []
+HelpMessage: ''
+```
+```yaml
+Type: None
 Parameter Sets: (All)
-Aliases:
+Aliases: 
 
 Required: False
-Position: 3
+Position: Named
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
+### -ContinueOnError
 
-### -postaction
+If this switch parameter is set then the task will not cause the build to
+fail when an exception is thrown by the task
+
+```yaml
+Type: System.Management.Automation.SwitchParameter
+DefaultValue: False
+SupportsWildcards: false
+Aliases: []
+ParameterSets:
+- Name: SharedTask
+  Position: Named
+  IsRequired: false
+  ValueFromPipeline: false
+  ValueFromPipelineByPropertyName: false
+  ValueFromRemainingArguments: false
+- Name: Normal
+  Position: Named
+  IsRequired: false
+  ValueFromPipeline: false
+  ValueFromPipelineByPropertyName: false
+  ValueFromRemainingArguments: false
+DontShow: false
+AcceptedValues: []
+HelpMessage: ''
+```
+```yaml
+Type: None
+Parameter Sets: (All)
+Aliases: 
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+### -Definition
+
+A hashtable that can be used to define a task using a single parameter
+instead of using multiple parameters.
+This is an alternative to the normal
+syntax of Task 'TaskName' -Action \{ ...
+\} -Depends 'OtherTask' and allows
+for a more declarative style of task definition.
+The hashtable can contain
+the following keys:
+- Action
+- PreAction
+- PostAction
+- PreCondition
+- PostCondition
+
+```yaml
+Type: System.Collections.Hashtable
+DefaultValue: ''
+SupportsWildcards: false
+Aliases: []
+ParameterSets:
+- Name: Declarative
+  Position: 1
+  IsRequired: false
+  ValueFromPipeline: false
+  ValueFromPipelineByPropertyName: false
+  ValueFromRemainingArguments: false
+DontShow: false
+AcceptedValues: []
+HelpMessage: ''
+```
+```yaml
+Type: None
+Parameter Sets: (All)
+Aliases: 
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+### -Depends
+
+An array of task names that this task depends on.
+These tasks will be executed before the current task is executed.
+
+```yaml
+Type: System.String[]
+DefaultValue: '@()'
+SupportsWildcards: false
+Aliases: []
+ParameterSets:
+- Name: SharedTask
+  Position: Named
+  IsRequired: false
+  ValueFromPipeline: false
+  ValueFromPipelineByPropertyName: false
+  ValueFromRemainingArguments: false
+- Name: Normal
+  Position: Named
+  IsRequired: false
+  ValueFromPipeline: false
+  ValueFromPipelineByPropertyName: false
+  ValueFromRemainingArguments: false
+DontShow: false
+AcceptedValues: []
+HelpMessage: ''
+```
+```yaml
+Type: None
+Parameter Sets: (All)
+Aliases: 
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+### -Description
+
+A description of the task.
+
+```yaml
+Type: System.String
+DefaultValue: ''
+SupportsWildcards: false
+Aliases: []
+ParameterSets:
+- Name: SharedTask
+  Position: Named
+  IsRequired: false
+  ValueFromPipeline: false
+  ValueFromPipelineByPropertyName: false
+  ValueFromRemainingArguments: false
+- Name: Normal
+  Position: Named
+  IsRequired: false
+  ValueFromPipeline: false
+  ValueFromPipelineByPropertyName: false
+  ValueFromRemainingArguments: false
+DontShow: false
+AcceptedValues: []
+HelpMessage: ''
+```
+```yaml
+Type: None
+Parameter Sets: (All)
+Aliases: 
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+### -FromModule
+
+Load in the task from the specified PowerShell module.
+
+```yaml
+Type: System.String
+DefaultValue: ''
+SupportsWildcards: false
+Aliases: []
+ParameterSets:
+- Name: SharedTask
+  Position: Named
+  IsRequired: true
+  ValueFromPipeline: false
+  ValueFromPipelineByPropertyName: false
+  ValueFromRemainingArguments: false
+DontShow: false
+AcceptedValues: []
+HelpMessage: ''
+```
+```yaml
+Type: None
+Parameter Sets: (All)
+Aliases: 
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+### -LessThanVersion
+
+The version of the PowerShell module to load in the task from that should
+not be met or exceeded.
+eg -LessThanVersion 2.0.0 will reject anything 2.0.0
+or higher, allowing any module in the 1.x.x series.
+
+```yaml
+Type: System.String
+DefaultValue: ''
+SupportsWildcards: false
+Aliases: []
+ParameterSets:
+- Name: SharedTask
+  Position: Named
+  IsRequired: false
+  ValueFromPipeline: false
+  ValueFromPipelineByPropertyName: false
+  ValueFromRemainingArguments: false
+DontShow: false
+AcceptedValues: []
+HelpMessage: ''
+```
+```yaml
+Type: None
+Parameter Sets: (All)
+Aliases: 
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+### -MaximumVersion
+
+The maximum (inclusive) version of the PowerShell module to load in the task
+from.
+
+```yaml
+Type: System.String
+DefaultValue: ''
+SupportsWildcards: false
+Aliases: []
+ParameterSets:
+- Name: SharedTask
+  Position: Named
+  IsRequired: false
+  ValueFromPipeline: false
+  ValueFromPipelineByPropertyName: false
+  ValueFromRemainingArguments: false
+DontShow: false
+AcceptedValues: []
+HelpMessage: ''
+```
+```yaml
+Type: None
+Parameter Sets: (All)
+Aliases: 
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+### -MinimumVersion
+
+The minimum (inclusive) version of the PowerShell module to load in the task
+from.
+
+```yaml
+Type: System.String
+DefaultValue: ''
+SupportsWildcards: false
+Aliases: []
+ParameterSets:
+- Name: SharedTask
+  Position: Named
+  IsRequired: false
+  ValueFromPipeline: false
+  ValueFromPipelineByPropertyName: false
+  ValueFromRemainingArguments: false
+DontShow: false
+AcceptedValues: []
+HelpMessage: ''
+```
+```yaml
+Type: None
+Parameter Sets: (All)
+Aliases: 
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+### -Name
+
+The name of the task
+
+```yaml
+Type: System.String
+DefaultValue: ''
+SupportsWildcards: false
+Aliases: []
+ParameterSets:
+- Name: (All)
+  Position: 0
+  IsRequired: true
+  ValueFromPipeline: false
+  ValueFromPipelineByPropertyName: false
+  ValueFromRemainingArguments: false
+DontShow: false
+AcceptedValues: []
+HelpMessage: ''
+```
+```yaml
+Type: None
+Parameter Sets: (All)
+Aliases: 
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+### -PostAction
 
 A scriptblock to be executed after the 'Action' scriptblock.
 Note: This parameter is ignored if the 'Action' scriptblock is not defined.
 
 ```yaml
-Type: ScriptBlock
+Type: System.Management.Automation.ScriptBlock
+DefaultValue: ''
+SupportsWildcards: false
+Aliases: []
+ParameterSets:
+- Name: SharedTask
+  Position: Named
+  IsRequired: false
+  ValueFromPipeline: false
+  ValueFromPipelineByPropertyName: false
+  ValueFromRemainingArguments: false
+- Name: Normal
+  Position: Named
+  IsRequired: false
+  ValueFromPipeline: false
+  ValueFromPipelineByPropertyName: false
+  ValueFromRemainingArguments: false
+DontShow: false
+AcceptedValues: []
+HelpMessage: ''
+```
+```yaml
+Type: None
 Parameter Sets: (All)
-Aliases:
+Aliases: 
 
 Required: False
-Position: 4
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+### -PostCondition
+
+A scriptblock that is executed to determine if the task completed its job
+correctly.
+An exception is thrown if the scriptblock returns $false.
+
+```yaml
+Type: System.Management.Automation.ScriptBlock
+DefaultValue: '{ $true }'
+SupportsWildcards: false
+Aliases: []
+ParameterSets:
+- Name: SharedTask
+  Position: Named
+  IsRequired: false
+  ValueFromPipeline: false
+  ValueFromPipelineByPropertyName: false
+  ValueFromRemainingArguments: false
+- Name: Normal
+  Position: Named
+  IsRequired: false
+  ValueFromPipeline: false
+  ValueFromPipelineByPropertyName: false
+  ValueFromRemainingArguments: false
+DontShow: false
+AcceptedValues: []
+HelpMessage: ''
+```
+```yaml
+Type: None
+Parameter Sets: (All)
+Aliases: 
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+### -PreAction
+
+A scriptblock to be executed before the 'Action' scriptblock.
+Note: This parameter is ignored if the 'Action' scriptblock is not defined.
+
+```yaml
+Type: System.Management.Automation.ScriptBlock
+DefaultValue: ''
+SupportsWildcards: false
+Aliases: []
+ParameterSets:
+- Name: SharedTask
+  Position: Named
+  IsRequired: false
+  ValueFromPipeline: false
+  ValueFromPipelineByPropertyName: false
+  ValueFromRemainingArguments: false
+- Name: Normal
+  Position: Named
+  IsRequired: false
+  ValueFromPipeline: false
+  ValueFromPipelineByPropertyName: false
+  ValueFromRemainingArguments: false
+DontShow: false
+AcceptedValues: []
+HelpMessage: ''
+```
+```yaml
+Type: None
+Parameter Sets: (All)
+Aliases: 
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+### -PreCondition
+
+A scriptblock that is executed to determine if the task is executed or
+skipped.
+This scriptblock should return $true or $false
+
+```yaml
+Type: System.Management.Automation.ScriptBlock
+DefaultValue: '{ $true }'
+SupportsWildcards: false
+Aliases: []
+ParameterSets:
+- Name: SharedTask
+  Position: Named
+  IsRequired: false
+  ValueFromPipeline: false
+  ValueFromPipelineByPropertyName: false
+  ValueFromRemainingArguments: false
+- Name: Normal
+  Position: Named
+  IsRequired: false
+  ValueFromPipeline: false
+  ValueFromPipelineByPropertyName: false
+  ValueFromRemainingArguments: false
+DontShow: false
+AcceptedValues: []
+HelpMessage: ''
+```
+```yaml
+Type: None
+Parameter Sets: (All)
+Aliases: 
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+### -RequiredVariables
+
+An array of names of variables that must be set to run this task.
+
+```yaml
+Type: System.String[]
+DefaultValue: '@()'
+SupportsWildcards: false
+Aliases: []
+ParameterSets:
+- Name: SharedTask
+  Position: Named
+  IsRequired: false
+  ValueFromPipeline: false
+  ValueFromPipelineByPropertyName: false
+  ValueFromRemainingArguments: false
+- Name: Normal
+  Position: Named
+  IsRequired: false
+  ValueFromPipeline: false
+  ValueFromPipelineByPropertyName: false
+  ValueFromRemainingArguments: false
+DontShow: false
+AcceptedValues: []
+HelpMessage: ''
+```
+```yaml
+Type: None
+Parameter Sets: (All)
+Aliases: 
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+### -RequiredVersion
+
+The specific version of a module to load the task from
+
+```yaml
+Type: System.String
+DefaultValue: ''
+SupportsWildcards: false
+Aliases:
+- Version
+ParameterSets:
+- Name: SharedTask
+  Position: Named
+  IsRequired: false
+  ValueFromPipeline: false
+  ValueFromPipelineByPropertyName: false
+  ValueFromRemainingArguments: false
+DontShow: false
+AcceptedValues: []
+HelpMessage: ''
+```
+
+### CommonParameters
+
+This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable,
+-InformationAction, -InformationVariable, -OutBuffer, -OutVariable, -PipelineVariable,
+-ProgressAction, -Verbose, -WarningAction, and -WarningVariable. For more information, see
+[about_CommonParameters](https://go.microsoft.com/fwlink/?LinkID=113216).
+
+## INPUTS
+
+## OUTPUTS
+
+## NOTES
+
+## RELATED LINKS
+
+\{\{ Fill in the related links here \}\}
+```yaml
+Type: None
+Parameter Sets: (All)
+Aliases: 
+
+Required: False
+Position: Named
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -precondition
-
-A scriptblock that is executed to determine if the task is executed or skipped.
-This scriptblock should return $true or $false
-
-```yaml
-Type: ScriptBlock
-Parameter Sets: (All)
-Aliases:
-
-R
+## VERSION
+*This page was generated using comment-based help in [Psake 5.0.3](https://github.com/psake/psake).*

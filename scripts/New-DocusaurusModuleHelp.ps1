@@ -14,7 +14,9 @@ function New-DocusaurusModuleHelp {
         [hashtable] $CommandVersionMap = @{}
     )
 
-    Import-Module $Module -Force
+    if (-not (Get-Module $Module)) {
+        Import-Module $Module -Force
+    }
 
     $tempDir = Join-Path ([System.IO.Path]::GetTempPath()) "platyps_$(Get-Random)"
     New-Item -ItemType Directory -Path $tempDir | Out-Null
