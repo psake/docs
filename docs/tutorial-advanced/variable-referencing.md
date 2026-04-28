@@ -133,3 +133,5 @@ In case you create a variable with script scope, the variable is kept inside the
 psake module. This means, that if you run Invoke-psake again, the variable is
 available. That’s why variables with script scope should be used carefully.
 Consider them as global variables accessible for all scripts running in psake.
+
+> **Gotcha:** If a `$script:` variable is declared inside a `Properties` block, that block re-runs on every `Invoke-psake` call and will **silently overwrite** whatever value the previous call left behind. Only variables set inside task bodies (not `Properties`) survive intact between calls.
