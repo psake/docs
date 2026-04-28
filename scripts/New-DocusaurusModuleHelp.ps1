@@ -134,6 +134,19 @@ function ConvertTo-DocusaurusMdx {
     }
     $body = $body -replace '\[([^\]]+)\]\(\)', '$1'
 
+    # Strip PlatyPS placeholder sections before MDX escaping.
+    # Remove ## ALIASES section when it contains only the "no aliases" placeholder.
+    $body = $body -replace '(?ms)^## ALIASES\r?\n\r?\nThis cmdlet has the following aliases,\r?\n  \{\{Insert list of aliases\}\}\r?\n(\r?\n)?', ''
+    # Remove the "Fill in the related links here" placeholder (keep real links if any).
+    $body = $body -replace '\{\{ Fill in the related links here \}\}\r?\n', ''
+
+    # Warn about any remaining {{...}} placeholders — these indicate unfilled CBH fields.
+    $remainingPlaceholders = [regex]::Matches($body, '\{\{[^}]+\}\}')
+    if ($remainingPlaceholders.Count -gt 0) {
+        $unique = $remainingPlaceholders | ForEach-Object { $_.Value } | Sort-Object -Unique
+        Write-Warning "$CommandName`: unfilled placeholder(s): $($unique -join ', ')"
+    }
+
     # Escape curly braces outside code fences (required for MDX/JSX compatibility)
     $body = Escape-CurlyBracesOutsideCodeFences -Body $body
 
