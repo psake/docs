@@ -7,6 +7,7 @@
     Parameters = @{
       SkipPublisherCheck = $true
     }
+    Import = $false
   }
   'psake' = @{
     Version = 'latest'

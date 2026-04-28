@@ -150,7 +150,13 @@ custom_edit_url: $customEditUrl
 function Convert-ParameterTablesToYamlFences {
     param([string] $Body)
 
-    # Match each ### -ParameterName block through to the next ### - or end of PARAMETERS section
+    # PlatyPS v2 emits yaml fenced blocks natively (keys: DefaultValue, ParameterSets, etc.)
+    # These are already renderable — return body unchanged and skip table conversion.
+    if ($Body -match '(?ms)^```yaml[\r\n]+(?:Type|DefaultValue):') {
+        return $Body
+    }
+
+    # PlatyPS v1: convert markdown tables to yaml fences
     $result = [System.Text.RegularExpressions.Regex]::Replace(
         $Body,
         '(?ms)(### -\w[^\r\n]*\r?\n)(.*?)(?=### -|\z)',
