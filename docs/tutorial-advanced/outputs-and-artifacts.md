@@ -206,7 +206,9 @@ Task Package -Depends Build {
 }
 ```
 
-**Important:** These variables are **only** accessible within the same `Invoke-psake` call. They **cannot** be accessed by the calling script.
+**Important:** These variables live in the psake **module scope** and persist across `Invoke-psake` calls — they are not automatically reset between calls. They cannot be accessed from the calling script as regular PowerShell variables.
+
+> **Gotcha:** If a variable is declared inside a `Properties` block, that block re-runs on every `Invoke-psake` call and will **silently overwrite** whatever value the previous call left behind. Only variables set inside task bodies (not `Properties`) survive intact between calls.
 
 **When to use:** For passing data between tasks within the same build execution.
 
@@ -545,7 +547,7 @@ steps:
 
 1. **Use JSON/YAML output files** - This is the primary recommended approach for returning data
 2. **Always check exit codes** - They remain the primary success/failure indicator
-3. **Use `$script:` variables for inter-task communication** - But understand they're not accessible outside psake
+3. **Use `$script:` variables for inter-task communication** - They persist in the psake module scope across calls; they are not accessible from the calling script as regular variables
 4. **Avoid Write-Host/Write-Output** for structured data - Use files instead
 5. **Document your output schema** - So consumers know what to expect
 6. **Handle failures gracefully** - Ensure output files contain meaningful error information
