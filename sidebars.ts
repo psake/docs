@@ -77,6 +77,7 @@ const sidebars: SidebarsConfig = {
       label: 'Editor & Tool Integration',
       items: [
         'integrations/vscode-extension',
+        'integrations/llm-tools',
       ]
     },
   ],
