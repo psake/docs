@@ -18,7 +18,8 @@ Contributions are welcome in [Psake-repo](https://github.com/psake/psake).
 
 ## SYNOPSIS
 
-This function allows you to change how psake renders the task name during a build.
+This function allows you to change how psake renders the task name during a
+build.
 
 ## SYNTAX
 
@@ -30,35 +31,35 @@ FormatTaskName [-Format] <Object> [<CommonParameters>]
 
 ## DESCRIPTION
 
-This function takes either a string which represents a format string (formats using the -f format operator see "help about_operators") or it can accept a script block that has a single parameter that is the name of the task that will be executed.
+Useful for adding visual separators or color to task names in the
+build output.
+Accepts a -f format string or a scriptblock that
+receives the task name as its only argument.
 
 ## EXAMPLES
 
 ### EXAMPLE 1
 
 ```powershell
-A sample build script that uses a format string is shown below:
+Task default -depends TaskA, TaskB, TaskC
+FormatTaskName "-------- {0} --------"
+Task TaskA {
+    "TaskA is executing"
+}
+Task TaskB {
+    "TaskB is executing"
+}
+Task TaskC {
+    "TaskC is executing"
+}
 ```
 
 
-Task default -depends TaskA, TaskB, TaskC
+A sample build script that uses a format string.
+The script above produces
+the following output:
 
-FormatTaskName "-------- \{0\} --------"
-
-Task TaskA \{
-"TaskA is executing"
-\}
-
-Task TaskB \{
-"TaskB is executing"
-\}
-
-Task TaskC \{
-"TaskC is executing"
-
------------
-The script above produces the following output:
-
+```
 -------- TaskA --------
 TaskA is executing
 -------- TaskB --------
@@ -67,37 +68,34 @@ TaskB is executing
 TaskC is executing
 
 Build Succeeded!
+```
 
 ### EXAMPLE 2
 
 ```powershell
-A sample build script that uses a ScriptBlock is shown below:
+Task default -depends TaskA, TaskB, TaskC
+FormatTaskName {
+    param($taskName)
+    write-host "Executing Task: $taskName" -ForegroundColor blue
+}
+Task TaskA {
+    "TaskA is executing"
+}
+Task TaskB {
+    "TaskB is executing"
+}
+Task TaskC {
+    "TaskC is executing"
+}
 ```
 
 
-Task default -depends TaskA, TaskB, TaskC
+A sample build script that uses a ScriptBlock.
+The above example uses the
+scriptblock parameter to the FormatTaskName function to render each task
+name in the color blue.
 
-FormatTaskName \{
-    param($taskName)
-    write-host "Executing Task: $taskName" -foregroundcolor blue
-\}
-
-Task TaskA \{
-"TaskA is executing"
-\}
-
-Task TaskB \{
-"TaskB is executing"
-\}
-
-Task TaskC \{
-"TaskC is executing"
-\}
-
------------
-The above example uses the scriptblock parameter to the FormatTaskName function to render each task name in the color blue.
-
-Note: the $taskName parameter is arbitrary, it could be named anything.
+Note: the $taskName parameter name is arbitrary, it could be named anything.
 
 ## PARAMETERS
 
@@ -138,4 +136,4 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 ## RELATED LINKS
 
 ## VERSION
-*This page was generated using comment-based help in [Psake 5.0.3](https://github.com/psake/psake).*
+*This page was generated using comment-based help in [Psake 5.0.4](https://github.com/psake/psake).*

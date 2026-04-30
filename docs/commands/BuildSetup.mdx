@@ -34,8 +34,9 @@ BuildSetup [-Setup] <scriptblock> [<CommonParameters>]
 
 ## DESCRIPTION
 
-This function will accept a scriptblock that will be executed once at the
-beginning of the build.
+Runs once before the first task executes.
+Use this to set up shared
+state, logging, or environment validation for the whole build.
 
 ## EXAMPLES
 
@@ -43,12 +44,9 @@ beginning of the build.
 
 ```powershell
 Task default -Depends Test
-Task Test -Depends Compile, Clean {
-}
-Task Compile -Depends Clean {
-}
-Task Clean {
-}
+Task Test -Depends Compile, Clean {}
+Task Compile -Depends Clean {}
+Task Clean {}
 BuildSetup {
     "Running 'BuildSetup'"
 }
@@ -56,17 +54,20 @@ BuildSetup {
 
 
 The script above produces the following output:
+
+```
 Running 'BuildSetup'
 Executing task, Clean...
 Executing task, Compile...
 Executing task, Test...
 Build Succeeded
+```
 
 ## PARAMETERS
 
 ### -Setup
 
-A scriptblock to execute
+Executed once before any tasks run.
 
 ```yaml
 Type: System.Management.Automation.ScriptBlock
@@ -101,4 +102,4 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 ## RELATED LINKS
 
 ## VERSION
-*This page was generated using comment-based help in [Psake 5.0.3](https://github.com/psake/psake).*
+*This page was generated using comment-based help in [Psake 5.0.4](https://github.com/psake/psake).*

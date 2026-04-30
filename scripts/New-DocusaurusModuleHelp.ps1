@@ -139,6 +139,9 @@ function ConvertTo-DocusaurusMdx {
     $body = $body -replace '(?ms)^## ALIASES\r?\n\r?\nThis cmdlet has the following aliases,\r?\n  \{\{Insert list of aliases\}\}\r?\n(\r?\n)?', ''
     # Remove the "Fill in the related links here" placeholder (keep real links if any).
     $body = $body -replace '\{\{ Fill in the related links here \}\}\r?\n', ''
+    # Remove "Fill in the Description" placeholders in INPUTS/OUTPUTS sections (PlatyPS generates
+    # these when .INPUTS/.OUTPUTS CBH is absent; real content on adjacent lines is preserved).
+    $body = $body -replace '\{\{ Fill in the Description \}\}\r?\n', ''
 
     # Warn about any remaining {{...}} placeholders — these indicate unfilled CBH fields.
     $remainingPlaceholders = [regex]::Matches($body, '\{\{[^}]+\}\}')

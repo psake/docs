@@ -36,12 +36,8 @@ Execute [-Cmd] <scriptblock> [[-ErrorMessage] <string>] [[-MaxRetries] <int>]
 
 ## DESCRIPTION
 
-This is a helper function that runs a scriptblock and checks the PS variable
-$lastexitcode to see if an error occured.
-
-If an error is detected then an exception is thrown.
-This function allows you to run command-line programs without having to
-explicitly check the $lastexitcode variable.
+Throws a terminating error if $lastexitcode is non-zero after the
+command runs, so callers don't need to check it after each invocation.
 
 ## EXAMPLES
 
@@ -230,4 +226,4 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 ## RELATED LINKS
 
 ## VERSION
-*This page was generated using comment-based help in [Psake 5.0.3](https://github.com/psake/psake).*
+*This page was generated using comment-based help in [Psake 5.0.4](https://github.com/psake/psake).*

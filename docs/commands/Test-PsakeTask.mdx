@@ -137,13 +137,11 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 
 ## NOTES
 
-This function is intended for testing purposes and does not execute task
-dependencies or pre/post actions.
-It directly invokes the specified task's
-Action scriptblock in isolation.
+Dependencies, PreAction, and PostAction are skipped — only the
+task's Action scriptblock is executed.
 
 
 ## RELATED LINKS
 
 ## VERSION
-*This page was generated using comment-based help in [Psake 5.0.3](https://github.com/psake/psake).*
+*This page was generated using comment-based help in [Psake 5.0.4](https://github.com/psake/psake).*

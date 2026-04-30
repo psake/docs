@@ -30,11 +30,10 @@ TaskTearDown [-TearDown] <scriptblock> [<CommonParameters>]
 
 ## DESCRIPTION
 
-This function will accept a scriptblock that will be executed after each
-task in the build script.
-
-The scriptblock accepts an optional parameter which describes the Task being
-torn down.
+Use this for per-task teardown such as logging duration, checking
+postconditions, or cleaning up temporary state.
+The completed
+[PsakeTask] is passed as an optional argument with success/error info.
 
 ## EXAMPLES
 
@@ -55,6 +54,7 @@ The script above produces the following output:
 ```
 
 
+```
 Executing task, Clean...
 Running 'TaskTearDown' for task Clean
 Executing task, Compile...
@@ -63,31 +63,29 @@ Executing task, Test...
 Running 'TaskTearDown' for task Test
 
 Build Succeeded
+```
 
 ### EXAMPLE 2
 
 ```powershell
 Task default -Depends Test
-Task Test -Depends Compile, Clean {
-}
-Task Compile -Depends Clean {
-}
-Task Clean {
-}
+Task Test -Depends Compile, Clean {}
+Task Compile -Depends Clean {}
+Task Clean {}
 TaskTearDown {
     param($task)
+    if ($task.Success) {
+        "Running 'TaskTearDown' for task $($task.Name) - success!"
+    } else {
+        "Running 'TaskTearDown' for task $($task.Name) - failed: $($task.ErrorMessage)"
+    }
+}
 ```
 
 
-if ($task.Success) \{
-        "Running 'TaskTearDown' for task $($task.Name) - success!"
-    \} else \{
-        "Running 'TaskTearDown' for task $($task.Name) - failed: $($task.ErrorMessage)"
-    \}
-\}
-
 The script above produces the following output:
 
+```
 Executing task, Clean...
 Running 'TaskTearDown' for task Clean - success!
 Executing task, Compile...
@@ -96,12 +94,13 @@ Executing task, Test...
 Running 'TaskTearDown' for task Test - success!
 
 Build Succeeded
+```
 
 ## PARAMETERS
 
 ### -TearDown
 
-A scriptblock to execute
+Receives the completed task as an optional [PsakeTask] argument.
 
 ```yaml
 Type: System.Management.Automation.ScriptBlock
@@ -136,4 +135,4 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 ## RELATED LINKS
 
 ## VERSION
-*This page was generated using comment-based help in [Psake 5.0.3](https://github.com/psake/psake).*
+*This page was generated using comment-based help in [Psake 5.0.4](https://github.com/psake/psake).*

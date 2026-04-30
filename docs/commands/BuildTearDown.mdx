@@ -34,8 +34,9 @@ BuildTearDown [-Setup] <scriptblock> [<CommonParameters>]
 
 ## DESCRIPTION
 
-This function will accept a scriptblock that will be executed once at the
-end of the build, regardless of success or failure
+Runs after all tasks complete, even if the build failed.
+Use this for
+cleanup, notifications, or post-build reporting.
 
 ## EXAMPLES
 
@@ -43,12 +44,9 @@ end of the build, regardless of success or failure
 
 ```powershell
 Task default -Depends Test
-Task Test -Depends Compile, Clean {
-}
-Task Compile -Depends Clean {
-}
-Task Clean {
-}
+Task Test -Depends Compile, Clean {}
+Task Compile -Depends Clean {}
+Task Clean {}
 BuildTearDown {
     "Running 'BuildTearDown'"
 }
@@ -56,11 +54,14 @@ BuildTearDown {
 
 
 The script above produces the following output:
+
+```
 Executing task, Clean...
 Executing task, Compile...
 Executing task, Test...
 Running 'BuildTearDown'
 Build Succeeded
+```
 
 ### EXAMPLE 2
 
@@ -69,10 +70,8 @@ Task default -Depends Test
 Task Test -Depends Compile, Clean {
     throw "forced error"
 }
-Task Compile -Depends Clean {
-}
-Task Clean {
-}
+Task Compile -Depends Clean {}
+Task Clean {}
 BuildTearDown {
     "Running 'BuildTearDown'"
 }
@@ -80,18 +79,21 @@ BuildTearDown {
 
 
 The script above produces the following output:
+
+```
 Executing task, Clean...
 Executing task, Compile...
 Executing task, Test...
 Running 'BuildTearDown'
 forced error
 At line:x char:x ...
+```
 
 ## PARAMETERS
 
 ### -Setup
 
-A scriptblock to execute
+Executed after all tasks finish, whether or not the build succeeded.
 
 ```yaml
 Type: System.Management.Automation.ScriptBlock
@@ -126,4 +128,4 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 ## RELATED LINKS
 
 ## VERSION
-*This page was generated using comment-based help in [Psake 5.0.3](https://github.com/psake/psake).*
+*This page was generated using comment-based help in [Psake 5.0.4](https://github.com/psake/psake).*
