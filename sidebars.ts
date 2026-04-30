@@ -1,5 +1,6 @@
 import type { SidebarsConfig } from '@docusaurus/plugin-content-docs';
 import commands from "./docs/commands/docusaurus.sidebar.js";
+import psbCommands from "./docs/psb-commands/docusaurus.sidebar.js";
 
 /**
  * Creating a sidebar enables you to:
@@ -87,6 +88,11 @@ const sidebars: SidebarsConfig = {
     'powershellbuild/task-reference',
     'powershellbuild/configuration',
     'powershellbuild/real-world-example',
+    ...(psbCommands.length > 0 ? [{
+      type: 'category' as const,
+      label: 'Command Reference',
+      items: psbCommands,
+    }] : []),
   ],
 
   // Reference - Command reference, troubleshooting, and lookup materials

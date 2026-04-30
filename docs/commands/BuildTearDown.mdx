@@ -1,7 +1,7 @@
 ---
-id: TaskTearDown
-title: TaskTearDown
-description: Help page for the PowerShell Psake "TaskTearDown" command
+id: BuildTearDown
+title: BuildTearDown
+description: Help page for the PowerShell Psake "BuildTearDown" command
 keywords:
   - PowerShell
   - Psake
@@ -16,24 +16,27 @@ custom_edit_url: null
 Contributions are welcome in [Psake-repo](https://github.com/psake/psake).
 :::
 
+:::note Since Psake 5.0
+This command was introduced in Psake 5.0 and is not available in earlier versions.
+:::
+
 ## SYNOPSIS
 
-Adds a scriptblock to the build that will be executed after each task
+Adds a scriptblock that will be executed once at the end of the build
 
 ## SYNTAX
 
 ### __AllParameterSets
 
 ```
-TaskTearDown [-TearDown] <scriptblock> [<CommonParameters>]
+BuildTearDown [-Setup] <scriptblock> [<CommonParameters>]
 ```
 
 ## DESCRIPTION
 
-Use this for per-task teardown such as logging duration, checking
-postconditions, or cleaning up temporary state.
-The completed
-[PsakeTask] is passed as an optional argument with success/error info.
+Runs after all tasks complete, even if the build failed.
+Use this for
+cleanup, notifications, or post-build reporting.
 
 ## EXAMPLES
 
@@ -41,27 +44,22 @@ The completed
 
 ```powershell
 Task default -Depends Test
-Task Test -Depends Compile, Clean {
+Task Test -Depends Compile, Clean {}
+Task Compile -Depends Clean {}
+Task Clean {}
+BuildTearDown {
+    "Running 'BuildTearDown'"
 }
-Task Compile -Depends Clean {
-}
-Task Clean {
-}
-TaskTearDown {
-    "Running 'TaskTearDown' for task $context.Peek().currentTaskName"
-}
-The script above produces the following output:
 ```
 
+
+The script above produces the following output:
 
 ```
 Executing task, Clean...
-Running 'TaskTearDown' for task Clean
 Executing task, Compile...
-Running 'TaskTearDown' for task Compile
 Executing task, Test...
-Running 'TaskTearDown' for task Test
-
+Running 'BuildTearDown'
 Build Succeeded
 ```
 
@@ -69,16 +67,13 @@ Build Succeeded
 
 ```powershell
 Task default -Depends Test
-Task Test -Depends Compile, Clean {}
+Task Test -Depends Compile, Clean {
+    throw "forced error"
+}
 Task Compile -Depends Clean {}
 Task Clean {}
-TaskTearDown {
-    param($task)
-    if ($task.Success) {
-        "Running 'TaskTearDown' for task $($task.Name) - success!"
-    } else {
-        "Running 'TaskTearDown' for task $($task.Name) - failed: $($task.ErrorMessage)"
-    }
+BuildTearDown {
+    "Running 'BuildTearDown'"
 }
 ```
 
@@ -87,20 +82,18 @@ The script above produces the following output:
 
 ```
 Executing task, Clean...
-Running 'TaskTearDown' for task Clean - success!
 Executing task, Compile...
-Running 'TaskTearDown' for task Compile - success!
 Executing task, Test...
-Running 'TaskTearDown' for task Test - success!
-
-Build Succeeded
+Running 'BuildTearDown'
+forced error
+At line:x char:x ...
 ```
 
 ## PARAMETERS
 
-### -TearDown
+### -Setup
 
-Receives the completed task as an optional [PsakeTask] argument.
+Executed after all tasks finish, whether or not the build succeeded.
 
 ```yaml
 Type: System.Management.Automation.ScriptBlock

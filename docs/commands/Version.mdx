@@ -1,7 +1,7 @@
 ---
-id: Get-PSakeScriptTasks
-title: Get-PSakeScriptTasks
-description: Help page for the PowerShell Psake "Get-PSakeScriptTasks" command
+id: Version
+title: Version
+description: Help page for the PowerShell Psake "Version" command
 keywords:
   - PowerShell
   - Psake
@@ -16,57 +16,56 @@ custom_edit_url: null
 Contributions are welcome in [Psake-repo](https://github.com/psake/psake).
 :::
 
+:::note Since Psake 5.0
+This command was introduced in Psake 5.0 and is not available in earlier versions.
+:::
+
 ## SYNOPSIS
 
-Returns meta data about all the tasks defined in the provided psake script.
+Declares the required psake version for the build script.
 
 ## SYNTAX
 
 ### __AllParameterSets
 
 ```
-Get-PSakeScriptTasks [[-BuildFile] <string>] [<CommonParameters>]
+Version [-RequiredVersion] <int> [<CommonParameters>]
 ```
 
 ## DESCRIPTION
 
-Loads the build file and evaluates task definitions without executing
-any tasks.
-Useful for tooling, IDE integrations, and tab completion.
+Use this function at the top of a psake build script to declare which
+major version of psake the script requires.
+The compile phase will validate
+that the running psake version matches.
 
 ## EXAMPLES
 
 ### EXAMPLE 1
 
 ```powershell
-Get-PSakeScriptTasks -BuildFile '.\build.ps1'
+Version 5
 ```
 
 
-DependsOn        Alias Name    Description
----------        ----- ----    -----------
-\{\}                     Compile
-\{\}                     Clean
-\{Test\}                 Default
-\{Clean, Compile\}       Test
-
-Gets the psake tasks contained in the 'build.ps1' file.
+Declares that this build script requires psake v5.
 
 ## PARAMETERS
 
-### -BuildFile
+### -RequiredVersion
 
-The path to the psake build script to read the tasks from.
+The major version number required (e.g.
+5).
 
 ```yaml
-Type: System.String
-DefaultValue: ''
+Type: System.Int32
+DefaultValue: 0
 SupportsWildcards: false
 Aliases: []
 ParameterSets:
 - Name: (All)
   Position: 0
-  IsRequired: false
+  IsRequired: true
   ValueFromPipeline: false
   ValueFromPipelineByPropertyName: false
   ValueFromRemainingArguments: false

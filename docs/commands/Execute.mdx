@@ -1,0 +1,229 @@
+---
+id: Execute
+title: Execute
+description: Help page for the PowerShell Psake "Execute" command
+keywords:
+  - PowerShell
+  - Psake
+  - Help
+  - Documentation
+hide_title: false
+hide_table_of_contents: false
+custom_edit_url: null
+---
+
+:::info This page was generated
+Contributions are welcome in [Psake-repo](https://github.com/psake/psake).
+:::
+
+:::note Since Psake 5.0
+This command was introduced in Psake 5.0 and is not available in earlier versions.
+:::
+
+## SYNOPSIS
+
+Helper function for executing command-line programs.
+
+## SYNTAX
+
+### __AllParameterSets
+
+```
+Execute [-Cmd] <scriptblock> [[-ErrorMessage] <string>] [[-MaxRetries] <int>]
+ [[-RetryTriggerErrorPattern] <string>] [[-WorkingDirectory] <string>] [[-TimeoutSeconds] <int>]
+ [-NewProcess] [<CommonParameters>]
+```
+
+## DESCRIPTION
+
+Throws a terminating error if $lastexitcode is non-zero after the
+command runs, so callers don't need to check it after each invocation.
+
+## EXAMPLES
+
+### EXAMPLE 1
+
+```powershell
+Execute { svn info $repository_trunk } "Error executing SVN. Please verify SVN command-line client is installed"
+```
+
+
+This example calls the svn command-line client.
+
+## PARAMETERS
+
+### -Cmd
+
+The scriptblock to execute.
+This scriptblock will typically contain the
+command-line invocation.
+
+```yaml
+Type: System.Management.Automation.ScriptBlock
+DefaultValue: ''
+SupportsWildcards: false
+Aliases: []
+ParameterSets:
+- Name: (All)
+  Position: 0
+  IsRequired: true
+  ValueFromPipeline: false
+  ValueFromPipelineByPropertyName: false
+  ValueFromRemainingArguments: false
+DontShow: false
+AcceptedValues: []
+HelpMessage: ''
+```
+
+### -ErrorMessage
+
+The error message to display if the external command returned a non-zero
+exit code.
+
+```yaml
+Type: System.String
+DefaultValue: ($msgs.error_bad_command -f $Cmd.ToString().Trim())
+SupportsWildcards: false
+Aliases: []
+ParameterSets:
+- Name: (All)
+  Position: 1
+  IsRequired: false
+  ValueFromPipeline: false
+  ValueFromPipelineByPropertyName: false
+  ValueFromRemainingArguments: false
+DontShow: false
+AcceptedValues: []
+HelpMessage: ''
+```
+
+### -MaxRetries
+
+The maximum number of times to retry the command before failing.
+
+```yaml
+Type: System.Int32
+DefaultValue: 0
+SupportsWildcards: false
+Aliases: []
+ParameterSets:
+- Name: (All)
+  Position: 2
+  IsRequired: false
+  ValueFromPipeline: false
+  ValueFromPipelineByPropertyName: false
+  ValueFromRemainingArguments: false
+DontShow: false
+AcceptedValues: []
+HelpMessage: ''
+```
+
+### -NewProcess
+
+If set, the command will be executed in a new process.
+This can be used to
+isolate the command's environment from the current process.
+
+```yaml
+Type: System.Management.Automation.SwitchParameter
+DefaultValue: False
+SupportsWildcards: false
+Aliases: []
+ParameterSets:
+- Name: (All)
+  Position: Named
+  IsRequired: false
+  ValueFromPipeline: false
+  ValueFromPipelineByPropertyName: false
+  ValueFromRemainingArguments: false
+DontShow: false
+AcceptedValues: []
+HelpMessage: ''
+```
+
+### -RetryTriggerErrorPattern
+
+If the external command raises an exception, match the exception against
+this regex to determine if the command can be retried.
+If a match is found,
+the command will be retried provided [MaxRetries] has not been reached.
+
+```yaml
+Type: System.String
+DefaultValue: ''
+SupportsWildcards: false
+Aliases: []
+ParameterSets:
+- Name: (All)
+  Position: 3
+  IsRequired: false
+  ValueFromPipeline: false
+  ValueFromPipelineByPropertyName: false
+  ValueFromRemainingArguments: false
+DontShow: false
+AcceptedValues: []
+HelpMessage: ''
+```
+
+### -TimeoutSeconds
+
+If set, the command will be terminated if it runs longer than this number of
+seconds.
+Defaults to 300 seconds (5 minutes).
+
+```yaml
+Type: System.Int32
+DefaultValue: 300
+SupportsWildcards: false
+Aliases: []
+ParameterSets:
+- Name: (All)
+  Position: 5
+  IsRequired: false
+  ValueFromPipeline: false
+  ValueFromPipelineByPropertyName: false
+  ValueFromRemainingArguments: false
+DontShow: false
+AcceptedValues: []
+HelpMessage: ''
+```
+
+### -WorkingDirectory
+
+The working directory to set before running the external command.
+
+```yaml
+Type: System.String
+DefaultValue: ''
+SupportsWildcards: false
+Aliases:
+- wd
+ParameterSets:
+- Name: (All)
+  Position: 4
+  IsRequired: false
+  ValueFromPipeline: false
+  ValueFromPipelineByPropertyName: false
+  ValueFromRemainingArguments: false
+DontShow: false
+AcceptedValues: []
+HelpMessage: ''
+```
+
+### CommonParameters
+
+This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable,
+-InformationAction, -InformationVariable, -OutBuffer, -OutVariable, -PipelineVariable,
+-ProgressAction, -Verbose, -WarningAction, and -WarningVariable. For more information, see
+[about_CommonParameters](https://go.microsoft.com/fwlink/?LinkID=113216).
+
+## INPUTS
+
+## OUTPUTS
+
+## NOTES
+
+## RELATED LINKS
+
+## VERSION
+*This page was generated using comment-based help in [Psake 5.0.4](https://github.com/psake/psake).*

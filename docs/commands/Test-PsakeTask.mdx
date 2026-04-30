@@ -1,0 +1,147 @@
+---
+id: Test-PsakeTask
+title: Test-PsakeTask
+description: Help page for the PowerShell Psake "Test-PsakeTask" command
+keywords:
+  - PowerShell
+  - Psake
+  - Help
+  - Documentation
+hide_title: false
+hide_table_of_contents: false
+custom_edit_url: null
+---
+
+:::info This page was generated
+Contributions are welcome in [Psake-repo](https://github.com/psake/psake).
+:::
+
+:::note Since Psake 5.0
+This command was introduced in Psake 5.0 and is not available in earlier versions.
+:::
+
+## SYNOPSIS
+
+Runs a single task's Action in isolation, without triggering dependencies.
+
+## SYNTAX
+
+### __AllParameterSets
+
+```
+Test-PsakeTask [[-BuildFile] <string>] [-TaskName] <string> [[-Variables] <hashtable>]
+ [<CommonParameters>]
+```
+
+## DESCRIPTION
+
+Compiles the build file, finds the specified task, and executes only its
+Action scriptblock with the provided variables.
+Dependencies are NOT
+executed.This enables unit-testing individual tasks.
+
+## EXAMPLES
+
+### EXAMPLE 1
+
+```powershell
+$result = Test-PsakeTask -BuildFile './psakefile.ps1' -TaskName 'Build' -Variables @{
+    Configuration = 'Debug'
+    OutputDir = './test-output'
+}
+$result.Success | Should -BeTrue
+```
+
+
+This example runs the 'Build' task from 'psakefile.ps1' with two variables
+injected into the task's scope.
+The result object contains details about the
+execution, including success status, duration, and any error messages.
+
+## PARAMETERS
+
+### -BuildFile
+
+The path to the psake build script.
+Defaults to 'psakefile.ps1'.
+
+```yaml
+Type: System.String
+DefaultValue: ''
+SupportsWildcards: false
+Aliases: []
+ParameterSets:
+- Name: (All)
+  Position: 0
+  IsRequired: false
+  ValueFromPipeline: false
+  ValueFromPipelineByPropertyName: false
+  ValueFromRemainingArguments: false
+DontShow: false
+AcceptedValues: []
+HelpMessage: ''
+```
+
+### -TaskName
+
+The name of the task to execute.
+
+```yaml
+Type: System.String
+DefaultValue: ''
+SupportsWildcards: false
+Aliases: []
+ParameterSets:
+- Name: (All)
+  Position: 1
+  IsRequired: true
+  ValueFromPipeline: false
+  ValueFromPipelineByPropertyName: false
+  ValueFromRemainingArguments: false
+DontShow: false
+AcceptedValues: []
+HelpMessage: ''
+```
+
+### -Variables
+
+A hashtable of variables to inject into the task's execution scope.
+
+```yaml
+Type: System.Collections.Hashtable
+DefaultValue: '@{}'
+SupportsWildcards: false
+Aliases: []
+ParameterSets:
+- Name: (All)
+  Position: 2
+  IsRequired: false
+  ValueFromPipeline: false
+  ValueFromPipelineByPropertyName: false
+  ValueFromRemainingArguments: false
+DontShow: false
+AcceptedValues: []
+HelpMessage: ''
+```
+
+### CommonParameters
+
+This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable,
+-InformationAction, -InformationVariable, -OutBuffer, -OutVariable, -PipelineVariable,
+-ProgressAction, -Verbose, -WarningAction, and -WarningVariable. For more information, see
+[about_CommonParameters](https://go.microsoft.com/fwlink/?LinkID=113216).
+
+## INPUTS
+
+## OUTPUTS
+
+## NOTES
+
+Dependencies, PreAction, and PostAction are skipped — only the
+task's Action scriptblock is executed.
+
+
+## RELATED LINKS
+
+## VERSION
+*This page was generated using comment-based help in [Psake 5.0.4](https://github.com/psake/psake).*

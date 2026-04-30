@@ -1,7 +1,7 @@
 ---
-id: Get-PSakeScriptTasks
-title: Get-PSakeScriptTasks
-description: Help page for the PowerShell Psake "Get-PSakeScriptTasks" command
+id: Clear-PsakeCache
+title: Clear-PsakeCache
+description: Help page for the PowerShell Psake "Clear-PsakeCache" command
 keywords:
   - PowerShell
   - Psake
@@ -16,47 +16,75 @@ custom_edit_url: null
 Contributions are welcome in [Psake-repo](https://github.com/psake/psake).
 :::
 
+:::note Since Psake 5.0
+This command was introduced in Psake 5.0 and is not available in earlier versions.
+:::
+
 ## SYNOPSIS
 
-Returns meta data about all the tasks defined in the provided psake script.
+Clears the psake build cache.
 
 ## SYNTAX
 
 ### __AllParameterSets
 
 ```
-Get-PSakeScriptTasks [[-BuildFile] <string>] [<CommonParameters>]
+Clear-PsakeCache [[-Path] <string>] [[-TaskName] <string>] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
 
-Loads the build file and evaluates task definitions without executing
-any tasks.
-Useful for tooling, IDE integrations, and tab completion.
+Removes cached task state from the .psake/cache/ directory.
+This forces all tasks to re-execute on the next build.
 
 ## EXAMPLES
 
 ### EXAMPLE 1
 
 ```powershell
-Get-PSakeScriptTasks -BuildFile '.\build.ps1'
+Clear-PsakeCache
 ```
 
 
-DependsOn        Alias Name    Description
----------        ----- ----    -----------
-\{\}                     Compile
-\{\}                     Clean
-\{Test\}                 Default
-\{Clean, Compile\}       Test
+Clears all cached task state in the current directory.
 
-Gets the psake tasks contained in the 'build.ps1' file.
+### EXAMPLE 2
+
+```powershell
+Clear-PsakeCache -TaskName 'Build'
+```
+
+
+Clears cached state for the 'Build' task only.
 
 ## PARAMETERS
 
-### -BuildFile
+### -Path
 
-The path to the psake build script to read the tasks from.
+The directory containing the .psake/cache/ folder.
+Defaults to the current
+directory.
+
+```yaml
+Type: System.String
+DefaultValue: .
+SupportsWildcards: false
+Aliases: []
+ParameterSets:
+- Name: (All)
+  Position: 0
+  IsRequired: false
+  ValueFromPipeline: false
+  ValueFromPipelineByPropertyName: false
+  ValueFromRemainingArguments: false
+DontShow: false
+AcceptedValues: []
+HelpMessage: ''
+```
+
+### -TaskName
+
+Optional: clear cache for a specific task only.
 
 ```yaml
 Type: System.String
@@ -65,7 +93,7 @@ SupportsWildcards: false
 Aliases: []
 ParameterSets:
 - Name: (All)
-  Position: 0
+  Position: 1
   IsRequired: false
   ValueFromPipeline: false
   ValueFromPipelineByPropertyName: false
@@ -89,6 +117,8 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 ## NOTES
 
 ## RELATED LINKS
+
+- [Invoke-Psake](/docs/commands/Invoke-Psake)
 
 ## VERSION
 *This page was generated using comment-based help in [Psake 5.0.4](https://github.com/psake/psake).*

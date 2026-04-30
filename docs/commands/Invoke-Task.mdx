@@ -22,13 +22,16 @@ Executes another task in the current build script.
 
 ## SYNTAX
 
-```powershell
-Invoke-Task [-taskName] <String> [-ProgressAction <ActionPreference>] [<CommonParameters>]
+### __AllParameterSets
+
+```
+Invoke-Task [-TaskName] <string> [<CommonParameters>]
 ```
 
 ## DESCRIPTION
 
-This is a function that will allow you to invoke a Task from within another Task in the current build script.
+Use this inside a task's Action when you need to sequence tasks
+programmatically rather than declaring them with -Depends.
 
 ## EXAMPLES
 
@@ -38,45 +41,38 @@ This is a function that will allow you to invoke a Task from within another Task
 Invoke-Task "Compile"
 ```
 
+
 This example calls the "Compile" task.
 
 ## PARAMETERS
 
-### -taskName
+### -TaskName
 
 The name of the task to execute.
 
 ```yaml
-Type: String
-Parameter Sets: (All)
-Aliases:
-
-Required: True
-Position: 1
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -ProgressAction
-
-\{\{ Fill ProgressAction Description \}\}
-
-```yaml
-Type: ActionPreference
-Parameter Sets: (All)
-Aliases: proga
-
-Required: False
-Position: Named
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
+Type: System.String
+DefaultValue: ''
+SupportsWildcards: false
+Aliases: []
+ParameterSets:
+- Name: (All)
+  Position: 0
+  IsRequired: true
+  ValueFromPipeline: false
+  ValueFromPipelineByPropertyName: false
+  ValueFromRemainingArguments: false
+DontShow: false
+AcceptedValues: []
+HelpMessage: ''
 ```
 
 ### CommonParameters
 
-This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see [about_CommonParameters](http://go.microsoft.com/fwlink/?LinkID=113216).
+This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable,
+-InformationAction, -InformationVariable, -OutBuffer, -OutVariable, -PipelineVariable,
+-ProgressAction, -Verbose, -WarningAction, and -WarningVariable. For more information, see
+[about_CommonParameters](https://go.microsoft.com/fwlink/?LinkID=113216).
 
 ## INPUTS
 
@@ -86,28 +82,5 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 
 ## RELATED LINKS
 
-[Assert](Assert.mdx)
-
-[Exec](Exec.mdx)
-
-[FormatTaskName](FormatTaskName.mdx)
-
-[Framework](Framework.mdx)
-
-[Get-PSakeScriptTasks](Get-PSakeScriptTasks.mdx)
-
-[Include](Include.mdx)
-
-[Invoke-psake](Invoke-psake.mdx)
-
-[Properties](Properties.mdx)
-
-[Task](Task.mdx)
-
-[TaskSetup](TaskSetup.mdx)
-
-[TaskTearDown](TaskTearDown.mdx)
-
 ## VERSION
-
-*This page was generated using comment-based help in [Psake 4.9.0](https://github.com/psake/psake).*
+*This page was generated using comment-based help in [Psake 5.0.4](https://github.com/psake/psake).*

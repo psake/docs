@@ -33,6 +33,8 @@ The build system uses **PowerShell + psake** for orchestration, with Docusaurus/
 .\build.ps1 -Help
 ```
 
+> **Token efficiency**: Always prefer `.\build.ps1 -Quiet -Task <task>` when running builds from Claude Code. The `-Quiet` flag suppresses verbose console output and returns a structured `PsakeBuildResult` object, which dramatically reduces token usage while still capturing success/failure.
+
 **Important**: The `Server` task runs `bun run serve` which serves the production build. For local development with hot-reload, use:
 ```powershell
 .\build.ps1 -Task Init        # Install dependencies first
@@ -54,11 +56,11 @@ bun start                     # Then start dev server directly
 
 Command documentation is **auto-generated** from the psake PowerShell module:
 
-- **Generator**: `New-DocusaurusHelp` from `Alt3.Docusaurus.Powershell` module
+- **Generator**: `New-PsakeDocusaurusHelp` in `scripts/New-PsakeDocusaurusHelp.ps1`, powered by `Microsoft.PowerShell.PlatyPS`
 - **Source**: psake module help (from the main psake repository)
 - **Output**: `docs/commands/*.mdx` files
 - **Sidebar**: Auto-imported via `docs/commands/docusaurus.sidebar.js`
-- **Configuration**: See `$docusaurusOptions` in `psakeFile.ps1:12-34`
+- **Configuration**: See `$docusaurusOptions` in `psakeFile.ps1`
 
 **Never manually edit files in `docs/commands/`** - they will be overwritten. Edit the source help in the [psake repository](https://github.com/psake/psake) instead.
 

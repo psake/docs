@@ -18,81 +18,137 @@ Contributions are welcome in [Psake-repo](https://github.com/psake/psake).
 
 ## SYNOPSIS
 
-Define a scriptblock that contains assignments to variables that will be available to all tasks in the build script
+Define a scriptblock that contains assignments to variables that will be
+available within all tasks in the build script
 
 ## SYNTAX
 
-```powershell
-Properties [-properties] <ScriptBlock> [-ProgressAction <ActionPreference>] [<CommonParameters>]
+### ScriptBlock (Default)
+
+```
+Properties [-Properties] <scriptblock> [<CommonParameters>]
+```
+
+### Hashtable
+
+```
+Properties [-Hashtable] <hashtable> [<CommonParameters>]
 ```
 
 ## DESCRIPTION
 
-A build script may declare a "Properies" function which allows you to define variables that will be available to all the "Task" functions in the build script.
+A build script may declare a "Properties" function which allows you to
+define variables that will be available within all the "Task" functions in
+the build script.
 
 ## EXAMPLES
 
 ### EXAMPLE 1
 
 ```powershell
-A sample build script is shown below:
-```
-
-Properties \{
+Properties {
     $build_dir = "c:\build"
     $connection_string = "datasource=localhost;initial catalog=northwind;integrated security=sspi"
-\}
-
+}
 Task default -depends Test
+Task Test -depends Compile, Clean {
+}
+Task Compile -depends Clean {
+}
+Task Clean {
+}
+```
 
-Task Test -depends Compile, Clean \{
-\}
-
-Task Compile -depends Clean \{
-\}
-
-Task Clean \{
-\}
 
 Note: You can have more than one "Properties" function defined in the build script.
 
+### EXAMPLE 2
+
+```powershell
+Properties {
+    $script:build_dir = "c:\build"
+    $script:connection_string = "datasource=localhost;initial catalog=northwind;integrated security=sspi"
+}
+Task Compile {
+    "Building to: $build_dir"  # No PSScriptAnalyzer warning, variable is recognized
+}
+```
+
+
+Recommended: Use script-scoped variables to avoid PSScriptAnalyzer warnings
+The $script: prefix has identical runtime behavior but satisfies
+PSScriptAnalyzer's static analysis requirements.
+
+### EXAMPLE 3
+
+```powershell
+Properties {
+    $build_dir = "c:\build"  # Warning: PSUseDeclaredVarsMoreThanAssignments
+}
+Task Compile {
+    "Building to: $build_dir"  # Works at runtime, but PSScriptAnalyzer warns
+}
+```
+
+
+Alternative: Non-scoped variables (generates PSScriptAnalyzer warnings)
+
+Variables still work correctly at runtime, but PSScriptAnalyzer cannot detect
+that they will be used in tasks.
+
 ## PARAMETERS
 
-### -properties
+### -Hashtable
+
+An alternative to the scriptblock parameter, you can provide a hashtable of
+key-value pairs that will be converted into variables.
+This is useful when
+you want to define properties programmatically or from an external source.
+
+```yaml
+Type: System.Collections.Hashtable
+DefaultValue: ''
+SupportsWildcards: false
+Aliases: []
+ParameterSets:
+- Name: Hashtable
+  Position: 0
+  IsRequired: true
+  ValueFromPipeline: false
+  ValueFromPipelineByPropertyName: false
+  ValueFromRemainingArguments: false
+DontShow: false
+AcceptedValues: []
+HelpMessage: ''
+```
+
+### -Properties
 
 The script block containing all the variable assignment statements
 
 ```yaml
-Type: ScriptBlock
-Parameter Sets: (All)
-Aliases:
-
-Required: True
-Position: 1
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -ProgressAction
-
-\{\{ Fill ProgressAction Description \}\}
-
-```yaml
-Type: ActionPreference
-Parameter Sets: (All)
-Aliases: proga
-
-Required: False
-Position: Named
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
+Type: System.Management.Automation.ScriptBlock
+DefaultValue: ''
+SupportsWildcards: false
+Aliases: []
+ParameterSets:
+- Name: ScriptBlock
+  Position: 0
+  IsRequired: true
+  ValueFromPipeline: false
+  ValueFromPipelineByPropertyName: false
+  ValueFromRemainingArguments: false
+DontShow: false
+AcceptedValues: []
+HelpMessage: ''
 ```
 
 ### CommonParameters
 
-This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see [about_CommonParameters](http://go.microsoft.com/fwlink/?LinkID=113216).
+This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable,
+-InformationAction, -InformationVariable, -OutBuffer, -OutVariable, -PipelineVariable,
+-ProgressAction, -Verbose, -WarningAction, and -WarningVariable. For more information, see
+[about_CommonParameters](https://go.microsoft.com/fwlink/?LinkID=113216).
 
 ## INPUTS
 
@@ -100,28 +156,16 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 
 ## NOTES
 
+Properties scriptblocks are dot-sourced into each task's scope at
+runtime.
+Variables are not accessible outside of task scriptblocks.
+
+PSScriptAnalyzer may flag declared variables as unused — this is a
+false positive.
+Use the $script: prefix to suppress it (see examples).
+
+
 ## RELATED LINKS
 
-[Assert](Assert.mdx)
-
-[Exec](Exec.mdx)
-
-[FormatTaskName](FormatTaskName.mdx)
-
-[Framework](Framework.mdx)
-
-[Get-PSakeScriptTasks](Get-PSakeScriptTasks.mdx)
-
-[Include](Include.mdx)
-
-[Invoke-psake](Invoke-psake.mdx)
-
-[Task](Task.mdx)
-
-[TaskSetup](TaskSetup.mdx)
-
-[TaskTearDown](TaskTearDown.mdx)
-
 ## VERSION
-
-*This page was generated using comment-based help in [Psake 4.9.0](https://github.com/psake/psake).*
+*This page was generated using comment-based help in [Psake 5.0.4](https://github.com/psake/psake).*

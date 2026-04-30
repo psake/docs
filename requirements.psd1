@@ -7,15 +7,16 @@
     Parameters = @{
       SkipPublisherCheck = $true
     }
+    Import = $false
   }
   'psake' = @{
-    Version = '5.0.3'
+    Version = 'latest'
   }
-  'PlatyPS' = @{
-    Version = '0.14.2'
+  'Microsoft.PowerShell.PlatyPS' = @{
+    Version = 'latest'
   }
-  'Alt3.Docusaurus.Powershell' = @{
-    Version = '1.0.36'
+  'PowerShellBuild' = @{
+    Version = 'latest'
   }
   'Yayaml' = @{
     Version = '0.6.0'

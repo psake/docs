@@ -1,0 +1,150 @@
+---
+id: Get-PsakeBuildPlan
+title: Get-PsakeBuildPlan
+description: Help page for the PowerShell Psake "Get-PsakeBuildPlan" command
+keywords:
+  - PowerShell
+  - Psake
+  - Help
+  - Documentation
+hide_title: false
+hide_table_of_contents: false
+custom_edit_url: null
+---
+
+:::info This page was generated
+Contributions are welcome in [Psake-repo](https://github.com/psake/psake).
+:::
+
+:::note Since Psake 5.0
+This command was introduced in Psake 5.0 and is not available in earlier versions.
+:::
+
+## SYNOPSIS
+
+Compiles a build file and returns the build plan without executing any tasks.
+
+## SYNTAX
+
+### __AllParameterSets
+
+```
+Get-PsakeBuildPlan [[-BuildFile] <string>] [[-TaskList] <string[]>] [<CommonParameters>]
+```
+
+## DESCRIPTION
+
+This is the primary testability API for psake v5.
+It loads a build file,
+validates the dependency graph, and returns a PsakeBuildPlan object that
+can be inspected in tests.
+
+This function always returns a [PsakeBuildPlan].
+If the build file cannot
+be loaded or the dependency graph is invalid, an invalid plan is returned
+with IsValid = $false and ValidationErrors populated.
+
+The returned plan can be piped into Invoke-Psake for execution.
+Note that
+when piping, the build file is re-loaded during the execution phase to
+resolve properties, setup, and teardown blocks.
+
+## EXAMPLES
+
+### EXAMPLE 1
+
+```powershell
+$plan = Get-PsakeBuildPlan -BuildFile './psakefile.ps1'
+$plan.Tasks | Should -HaveCount 4
+$plan.ExecutionOrder | Should -Be @('Clean', 'Compile', 'Test', 'Default')
+```
+
+
+This example compiles the build file and asserts that there are 4 tasks and
+that the execution order is correct.
+
+### EXAMPLE 2
+
+```powershell
+$plan = Get-PsakeBuildPlan
+$plan.TaskMap['build'].DependsOn | Should -Contain 'Clean'
+$plan.IsValid | Should -BeTrue
+```
+
+
+This example compiles the default build file and asserts that the 'build'
+task depends on the 'Clean' task and that the plan is valid.
+
+### EXAMPLE 3
+
+```powershell
+Get-PsakeBuildPlan -BuildFile './psakefile.ps1' | Invoke-Psake
+```
+
+
+Compiles the build plan and pipes it into Invoke-Psake for execution.
+Note: the build file is re-loaded during the execution phase.
+
+## PARAMETERS
+
+### -BuildFile
+
+The path to the psake build script.
+Defaults to 'psakefile.ps1'.
+
+```yaml
+Type: System.String
+DefaultValue: ''
+SupportsWildcards: false
+Aliases: []
+ParameterSets:
+- Name: (All)
+  Position: 0
+  IsRequired: false
+  ValueFromPipeline: false
+  ValueFromPipelineByPropertyName: false
+  ValueFromRemainingArguments: false
+DontShow: false
+AcceptedValues: []
+HelpMessage: ''
+```
+
+### -TaskList
+
+A list of task names to include in the plan.
+Defaults to 'default'.
+
+```yaml
+Type: System.String[]
+DefaultValue: "@('default')"
+SupportsWildcards: false
+Aliases: []
+ParameterSets:
+- Name: (All)
+  Position: 1
+  IsRequired: false
+  ValueFromPipeline: false
+  ValueFromPipelineByPropertyName: false
+  ValueFromRemainingArguments: false
+DontShow: false
+AcceptedValues: []
+HelpMessage: ''
+```
+
+### CommonParameters
+
+This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable,
+-InformationAction, -InformationVariable, -OutBuffer, -OutVariable, -PipelineVariable,
+-ProgressAction, -Verbose, -WarningAction, and -WarningVariable. For more information, see
+[about_CommonParameters](https://go.microsoft.com/fwlink/?LinkID=113216).
+
+## INPUTS
+
+## OUTPUTS
+
+## NOTES
+
+## RELATED LINKS
+
+## VERSION
+*This page was generated using comment-based help in [Psake 5.0.4](https://github.com/psake/psake).*

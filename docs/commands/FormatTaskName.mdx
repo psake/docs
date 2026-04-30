@@ -18,44 +18,48 @@ Contributions are welcome in [Psake-repo](https://github.com/psake/psake).
 
 ## SYNOPSIS
 
-This function allows you to change how psake renders the task name during a build.
+This function allows you to change how psake renders the task name during a
+build.
 
 ## SYNTAX
 
-```powershell
-FormatTaskName [-format] <Object> [-ProgressAction <ActionPreference>] [<CommonParameters>]
+### __AllParameterSets
+
+```
+FormatTaskName [-Format] <Object> [<CommonParameters>]
 ```
 
 ## DESCRIPTION
 
-This function takes either a string which represents a format string (formats using the -f format operator see "help about_operators") or it can accept a script block that has a single parameter that is the name of the task that will be executed.
+Useful for adding visual separators or color to task names in the
+build output.
+Accepts a -f format string or a scriptblock that
+receives the task name as its only argument.
 
 ## EXAMPLES
 
 ### EXAMPLE 1
 
 ```powershell
-A sample build script that uses a format string is shown below:
+Task default -depends TaskA, TaskB, TaskC
+FormatTaskName "-------- {0} --------"
+Task TaskA {
+    "TaskA is executing"
+}
+Task TaskB {
+    "TaskB is executing"
+}
+Task TaskC {
+    "TaskC is executing"
+}
 ```
 
-Task default -depends TaskA, TaskB, TaskC
 
-FormatTaskName "-------- \{0\} --------"
+A sample build script that uses a format string.
+The script above produces
+the following output:
 
-Task TaskA \{
-    "TaskA is executing"
-\}
-
-Task TaskB \{
-    "TaskB is executing"
-\}
-
-Task TaskC \{
-    "TaskC is executing"
-
------------
-The script above produces the following output:
-
+```
 -------- TaskA --------
 TaskA is executing
 -------- TaskB --------
@@ -64,74 +68,64 @@ TaskB is executing
 TaskC is executing
 
 Build Succeeded!
+```
 
 ### EXAMPLE 2
 
 ```powershell
-A sample build script that uses a ScriptBlock is shown below:
+Task default -depends TaskA, TaskB, TaskC
+FormatTaskName {
+    param($taskName)
+    write-host "Executing Task: $taskName" -ForegroundColor blue
+}
+Task TaskA {
+    "TaskA is executing"
+}
+Task TaskB {
+    "TaskB is executing"
+}
+Task TaskC {
+    "TaskC is executing"
+}
 ```
 
-Task default -depends TaskA, TaskB, TaskC
 
-FormatTaskName \{
-    param($taskName)
-    write-host "Executing Task: $taskName" -foregroundcolor blue
-\}
+A sample build script that uses a ScriptBlock.
+The above example uses the
+scriptblock parameter to the FormatTaskName function to render each task
+name in the color blue.
 
-Task TaskA \{
-    "TaskA is executing"
-\}
-
-Task TaskB \{
-    "TaskB is executing"
-\}
-
-Task TaskC \{
-    "TaskC is executing"
-\}
-
------------
-The above example uses the scriptblock parameter to the FormatTaskName function to render each task name in the color blue.
-
-Note: the $taskName parameter is arbitrary, it could be named anything.
+Note: the $taskName parameter name is arbitrary, it could be named anything.
 
 ## PARAMETERS
 
-### -format
+### -Format
 
 A format string or a scriptblock to execute
 
 ```yaml
-Type: Object
-Parameter Sets: (All)
-Aliases:
-
-Required: True
-Position: 1
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -ProgressAction
-
-\{\{ Fill ProgressAction Description \}\}
-
-```yaml
-Type: ActionPreference
-Parameter Sets: (All)
-Aliases: proga
-
-Required: False
-Position: Named
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
+Type: System.Object
+DefaultValue: ''
+SupportsWildcards: false
+Aliases: []
+ParameterSets:
+- Name: (All)
+  Position: 0
+  IsRequired: true
+  ValueFromPipeline: false
+  ValueFromPipelineByPropertyName: false
+  ValueFromRemainingArguments: false
+DontShow: false
+AcceptedValues: []
+HelpMessage: ''
 ```
 
 ### CommonParameters
 
-This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see [about_CommonParameters](http://go.microsoft.com/fwlink/?LinkID=113216).
+This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable,
+-InformationAction, -InformationVariable, -OutBuffer, -OutVariable, -PipelineVariable,
+-ProgressAction, -Verbose, -WarningAction, and -WarningVariable. For more information, see
+[about_CommonParameters](https://go.microsoft.com/fwlink/?LinkID=113216).
 
 ## INPUTS
 
@@ -141,26 +135,5 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 
 ## RELATED LINKS
 
-[Assert](Assert.mdx)
-
-[Exec](Exec.mdx)
-
-[Framework](Framework.mdx)
-
-[Get-PSakeScriptTasks](Get-PSakeScriptTasks.mdx)
-
-[Include](Include.mdx)
-
-[Invoke-psake](Invoke-psake.mdx)
-
-[Properties](Properties.mdx)
-
-[Task](Task.mdx)
-
-[TaskSetup](TaskSetup.mdx)
-
-[TaskTearDown](TaskTearDown.mdx)
-
 ## VERSION
-
-*This page was generated using comment-based help in [Psake 4.9.0](https://github.com/psake/psake).*
+*This page was generated using comment-based help in [Psake 5.0.4](https://github.com/psake/psake).*

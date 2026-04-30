@@ -22,41 +22,40 @@ Adds a scriptblock that will be executed before each task
 
 ## SYNTAX
 
-```powershell
-TaskSetup [-setup] <ScriptBlock> [-ProgressAction <ActionPreference>] [<CommonParameters>]
+### __AllParameterSets
+
+```
+TaskSetup [-Setup] <scriptblock> [<CommonParameters>]
 ```
 
 ## DESCRIPTION
 
-This function will accept a scriptblock that will be executed before each task in the build script.
-
-The scriptblock accepts an optional parameter which describes the Task being setup.
+Use this for per-task setup that applies across all tasks, such as
+logging, timing, or environment checks.
+The scriptblock receives the
+current [PsakeTask] as an optional argument.
 
 ## EXAMPLES
 
 ### EXAMPLE 1
 
 ```powershell
-A sample build script is shown below:
+Task default -Depends Test
+Task Test -Depends Compile, Clean {
+}
+Task Compile -Depends Clean {
+}
+Task Clean {
+}
+TaskSetup {
+    "Running 'TaskSetup' for task $context.Peek().currentTaskName"
+}
 ```
 
-Task default -depends Test
-
-Task Test -depends Compile, Clean \{
-\}
-
-Task Compile -depends Clean \{
-\}
-
-Task Clean \{
-\}
-
-TaskSetup \{
-    "Running 'TaskSetup' for task $context.Peek().currentTaskName"
-\}
 
 The script above produces the following output:
 
+```
 Running 'TaskSetup' for task Clean
 Executing task, Clean...
 Running 'TaskSetup' for task Compile
@@ -65,32 +64,25 @@ Running 'TaskSetup' for task Test
 Executing task, Test...
 
 Build Succeeded
+```
 
 ### EXAMPLE 2
 
 ```powershell
-A sample build script showing access to the Task context is shown below:
+Task default -Depends Test
+Task Test -Depends Compile, Clean {}
+Task Compile -Depends Clean {}
+Task Clean {}
+TaskSetup {
+    param($task)
+    "Running 'TaskSetup' for task $($task.Name)"
+}
 ```
 
-Task default -depends Test
-
-Task Test -depends Compile, Clean \{
-\}
-
-Task Compile -depends Clean \{
-\}
-
-Task Clean \{
-\}
-
-TaskSetup \{
-    param($task)
-
-    "Running 'TaskSetup' for task $($task.Name)"
-\}
 
 The script above produces the following output:
 
+```
 Running 'TaskSetup' for task Clean
 Executing task, Clean...
 Running 'TaskSetup' for task Compile
@@ -99,44 +91,37 @@ Running 'TaskSetup' for task Test
 Executing task, Test...
 
 Build Succeeded
+```
 
 ## PARAMETERS
 
-### -setup
+### -Setup
 
-A scriptblock to execute
-
-```yaml
-Type: ScriptBlock
-Parameter Sets: (All)
-Aliases:
-
-Required: True
-Position: 1
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -ProgressAction
-
-\{\{ Fill ProgressAction Description \}\}
+Receives the current task as an optional [PsakeTask] argument.
 
 ```yaml
-Type: ActionPreference
-Parameter Sets: (All)
-Aliases: proga
-
-Required: False
-Position: Named
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
+Type: System.Management.Automation.ScriptBlock
+DefaultValue: ''
+SupportsWildcards: false
+Aliases: []
+ParameterSets:
+- Name: (All)
+  Position: 0
+  IsRequired: true
+  ValueFromPipeline: false
+  ValueFromPipelineByPropertyName: false
+  ValueFromRemainingArguments: false
+DontShow: false
+AcceptedValues: []
+HelpMessage: ''
 ```
 
 ### CommonParameters
 
-This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see [about_CommonParameters](http://go.microsoft.com/fwlink/?LinkID=113216).
+This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable,
+-InformationAction, -InformationVariable, -OutBuffer, -OutVariable, -PipelineVariable,
+-ProgressAction, -Verbose, -WarningAction, and -WarningVariable. For more information, see
+[about_CommonParameters](https://go.microsoft.com/fwlink/?LinkID=113216).
 
 ## INPUTS
 
@@ -146,26 +131,5 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 
 ## RELATED LINKS
 
-[Assert](Assert.mdx)
-
-[Exec](Exec.mdx)
-
-[FormatTaskName](FormatTaskName.mdx)
-
-[Framework](Framework.mdx)
-
-[Get-PSakeScriptTasks](Get-PSakeScriptTasks.mdx)
-
-[Include](Include.mdx)
-
-[Invoke-psake](Invoke-psake.mdx)
-
-[Properties](Properties.mdx)
-
-[Task](Task.mdx)
-
-[TaskTearDown](TaskTearDown.mdx)
-
 ## VERSION
-
-*This page was generated using comment-based help in [Psake 4.9.0](https://github.com/psake/psake).*
+*This page was generated using comment-based help in [Psake 5.0.4](https://github.com/psake/psake).*
