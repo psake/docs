@@ -6,7 +6,7 @@
 
 /* Fonts: Roboto (display/headings) · Inter (body/UI) · JetBrains Mono (code)
  * Single request loads all three families; display=swap avoids FOIT. */
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@500;700;900&family=JetBrains+Mono:wght@400;500;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Maven+Pro:wght@500;700;900&family=JetBrains+Mono:wght@400;500;700&display=swap");
 
 /* Color is charcoal */
 :root {
@@ -22,7 +22,7 @@
   /* Type system */
   --ifm-font-family-base: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   --ifm-font-family-monospace: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, "Liberation Mono", monospace;
-  --ifm-heading-font-family: "Montserrat", system-ui, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+  --ifm-heading-font-family: "Maven Pro", system-ui, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
 }
 
