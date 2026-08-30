@@ -40,7 +40,7 @@ async function hasValidSignature(
   return timingSafeEqual(expected, signature);
 }
 
-export default async function handleGitHubPullRequestNotification(
+export default async function handleGitHubNotification(
   request: Request,
 ): Promise<Response> {
   if (request.method !== "POST") {
@@ -70,7 +70,12 @@ export default async function handleGitHubPullRequestNotification(
   }
 
   const event = request.headers.get("X-GitHub-Event");
-  if (event !== "pull_request" || !allowedActions.has(String(payload.action))) {
+  let forwardedEvent: "pull_request" | "release";
+  if (event === "release") {
+    forwardedEvent = "release";
+  } else if (event === "pull_request" && allowedActions.has(String(payload.action))) {
+    forwardedEvent = "pull_request";
+  } else {
     return new Response(null, { status: 204 });
   }
 
@@ -90,7 +95,7 @@ export default async function handleGitHubPullRequestNotification(
       body,
       headers: {
         "Content-Type": "application/json",
-        "X-GitHub-Event": "pull_request",
+        "X-GitHub-Event": forwardedEvent,
       },
       method: "POST",
     });
