@@ -49,7 +49,7 @@ afterEach(() => {
   globalThis.fetch = originalFetch;
 });
 
-describe("GitHub pull-request Discord relay", () => {
+describe("GitHub Discord relay", () => {
   test.each(["opened", "ready_for_review"])(
     "forwards %s pull requests unchanged",
     async (action) => {
@@ -76,6 +76,30 @@ describe("GitHub pull-request Discord relay", () => {
       });
     },
   );
+
+  test("forwards release events unchanged", async () => {
+    const calls = [];
+    globalThis.fetch = async (url, init) => {
+      calls.push({ init, url });
+      return new Response(null, { status: 204 });
+    };
+    const request = await requestFor("published", { event: "release" });
+    const body = await request.clone().text();
+
+    const response = await handleGitHubPullRequestNotification(request);
+
+    expect(response.status).toBe(202);
+    expect(calls).toHaveLength(1);
+    expect(calls[0].url).toBe(discordUrl);
+    expect(new TextDecoder().decode(calls[0].init.body)).toBe(body);
+    expect(calls[0].init).toMatchObject({
+      headers: {
+        "Content-Type": "application/json",
+        "X-GitHub-Event": "release",
+      },
+      method: "POST",
+    });
+  });
 
   test("acknowledges excluded pull-request actions without forwarding", async () => {
     const fetchCalls = [];
