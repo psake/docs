@@ -280,7 +280,7 @@ Task TestWithCoverage -depends Compile {
     $coverageFile = Get-ChildItem "$TestResultsDir/**/coverage.cobertura.xml" -Recurse | Select-Object -First 1
 
     if ($coverageFile) {
-        [xml]$coverage = Get-Content $coverageFile.FullName
+        [xml]$coverage = Get-Content $coverageFile.FullName -Raw
         $lineRate = [double]$coverage.coverage.'line-rate' * 100
 
         Write-Host "Code coverage: ${lineRate}%" -ForegroundColor Cyan
@@ -624,7 +624,7 @@ function Set-AssemblyVersion {
         throw "Project file not found: $ProjectFile"
     }
 
-    [xml]$project = Get-Content $ProjectFile
+    [xml]$project = Get-Content $ProjectFile -Raw
 
     $propertyGroup = $project.Project.PropertyGroup | Select-Object -First 1
 

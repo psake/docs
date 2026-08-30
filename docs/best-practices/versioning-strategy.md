@@ -360,7 +360,7 @@ function Update-ProjectVersion {
         throw "Project file not found: $ProjectFile"
     }
 
-    [xml]$project = Get-Content $ProjectFile
+    [xml]$project = Get-Content $ProjectFile -Raw
     $propertyGroup = $project.Project.PropertyGroup | Select-Object -First 1
     if ($null -eq $propertyGroup) {
         $propertyGroup = $project.CreateElement('PropertyGroup')
@@ -388,7 +388,7 @@ function Update-ProjectVersion {
 Task UpdateProjectVersions {
     Write-Host "Updating project versions..." -ForegroundColor Green
 
-    $projects = Get-ChildItem "$SrcDir/**/*.csproj" -Recurse
+    $projects = Get-ChildItem -Path $SrcDir -Filter *.csproj -Recurse
     foreach ($project in $projects) {
         Update-ProjectVersion `
             -ProjectFile $project.FullName `
@@ -573,10 +573,10 @@ Task UpdateVersions -depends ShowVersion {
     Write-Host "Updating project versions..." -ForegroundColor Green
 
     # Update .NET projects
-    $projects = Get-ChildItem "$SrcDir/**/*.csproj" -Recurse
+    $projects = Get-ChildItem -Path $SrcDir -Filter *.csproj -Recurse
 
     foreach ($project in $projects) {
-        [xml]$proj = Get-Content $project.FullName
+        [xml]$proj = Get-Content $project.FullName -Raw
 
         $propertyGroup = $proj.Project.PropertyGroup | Select-Object -First 1
 

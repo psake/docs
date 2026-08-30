@@ -31,9 +31,10 @@ Task Deploy {
         throw "DB_PASSWORD environment variable is required"
     }
 
-    # Use secrets (they won't appear in logs with -errorMessage)
+    # Expose the secret only through the child process environment.
     exec {
-        dotnet publish --api-key $ApiKey
+        $env:MYAPP_API_KEY = $ApiKey
+        try { dotnet publish } finally { Remove-Item Env:MYAPP_API_KEY }
     } -errorMessage "Publish failed (credentials redacted)"
 }
 ```
@@ -432,7 +433,7 @@ deploy/
 ```powershell
 Task Deploy {
     Write-Host "Using API key: $ApiKey" -ForegroundColor Gray  # NEVER DO THIS!
-    exec { dotnet publish --api-key $ApiKey }
+    exec { dotnet publish }
 }
 ```
 
@@ -442,9 +443,9 @@ Task Deploy {
 Task Deploy {
     Write-Host "Using API key: [REDACTED]" -ForegroundColor Gray
 
-    # Use custom error message to avoid exposing secrets
     exec {
-        dotnet publish --api-key $ApiKey
+        $env:MYAPP_API_KEY = $ApiKey
+        try { dotnet publish } finally { Remove-Item Env:MYAPP_API_KEY }
     } -errorMessage "Publish failed (check API key configuration)"
 }
 ```
@@ -723,7 +724,7 @@ Task GrantKeyVaultAccess {
 
     exec {
         az keyvault set-policy `
-            --name $KeyVaultName `
+            --name $env:AZURE_KEYVAULT_NAME `
             --spn $servicePrincipalId `
             --secret-permissions get list
     }

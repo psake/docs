@@ -434,7 +434,7 @@ Task Build {
         }
     }
 
-    $appConfigPath = Join-Path $ProjectRoot 'src/appsettings.$Environment.json'
+    $appConfigPath = Join-Path $ProjectRoot "src/appsettings.$Environment.json"
     $appConfig | ConvertTo-Json -Depth 10 | Set-Content $appConfigPath
 
     exec { dotnet build -c $Configuration }
@@ -872,10 +872,11 @@ stages:
 
 ```powershell
 Task Debug:ShowEnvironment {
+    $environmentConfig = Join-Path $PSScriptRoot "build/config/$Environment.ps1"
     Write-Host "BUILD_ENV: $($env:BUILD_ENV)" -ForegroundColor Yellow
     Write-Host "Environment: $Environment" -ForegroundColor Yellow
-    Write-Host "Config File: $envConfigFile" -ForegroundColor Yellow
-    Write-Host "File Exists: $(Test-Path $envConfigFile)" -ForegroundColor Yellow
+    Write-Host "Config File: $environmentConfig" -ForegroundColor Yellow
+    Write-Host "File Exists: $(Test-Path $environmentConfig)" -ForegroundColor Yellow
 }
 ```
 
