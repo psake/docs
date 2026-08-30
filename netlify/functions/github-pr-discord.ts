@@ -80,11 +80,6 @@ export default async function handleGitHubPullRequestNotification(
     return new Response(null, { status: 202 });
   }
 
-  if (process.env.DEBUG_PR_RELAY === "true")
-    console.info("[DEBUG-pr-relay] forwarding eligible delivery", {
-      action: String(payload.action),
-      delivery: request.headers.get("X-GitHub-Delivery"),
-    });
   try {
     const response = await fetch(discordWebhookUrl, {
       body,
@@ -94,11 +89,6 @@ export default async function handleGitHubPullRequestNotification(
       },
       method: "POST",
     });
-    if (process.env.DEBUG_PR_RELAY === "true")
-      console.info("[DEBUG-pr-relay] Discord response", {
-        delivery: request.headers.get("X-GitHub-Delivery"),
-        status: response.status,
-      });
     if (!response.ok) {
       console.error(
         "Discord rejected GitHub pull-request notification",
