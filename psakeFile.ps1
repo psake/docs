@@ -97,8 +97,10 @@ Task 'Server' @{
 }
 
 Task 'Test' @{
-  Description = 'Run Pester tests to validate sidebar links.'
+  Description = 'Run Netlify Function and Pester tests.'
+  DependsOn = 'Init'
   Action = {
+    Exec { bun test }
     Import-Module Pester -MinimumVersion '5.0' -Force
     $configuration = New-PesterConfiguration
     $configuration.Output.Verbosity = 'Detailed'
