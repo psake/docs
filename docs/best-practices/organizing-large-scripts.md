@@ -751,6 +751,7 @@ Use the `compile.ps1`, `test.ps1`, and `deploy.ps1` implementations from the mod
 ## See Also
 
 - [Access Functions in Another File](/docs/tutorial-advanced/access-functions-in-another-file) - Using Include and dot-sourcing
+- [Creating Shared Task Modules](/docs/tutorial-advanced/creating-shared-task-modules) - Distributing versioned tasks across repositories
 - [Structure of a psake Build Script](/docs/tutorial-advanced/structure-of-a-psake-build-script) - Basic script structure
 - [Environment Management](/docs/best-practices/environment-management) - Managing multiple environments
 - [Testing Build Scripts](/docs/best-practices/testing-build-scripts) - Testing your psake scripts

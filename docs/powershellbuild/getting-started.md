@@ -10,8 +10,10 @@ This guide walks through adding PowerShellBuild to a PowerShell module project f
 ## Prerequisites
 
 - PowerShell 5.1 or PowerShell 7+
-- psake >= 4.9.0
-- PowerShellBuild >= 0.7.0
+- psake >= 5.0.4
+- PowerShellBuild >= 0.8.2
+
+These versions match PowerShellBuild 0.8.2. Check the [current module manifest](https://github.com/psake/PowerShellBuild/blob/main/PowerShellBuild/PowerShellBuild.psd1) when selecting a newer release.
 
 Install both modules from the PowerShell Gallery:
 
@@ -56,10 +58,10 @@ properties {
 
 task default -depends Build
 
-task Build -FromModule PowerShellBuild -Version '0.7.1'
+task Build -FromModule PowerShellBuild -RequiredVersion '0.8.2'
 ```
 
-That is all you need. When psake runs the `Build` task, it loads it from the PowerShellBuild module and automatically runs the full dependency chain:
+That is all you need. psake finds PowerShellBuild, dot-sources its module-root `psakeFile.ps1`, and registers the provider tasks in the current build context. Running `Build` then executes its reachable dependency chain:
 
 ```
 Init → Clean → StageFiles → GenerateMarkdown → GenerateMAML → BuildHelp → Build
@@ -152,5 +154,6 @@ Invoke-Build Test
 ## Next Steps
 
 - [Task Reference](./task-reference) — Full list of tasks and their dependencies
+- [Creating Shared Task Modules](../tutorial-advanced/creating-shared-task-modules.md) — Build your own reusable task provider
 - [Configuration](./configuration) — Customize `$PSBPreference` to fit your project
 - [Real-World Example](./real-world-example) — A complete project with CI/CD integration

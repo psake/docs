@@ -40,6 +40,7 @@ const sidebars: SidebarsConfig = {
       label: 'Advanced Techniques',
       items: [
         'tutorial-advanced/access-functions-in-another-file',
+        'tutorial-advanced/creating-shared-task-modules',
         'tutorial-advanced/build-script-resilience',
         'tutorial-advanced/debug-script',
         'tutorial-advanced/custom-logging',
