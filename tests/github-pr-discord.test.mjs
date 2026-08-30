@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
-import handleGitHubPullRequestNotification from "./github-pr-discord.ts";
+import handleGitHubPullRequestNotification from "../netlify/functions/github-pr-discord.ts";
 
 const secret = "test-webhook-secret";
 const discordUrl = "https://discord.com/api/webhooks/123/token/github";
