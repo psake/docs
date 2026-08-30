@@ -27,13 +27,13 @@ Describe 'psake Build Script' {
         Test-Path $BuildFile | Should -Be $true
     }
 
-    It 'Build file is valid PowerShell' {
-        { . $BuildFile } | Should -Not -Throw
+    It 'Build file defines valid tasks' {
+        { Get-PSakeScriptTasks -BuildFile $BuildFile } | Should -Not -Throw
     }
 
     It 'Default task executes successfully' {
         $result = Invoke-psake -buildFile $BuildFile -nologo
-        $result | Should -Be $true
+        $result.Success | Should -BeTrue
     }
 }
 ```
@@ -79,8 +79,8 @@ Describe 'psake Build Configuration' {
         Test-Path $BuildFile | Should -Be $true
     }
 
-    It 'Build file has no syntax errors' {
-        { $null = & $BuildFile } | Should -Not -Throw
+    It 'Build file defines valid tasks' {
+        { Get-PSakeScriptTasks -BuildFile $BuildFile } | Should -Not -Throw
     }
 }
 
@@ -101,7 +101,7 @@ Describe 'Build Tasks' {
     Context 'Build Task' {
         It 'Executes without errors' {
             $result = Invoke-psake -buildFile $BuildFile -taskList Build -nologo
-            $result | Should -Be $true
+            $result.Success | Should -BeTrue
         }
 
         It 'Creates build artifacts' {
@@ -129,51 +129,27 @@ Ensure tasks execute in the correct order:
 Describe 'Task Dependencies' {
     BeforeAll {
         $script:BuildFile = Join-Path $PSScriptRoot '../psakefile.ps1'
-        $script:ExecutedTasks = @()
-
-        # Mock exec to track task execution
-        Mock -ModuleName psake -CommandName 'exec' -MockWith {
-            param($cmd, $errorMessage)
-            # Track execution instead of actually running
-            return $true
-        }
+        $script:Tasks = Get-PSakeScriptTasks -BuildFile $BuildFile
     }
 
     It 'Build depends on Compile' {
-        # Load build file
-        . $BuildFile
-
-        # Get task dependencies
-        $buildTask = Get-PSakeScriptTask -taskName 'Build'
+        $buildTask = $Tasks | Where-Object Name -eq 'Build'
         $buildTask.DependsOn | Should -Contain 'Compile'
     }
 
     It 'Deploy depends on Build and Test' {
-        . $BuildFile
-
-        $deployTask = Get-PSakeScriptTask -taskName 'Deploy'
+        $deployTask = $Tasks | Where-Object Name -eq 'Deploy'
         $deployTask.DependsOn | Should -Contain 'Build'
         $deployTask.DependsOn | Should -Contain 'Test'
     }
 
-    It 'Tasks execute in correct order' {
-        $executionOrder = @()
+    It 'Executes dependencies before Deploy' {
+        $result = Invoke-psake -BuildFile $BuildFile -TaskList Deploy -NoLogo
+        $result.Success | Should -BeTrue
 
-        # Override task execution to track order
-        function Track-TaskExecution {
-            param($taskName)
-            $script:executionOrder += $taskName
-        }
-
-        # Run build and track execution
-        # This requires modifying the build script to support test mode
-        $env:PSAKE_TEST_MODE = 'true'
-        Invoke-psake -buildFile $BuildFile -taskList Deploy -nologo
-        $env:PSAKE_TEST_MODE = $null
-
-        # Verify order
-        $executionOrder.IndexOf('Compile') | Should -BeLessThan $executionOrder.IndexOf('Build')
-        $executionOrder.IndexOf('Build') | Should -BeLessThan $executionOrder.IndexOf('Deploy')
+        $executedTasks = @($result.Tasks | Where-Object Status -eq 'Executed' | ForEach-Object Name)
+        $executedTasks.IndexOf('Compile') | Should -BeLessThan $executedTasks.IndexOf('Build')
+        $executedTasks.IndexOf('Build') | Should -BeLessThan $executedTasks.IndexOf('Deploy')
     }
 }
 ```
@@ -191,26 +167,12 @@ Describe 'Build with Mocked dotnet' {
 
         # Mock dotnet commands
         Mock -CommandName 'dotnet' -MockWith {
-            param($Command)
-
-            switch ($Command) {
-                'build' {
-                    Write-Output "Build succeeded"
-                    return 0
-                }
-                'test' {
-                    Write-Output "Tests passed: 50 passed, 0 failed"
-                    return 0
-                }
-                'publish' {
-                    Write-Output "Publish succeeded"
-                    return 0
-                }
-                default {
-                    return 0
-                }
+            switch ($args[0]) {
+                'build' { 'Build succeeded' }
+                'test' { 'Tests passed: 50 passed, 0 failed' }
+                'publish' { 'Publish succeeded' }
             }
-        } -ModuleName psake
+        }
     }
 
     It 'Compile task calls dotnet build' {
@@ -218,16 +180,16 @@ Describe 'Build with Mocked dotnet' {
 
         # Verify dotnet build was called
         Should -Invoke -CommandName 'dotnet' -ParameterFilter {
-            $Command -eq 'build'
-        } -Times 1 -ModuleName psake
+            $args[0] -eq 'build'
+        } -Times 1
     }
 
     It 'Test task calls dotnet test' {
         Invoke-psake -buildFile $BuildFile -taskList Test -nologo
 
         Should -Invoke -CommandName 'dotnet' -ParameterFilter {
-            $Command -eq 'test'
-        } -Times 1 -ModuleName psake
+            $args[0] -eq 'test'
+        } -Times 1
     }
 }
 ```
@@ -274,25 +236,13 @@ Describe 'Azure Deployment' {
 
         # Mock az CLI
         Mock -CommandName 'az' -MockWith {
-            param($Command)
-
-            if ($Command -eq 'login') {
-                return @"
-[
-  {
-    "cloudName": "AzureCloud",
-    "id": "12345678-1234-1234-1234-123456789012",
-    "state": "Enabled"
-  }
-]
-"@
+            if ($args[0] -eq 'login') {
+                return '[{"cloudName":"AzureCloud","state":"Enabled"}]'
             }
 
-            if ($Command -eq 'webapp') {
-                return "Deployment successful"
+            if ($args[0] -eq 'webapp') {
+                return '{"status":"Success"}'
             }
-
-            return ""
         }
     }
 
@@ -300,7 +250,7 @@ Describe 'Azure Deployment' {
         Invoke-psake -buildFile $BuildFile -taskList Deploy -nologo
 
         Should -Invoke -CommandName 'az' -ParameterFilter {
-            $Command -eq 'login'
+            $args[0] -eq 'login'
         } -Times 1
     }
 
@@ -308,7 +258,30 @@ Describe 'Azure Deployment' {
         Invoke-psake -buildFile $BuildFile -taskList Deploy -nologo
 
         Should -Invoke -CommandName 'az' -ParameterFilter {
-            $Command -eq 'webapp'
+            $args[0] -eq 'webapp'
+        } -Times 1
+    }
+}
+```
+
+### Mocking AWS CLI
+
+```powershell
+Describe 'AWS Deployment' {
+    BeforeAll {
+        $script:BuildFile = Join-Path $PSScriptRoot '../psakefile.ps1'
+        Mock -CommandName 'aws' -MockWith {
+            if ($args[0] -eq 'deploy' -and $args[1] -eq 'create-deployment') {
+                return '{"deploymentId":"d-1234567890"}'
+            }
+        }
+    }
+
+    It 'Creates a CodeDeploy deployment' {
+        $result = Invoke-psake -BuildFile $BuildFile -TaskList Deploy:AWS -NoLogo
+        $result.Success | Should -BeTrue
+        Should -Invoke -CommandName 'aws' -ParameterFilter {
+            $args[0] -eq 'deploy' -and $args[1] -eq 'create-deployment'
         } -Times 1
     }
 }
@@ -316,7 +289,31 @@ Describe 'Azure Deployment' {
 
 ## Testing Properties and Parameters
 
-Validate that properties are set correctly:
+Put assertions that depend on build properties inside tasks, where psake properties are in scope:
+
+```powershell
+# psakefile.ps1
+Properties {
+    $Configuration = 'Debug'
+    $Environment = 'dev'
+}
+
+Task ValidateDebugConfiguration {
+    Assert ($Configuration -eq 'Debug') 'Expected Debug configuration'
+}
+
+Task ValidateReleaseConfiguration {
+    Assert ($Configuration -eq 'Release') 'Expected Release configuration'
+}
+
+Task ValidateDevelopmentEnvironment {
+    Assert ($Environment -eq 'dev') 'Expected dev environment'
+}
+
+Task ValidateStagingEnvironment {
+    Assert ($Environment -eq 'staging') 'Expected staging environment'
+}
+```
 
 ```powershell
 Describe 'Build Properties' {
@@ -324,32 +321,21 @@ Describe 'Build Properties' {
         $script:BuildFile = Join-Path $PSScriptRoot '../psakefile.ps1'
     }
 
-    It 'Default configuration is Debug' {
-        # Load build file
-        . $BuildFile
-
-        # Check property
-        $psake.context.peek().config.Configuration | Should -Be 'Debug'
+    It 'Uses the default Debug configuration' {
+        $result = Invoke-psake -BuildFile $BuildFile -TaskList ValidateDebugConfiguration -NoLogo
+        $result.Success | Should -BeTrue
     }
 
-    It 'Configuration can be overridden' {
-        $parameters = @{
-            Configuration = 'Release'
-        }
-
-        Invoke-psake -buildFile $BuildFile `
-            -parameters $parameters `
-            -taskList ShowConfig `
-            -nologo
-
-        # Verify configuration was set
-        # This requires the build script to expose configuration
+    It 'Accepts a Release configuration override' {
+        $result = Invoke-psake -BuildFile $BuildFile `
+            -Properties @{ Configuration = 'Release' } `
+            -TaskList ValidateReleaseConfiguration -NoLogo
+        $result.Success | Should -BeTrue
     }
 
-    It 'Environment defaults to dev' {
-        . $BuildFile
-
-        $psake.context.peek().config.Environment | Should -Be 'dev'
+    It 'Uses the default dev environment' {
+        $result = Invoke-psake -BuildFile $BuildFile -TaskList ValidateDevelopmentEnvironment -NoLogo
+        $result.Success | Should -BeTrue
     }
 }
 ```
@@ -372,7 +358,7 @@ Describe 'Complete Build Pipeline' {
     Context 'Full Build' {
         It 'Completes without errors' {
             $result = Invoke-psake -buildFile $BuildFile -nologo
-            $result | Should -Be $true
+            $result.Success | Should -BeTrue
         }
 
         It 'Creates build artifacts' {
@@ -396,15 +382,13 @@ Describe 'Complete Build Pipeline' {
 
     Context 'Different Configurations' {
         It 'Debug build succeeds' {
-            $params = @{ Configuration = 'Debug' }
-            $result = Invoke-psake -buildFile $BuildFile -parameters $params -nologo
-            $result | Should -Be $true
+            $result = Invoke-psake -buildFile $BuildFile -properties @{ Configuration = 'Debug' } -nologo
+            $result.Success | Should -BeTrue
         }
 
         It 'Release build succeeds' {
-            $params = @{ Configuration = 'Release' }
-            $result = Invoke-psake -buildFile $BuildFile -parameters $params -nologo
-            $result | Should -Be $true
+            $result = Invoke-psake -buildFile $BuildFile -properties @{ Configuration = 'Release' } -nologo
+            $result.Success | Should -BeTrue
         }
     }
 
@@ -431,38 +415,28 @@ Describe 'Error Handling' {
     }
 
     It 'Build fails when compilation fails' {
-        # Mock dotnet to return error
-        Mock -CommandName 'dotnet' -MockWith {
-            Write-Error "Compilation failed"
-            return 1
-        }
+        Mock -CommandName 'dotnet' -MockWith { throw "Compilation failed" }
 
         $result = Invoke-psake -buildFile $BuildFile -taskList Compile -nologo
-        $result | Should -Be $false
+        $result.Success | Should -BeFalse
     }
 
     It 'Build fails when tests fail' {
         Mock -CommandName 'dotnet' -MockWith {
-            param($Command)
-
-            if ($Command -eq 'test') {
-                Write-Error "Tests failed"
-                return 1
-            }
-            return 0
+            if ($args[0] -eq 'test') { throw "Tests failed" }
         }
 
         $result = Invoke-psake -buildFile $BuildFile -taskList Test -nologo
-        $result | Should -Be $false
+        $result.Success | Should -BeFalse
     }
 
     It 'Build validates required secrets' {
-        # Clear environment variables
         $originalApiKey = $env:API_KEY
         $env:API_KEY = $null
 
         try {
-            { Invoke-psake -buildFile $BuildFile -taskList Deploy -nologo } | Should -Throw
+            $result = Invoke-psake -buildFile $BuildFile -taskList Deploy -nologo
+            $result.Success | Should -BeFalse
         }
         finally {
             $env:API_KEY = $originalApiKey
@@ -625,39 +599,36 @@ Describe 'Build Script Validation' {
             Test-Path $BuildFile | Should -Be $true
         }
 
-        It 'Build file is valid PowerShell' {
-            { . $BuildFile } | Should -Not -Throw
+        It 'Build file defines valid tasks' {
+            { Get-PSakeScriptTasks -BuildFile $BuildFile } | Should -Not -Throw
         }
 
         It 'Build tasks directory exists' {
             $tasksDir = Join-Path $ProjectRoot 'build/tasks'
-            Test-Path $tasksDir | Should -Be $true
+            Test-Path $tasksDir | Should -BeTrue
         }
     }
 
     Context 'Task Definitions' {
         BeforeAll {
-            . $BuildFile
+            $script:Tasks = Get-PSakeScriptTasks -BuildFile $BuildFile
         }
 
         It 'Defines Default task' {
-            $task = Get-PSakeScriptTask -taskName 'Default'
-            $task | Should -Not -BeNullOrEmpty
+            $Tasks.Name | Should -Contain 'Default'
         }
 
         It 'Defines Build task' {
-            $task = Get-PSakeScriptTask -taskName 'Build'
-            $task | Should -Not -BeNullOrEmpty
+            $Tasks.Name | Should -Contain 'Build'
         }
 
         It 'Defines Test task' {
-            $task = Get-PSakeScriptTask -taskName 'Test'
-            $task | Should -Not -BeNullOrEmpty
+            $Tasks.Name | Should -Contain 'Test'
         }
 
         It 'Test task depends on Build' {
-            $task = Get-PSakeScriptTask -taskName 'Test'
-            $task.DependsOn | Should -Contain 'Build'
+            $testTask = $Tasks | Where-Object Name -eq 'Test'
+            $testTask.DependsOn | Should -Contain 'Build'
         }
     }
 
@@ -671,38 +642,36 @@ Describe 'Build Script Validation' {
 
         It 'Clean task executes successfully' {
             $result = Invoke-psake -buildFile $BuildFile -taskList Clean -nologo
-            $result | Should -Be $true
+            $result.Success | Should -BeTrue
         }
 
         It 'Build task executes successfully' {
             $result = Invoke-psake -buildFile $BuildFile -taskList Build -nologo
-            $result | Should -Be $true
+            $result.Success | Should -BeTrue
         }
 
         It 'Full pipeline executes successfully' {
             $result = Invoke-psake -buildFile $BuildFile -nologo
-            $result | Should -Be $true
+            $result.Success | Should -BeTrue
         }
     }
 
     Context 'Properties and Configuration' {
-        It 'Respects Configuration parameter' {
-            $params = @{ Configuration = 'Release' }
-            $result = Invoke-psake -buildFile $BuildFile -parameters $params -taskList ShowConfig -nologo
-            $result | Should -Be $true
+        It 'Respects Configuration property' {
+            $result = Invoke-psake -buildFile $BuildFile -properties @{ Configuration = 'Release' } -taskList ValidateReleaseConfiguration -nologo
+            $result.Success | Should -BeTrue
         }
 
-        It 'Respects Environment parameter' {
-            $params = @{ Environment = 'staging' }
-            $result = Invoke-psake -buildFile $BuildFile -parameters $params -taskList ShowConfig -nologo
-            $result | Should -Be $true
+        It 'Respects Environment property' {
+            $result = Invoke-psake -buildFile $BuildFile -properties @{ Environment = 'staging' } -taskList ValidateStagingEnvironment -nologo
+            $result.Success | Should -BeTrue
         }
     }
 
     Context 'Error Handling' {
         It 'Fails gracefully on invalid task' {
             $result = Invoke-psake -buildFile $BuildFile -taskList InvalidTask -nologo
-            $result | Should -Be $false
+            $result.Success | Should -BeFalse
         }
 
         It 'Validates required environment variables' {
@@ -710,7 +679,8 @@ Describe 'Build Script Validation' {
             $env:REQUIRED_VAR = $null
 
             try {
-                { Invoke-psake -buildFile $BuildFile -taskList Deploy -nologo } | Should -Throw
+                $result = Invoke-psake -buildFile $BuildFile -taskList Deploy -nologo
+                $result.Success | Should -BeFalse
             }
             finally {
                 $env:REQUIRED_VAR = $originalEnv

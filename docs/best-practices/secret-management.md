@@ -148,16 +148,20 @@ Task LoadCredentials {
 Task Deploy -depends Build, LoadCredentials {
     Write-Host "Deploying with saved credentials..." -ForegroundColor Green
 
-    $username = $DeploymentCredential.UserName
-    $password = $DeploymentCredential.GetNetworkCredential().Password
+    $arguments = @(
+        '-verb:sync'
+        "-source:package=$BuildDir\package.zip"
+        '-dest:auto,computerName=https://server.example.com:8172/msdeploy.axd'
+        '-allowUntrusted'
+    )
+    $process = Start-Process msdeploy `
+        -ArgumentList $arguments `
+        -Credential $DeploymentCredential `
+        -Wait -PassThru -NoNewWindow
 
-    # Use credentials for deployment
-    exec {
-        msdeploy -verb:sync `
-            -source:package="$BuildDir\package.zip" `
-            -dest:auto,computerName="https://server.example.com:8172/msdeploy.axd",userName=$username,password=$password `
-            -allowUntrusted
-    } -errorMessage "Deployment failed"
+    if ($process.ExitCode -ne 0) {
+        throw "Deployment failed with exit code $($process.ExitCode)"
+    }
 }
 ```
 
@@ -169,27 +173,16 @@ For Azure-hosted secrets:
 Properties {
     $ProjectRoot = $PSScriptRoot
     $KeyVaultName = $env:AZURE_KEYVAULT_NAME
-
-    # Azure authentication
-    $AzureTenantId = $env:AZURE_TENANT_ID
-    $AzureClientId = $env:AZURE_CLIENT_ID
-    $AzureClientSecret = $env:AZURE_CLIENT_SECRET
 }
 
 Task AzureLogin {
     Write-Host "Authenticating with Azure..." -ForegroundColor Green
 
-    if ([string]::IsNullOrEmpty($AzureClientSecret)) {
-        # Interactive login for local development
-        exec { az login }
+    if ($env:CI) {
+        # CI authenticates before psake with azure/login or an equivalent workload identity.
+        exec { az account show --output none }
     } else {
-        # Service principal login for CI/CD
-        exec {
-            az login --service-principal `
-                --tenant $AzureTenantId `
-                --username $AzureClientId `
-                --password $AzureClientSecret
-        }
+        exec { az login }
     }
 
     Write-Host "Azure authentication successful" -ForegroundColor Green
@@ -226,23 +219,28 @@ Task GetSecretsFromKeyVault -depends AzureLogin {
     Write-Host "  Retrieved secrets successfully" -ForegroundColor Green
 }
 
-Task Deploy -depends Build, GetSecretsFromKeyVault {
-    Write-Host "Deploying with Key Vault secrets..." -ForegroundColor Green
+Task Deploy -depends Build, AzureLogin {
+    $databaseSecretUri = az keyvault secret show `
+        --name DatabasePassword --vault-name $KeyVaultName --query id -o tsv
+    $apiKeySecretUri = az keyvault secret show `
+        --name ApiKey --vault-name $KeyVaultName --query id -o tsv
+    $packageFile = Join-Path $BuildDir 'package.zip'
 
-    # Use the secrets retrieved from Key Vault
-    $connectionString = "Server=db.example.com;Database=MyApp;User Id=admin;Password=$DatabasePassword;"
-
-    # Update configuration with secrets
-    $appSettingsPath = Join-Path $BuildDir 'appsettings.json'
-    $appSettings = Get-Content $appSettingsPath | ConvertFrom-Json
-
-    $appSettings.ConnectionStrings.DefaultConnection = $connectionString
-    $appSettings.ExternalServices.ApiKey = $ApiKey
-
-    $appSettings | ConvertTo-Json -Depth 10 | Set-Content $appSettingsPath
-
-    # Deploy application
-    exec { az webapp deployment source config-zip --src "$BuildDir/package.zip" }
+    exec {
+        az webapp config appsettings set `
+            --resource-group $AzureResourceGroup `
+            --name $AzureWebAppName `
+            --settings `
+                "ConnectionStrings__DefaultConnection=@Microsoft.KeyVault(SecretUri=$databaseSecretUri)" `
+                "ExternalServices__ApiKey=@Microsoft.KeyVault(SecretUri=$apiKeySecretUri)"
+    }
+    exec {
+        az webapp deploy `
+            --resource-group $AzureResourceGroup `
+            --name $AzureWebAppName `
+            --src-path $packageFile `
+            --type zip
+    }
 }
 ```
 
@@ -297,41 +295,37 @@ Task GetSecretsFromAWS -depends VerifyAwsCli {
     Write-Host "  Retrieved secrets successfully" -ForegroundColor Green
 }
 
-Task CreateAwsSecret {
+Task SetAwsSecret {
     param(
         [string]$SecretName = 'myapp/prod',
-        [string]$SecretValue
+        [SecureString]$SecretValue
     )
 
-    Write-Host "Creating secret in AWS Secrets Manager..." -ForegroundColor Green
-
-    if ([string]::IsNullOrEmpty($SecretValue)) {
-        # Interactive input
+    if ($null -eq $SecretValue) {
         $SecretValue = Read-Host "Enter secret value" -AsSecureString
-        $SecretValue = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto(
-            [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($SecretValue)
-        )
     }
 
-    # Create or update secret
+    Import-Module AWS.Tools.SecretsManager
+    $credential = [PSCredential]::new('secret', $SecretValue)
+    $plainText = $credential.GetNetworkCredential().Password
+
     try {
-        exec {
-            aws secretsmanager create-secret `
-                --name $SecretName `
-                --secret-string $SecretValue `
-                --region $AwsRegion
+        $existingSecret = Get-SECSecretList |
+            Where-Object Name -eq $SecretName |
+            Select-Object -First 1
+
+        if ($existingSecret) {
+            Update-SECSecret -SecretId $SecretName -SecretString $plainText
+            Write-Host "Secret updated: $SecretName" -ForegroundColor Green
+        } else {
+            New-SECSecret -Name $SecretName -SecretString $plainText
+            Write-Host "Secret created: $SecretName" -ForegroundColor Green
         }
-        Write-Host "Secret created: $SecretName" -ForegroundColor Green
     }
-    catch {
-        # If secret exists, update it
-        exec {
-            aws secretsmanager update-secret `
-                --secret-id $SecretName `
-                --secret-string $SecretValue `
-                --region $AwsRegion
-        }
-        Write-Host "Secret updated: $SecretName" -ForegroundColor Green
+    finally {
+        $plainText = $null
+        $credential = $null
+        $SecretValue.Dispose()
     }
 }
 
@@ -493,29 +487,22 @@ Task ValidateSecrets {
 
 ```powershell
 Properties {
-    $CertificatePath = Join-Path $ProjectRoot 'certs/signing.pfx'
-    $CertificatePassword = $env:SIGNING_CERT_PASSWORD
+    $CertificateThumbprint = $env:SIGNING_CERT_THUMBPRINT
 }
 
 Task SignAssemblies -depends Build {
     Write-Host "Signing assemblies..." -ForegroundColor Green
 
-    if ([string]::IsNullOrEmpty($CertificatePassword)) {
-        throw "SIGNING_CERT_PASSWORD environment variable is required"
+    if ([string]::IsNullOrEmpty($CertificateThumbprint)) {
+        throw "SIGNING_CERT_THUMBPRINT environment variable is required"
     }
 
-    if (-not (Test-Path $CertificatePath)) {
-        throw "Certificate not found: $CertificatePath"
-    }
-
-    # Sign assemblies
     $assemblies = Get-ChildItem "$BuildDir/*.dll" -Recurse
-
     foreach ($assembly in $assemblies) {
         exec {
-            signtool sign /f $CertificatePath `
-                /p $CertificatePassword `
-                /t http://timestamp.digicert.com `
+            signtool sign /sha1 $CertificateThumbprint `
+                /tr http://timestamp.digicert.com `
+                /td SHA256 `
                 /fd SHA256 `
                 $assembly.FullName
         } -errorMessage "Failed to sign $($assembly.Name)"
@@ -525,30 +512,28 @@ Task SignAssemblies -depends Build {
 }
 ```
 
-### Cleanup Secrets After Use
+### Minimize Secret Lifetime
+
+Strings cannot be reliably erased from managed memory. Prefer APIs that accept `SecureString`, scope secrets narrowly, and dispose sensitive objects deterministically:
 
 ```powershell
-Task Deploy {
+Task InstallSigningCertificate {
+    $password = ConvertTo-SecureString $env:PFX_PASSWORD -AsPlainText -Force
+    $certificate = $null
+
     try {
-        # Retrieve secrets
-        $apiKey = $env:API_KEY
-        $dbPassword = $env:DB_PASSWORD
+        $certificate = Import-PfxCertificate `
+            -FilePath $CertificatePath `
+            -CertStoreLocation Cert:\CurrentUser\My `
+            -Password $password
 
-        # Use secrets
-        exec { dotnet publish --api-key $apiKey }
-
-        # Create temporary connection string
-        $connectionString = "Server=db;Database=MyApp;Password=$dbPassword;"
-        # Use connection string...
+        exec { signtool sign /sha1 $certificate.Thumbprint /fd SHA256 $PackagePath }
     }
     finally {
-        # Clear sensitive variables
-        $apiKey = $null
-        $dbPassword = $null
-        $connectionString = $null
-
-        # Force garbage collection
-        [System.GC]::Collect()
+        if ($certificate) {
+            Remove-Item $certificate.PSPath -Force
+        }
+        $password.Dispose()
     }
 }
 ```
@@ -654,26 +639,16 @@ Task ValidateSecrets {
     Write-Host "  Secrets validation passed" -ForegroundColor Green
 }
 
-Task GetSecrets -depends ValidateSecrets {
-    if ($UseKeyVault) {
-        Invoke-psake -taskList GetSecretsFromKeyVault
-    } else {
+Task GetSecrets -depends ValidateSecrets, GetSecretsFromKeyVault {
+    if (-not $UseKeyVault) {
         Write-Host "Using secrets from environment variables" -ForegroundColor Gray
     }
 }
 
-Task GetSecretsFromKeyVault {
+Task GetSecretsFromKeyVault -precondition { $UseKeyVault } {
     Write-Host "Retrieving secrets from Azure Key Vault..." -ForegroundColor Green
 
-    # Login to Azure
-    exec {
-        az login --service-principal `
-            --tenant $env:AZURE_TENANT_ID `
-            --username $env:AZURE_CLIENT_ID `
-            --password $env:AZURE_CLIENT_SECRET
-    }
-
-    # Retrieve secrets
+    # CI authenticates before psake with azure/login or an equivalent workload identity.
     $script:NuGetApiKey = az keyvault secret show `
         --name "NuGetApiKey" `
         --vault-name $AzureKeyVaultName `
@@ -695,22 +670,21 @@ Task Pack -depends Build {
 Task Publish -depends Pack, GetSecrets {
     Write-Host "Publishing packages to NuGet..." -ForegroundColor Green
 
-    $packages = Get-ChildItem "$BuildDir/*.nupkg"
-
-    foreach ($package in $packages) {
-        Write-Host "  Publishing: $($package.Name)" -ForegroundColor Gray
-
-        exec {
-            dotnet nuget push $package.FullName `
-                --api-key $NuGetApiKey `
-                --source https://api.nuget.org/v3/index.json
-        } -errorMessage "Failed to publish package (credentials redacted)"
+    try {
+        $packages = Get-ChildItem "$BuildDir/*.nupkg"
+        foreach ($package in $packages) {
+            Write-Host "  Publishing: $($package.Name)" -ForegroundColor Gray
+            exec {
+                dotnet nuget push $package.FullName `
+                    --api-key $NuGetApiKey `
+                    --source https://api.nuget.org/v3/index.json
+            } -errorMessage "Failed to publish package (credentials redacted)"
+        }
+        Write-Host "Publishing complete" -ForegroundColor Green
     }
-
-    # Clear sensitive data
-    $script:NuGetApiKey = $null
-
-    Write-Host "Publishing complete" -ForegroundColor Green
+    finally {
+        $script:NuGetApiKey = $null
+    }
 }
 ```
 

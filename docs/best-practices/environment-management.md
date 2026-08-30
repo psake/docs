@@ -57,41 +57,40 @@ Simple projects with few environment differences:
 ```powershell
 Properties {
     $Environment = if ($env:BUILD_ENV) { $env:BUILD_ENV } else { 'dev' }
-
-    # Configuration mode
-    $Configuration = switch ($Environment) {
-        'dev'     { 'Debug' }
-        'staging' { 'Release' }
-        'prod'    { 'Release' }
+    $environmentSettings = @{
+        dev = @{
+            Configuration = 'Debug'
+            DatabaseServer = 'localhost'
+            ApiUrl = 'http://localhost:5000'
+            EnableTelemetry = $false
+            LogLevel = 'Debug'
+        }
+        staging = @{
+            Configuration = 'Release'
+            DatabaseServer = 'db-staging.internal'
+            ApiUrl = 'https://api-staging.example.com'
+            EnableTelemetry = $true
+            LogLevel = 'Information'
+        }
+        prod = @{
+            Configuration = 'Release'
+            DatabaseServer = 'db-prod.internal'
+            ApiUrl = 'https://api.example.com'
+            EnableTelemetry = $true
+            LogLevel = 'Warning'
+        }
     }
 
-    # Database connection strings
-    $DatabaseServer = switch ($Environment) {
-        'dev'     { 'localhost' }
-        'staging' { 'db-staging.internal' }
-        'prod'    { 'db-prod.internal' }
+    if (-not $environmentSettings.ContainsKey($Environment)) {
+        throw "Unknown environment: $Environment"
     }
 
-    # API endpoints
-    $ApiUrl = switch ($Environment) {
-        'dev'     { 'http://localhost:5000' }
-        'staging' { 'https://api-staging.example.com' }
-        'prod'    { 'https://api.example.com' }
-    }
-
-    # Feature flags
-    $EnableTelemetry = switch ($Environment) {
-        'dev'     { $false }
-        'staging' { $true }
-        'prod'    { $true }
-    }
-
-    # Logging level
-    $LogLevel = switch ($Environment) {
-        'dev'     { 'Debug' }
-        'staging' { 'Information' }
-        'prod'    { 'Warning' }
-    }
+    $settings = $environmentSettings[$Environment]
+    $Configuration = $settings.Configuration
+    $DatabaseServer = $settings.DatabaseServer
+    $ApiUrl = $settings.ApiUrl
+    $EnableTelemetry = $settings.EnableTelemetry
+    $LogLevel = $settings.LogLevel
 }
 
 Task Build {
@@ -242,21 +241,23 @@ Properties {
 **psakefile.ps1:**
 
 ```powershell
+$selectedEnvironment = if ($env:BUILD_ENV) { $env:BUILD_ENV } else { 'dev' }
+$configDirectory = Join-Path $PSScriptRoot 'build/config'
+$environmentConfig = Join-Path $configDirectory "${selectedEnvironment}.ps1"
+
+if (-not (Test-Path $environmentConfig)) {
+    throw "Environment configuration not found: $environmentConfig. Valid environments: dev, staging, prod"
+}
+
+Write-Host "Loading configuration for: $selectedEnvironment" -ForegroundColor Cyan
+Include $environmentConfig
+
 Properties {
     $ProjectRoot = $PSScriptRoot
+    $BuildDir = Join-Path $ProjectRoot 'build/output'
     $Environment = if ($env:BUILD_ENV) { $env:BUILD_ENV } else { 'dev' }
     $ConfigDir = Join-Path $ProjectRoot 'build/config'
 }
-
-# Load environment-specific configuration
-$envConfig = Join-Path $ConfigDir "${Environment}.ps1"
-
-if (-not (Test-Path $envConfig)) {
-    throw "Environment configuration not found: $envConfig. Valid environments: dev, staging, prod"
-}
-
-Write-Host "Loading configuration for: $Environment" -ForegroundColor Cyan
-Include $envConfig
 
 Task Default -depends Build
 
@@ -269,19 +270,28 @@ Task Build {
     exec { dotnet build -c $Configuration }
 }
 
+function Deploy-AzureWebApp {
+    $packageFile = Get-ChildItem "$BuildDir/*.zip" | Select-Object -First 1
+    if (-not $packageFile) { throw "Deployment package not found in $BuildDir" }
+
+    exec {
+        az webapp deploy `
+            --resource-group $AzureResourceGroup `
+            --name $AzureWebAppName `
+            --src-path $packageFile.FullName `
+            --type zip
+    }
+}
+
 Task Deploy -depends Build {
-    if ($RequireApproval) {
-        $confirmation = Read-Host "Deploy to $Environment? This is a PRODUCTION environment! (yes/no)"
-        if ($confirmation -ne 'yes') {
-            Write-Host "Deployment cancelled" -ForegroundColor Yellow
-            return
-        }
+    if ($RequireApproval -and $env:DEPLOY_APPROVED -ne 'true') {
+        throw "Deployment to $Environment requires DEPLOY_APPROVED=true"
     }
 
     switch ($DeploymentTarget) {
-        'local' { Invoke-psake -taskList Deploy:Local }
-        'azure-staging' { Invoke-psake -taskList Deploy:Azure }
-        'azure-production' { Invoke-psake -taskList Deploy:Azure }
+        'local' { Copy-Item "$BuildDir/*" -Destination "C:\Deploy\$Environment" -Recurse -Force }
+        'azure-staging' { Deploy-AzureWebApp }
+        'azure-production' { Deploy-AzureWebApp }
         default { throw "Unknown deployment target: $DeploymentTarget" }
     }
 }
@@ -346,37 +356,60 @@ Use structured configuration files for complex settings:
 }
 ```
 
+**build/config/environments.yaml:**
+
+```yaml
+dev:
+  configuration: Debug
+  services:
+    api: http://localhost:5000
+staging:
+  configuration: Release
+  services:
+    api: https://api-staging.example.com
+prod:
+  configuration: Release
+  services:
+    api: https://api.example.com
+```
+
+For YAML, install and import `powershell-yaml`, then replace the JSON-loading expression with:
+
+```powershell
+Import-Module powershell-yaml
+$configurationFile = Join-Path $PSScriptRoot 'build/config/environments.yaml'
+$allConfigs = Get-Content $configurationFile -Raw | ConvertFrom-Yaml
+```
+
 **psakefile.ps1:**
 
 ```powershell
+$selectedEnvironment = if ($env:BUILD_ENV) { $env:BUILD_ENV } else { 'dev' }
+$configurationFile = Join-Path $PSScriptRoot 'build/config/environments.json'
+
+if (-not (Test-Path $configurationFile)) {
+    throw "Configuration file not found: $configurationFile"
+}
+
+$allConfigs = Get-Content $configurationFile -Raw | ConvertFrom-Json
+$selectedConfig = $allConfigs.$selectedEnvironment
+
+if ($null -eq $selectedConfig) {
+    throw "Configuration for environment '$selectedEnvironment' not found in $configurationFile"
+}
+
 Properties {
     $ProjectRoot = $PSScriptRoot
     $Environment = if ($env:BUILD_ENV) { $env:BUILD_ENV } else { 'dev' }
     $ConfigFile = Join-Path $ProjectRoot 'build/config/environments.json'
-}
-
-# Load and parse configuration
-if (-not (Test-Path $ConfigFile)) {
-    throw "Configuration file not found: $ConfigFile"
-}
-
-$allConfigs = Get-Content $ConfigFile | ConvertFrom-Json
-$config = $allConfigs.$Environment
-
-if ($null -eq $config) {
-    throw "Configuration for environment '$Environment' not found in $ConfigFile"
-}
-
-# Extract configuration values
-Properties {
-    $Configuration = $config.configuration
-    $DatabaseServer = $config.database.server
-    $DatabaseName = $config.database.name
-    $DatabasePort = $config.database.port
-    $ApiUrl = $config.services.api
-    $AuthUrl = $config.services.auth
-    $EnableCaching = $config.features.caching
-    $EnableTelemetry = $config.features.telemetry
+    $Configuration = $selectedConfig.configuration
+    $DatabaseServer = $selectedConfig.database.server
+    $DatabaseName = $selectedConfig.database.name
+    $DatabasePort = $selectedConfig.database.port
+    $ApiUrl = $selectedConfig.services.api
+    $AuthUrl = $selectedConfig.services.auth
+    $EnableCaching = $selectedConfig.features.caching
+    $EnableTelemetry = $selectedConfig.features.telemetry
 }
 
 Task Build {
@@ -436,8 +469,8 @@ Task DeployToProduction -depends Build -precondition { $Environment -eq 'prod' }
     exec { dotnet test --filter Category=Smoke }
 }
 
-Task SkipTestsInDev -precondition { $Environment -ne 'dev' } {
-    Invoke-psake -taskList RunTests
+Task TestOutsideDevelopment -precondition { $Environment -ne 'dev' } {
+    exec { dotnet test }
 }
 ```
 
@@ -448,7 +481,6 @@ Properties {
     $Environment = if ($env:BUILD_ENV) { $env:BUILD_ENV } else { 'dev' }
 }
 
-Task Default -depends Build
 
 Task Build -depends Clean, Compile
 
@@ -464,15 +496,17 @@ Task Production -depends Build, RunAllTests, SecurityScan, Package, DeployProduc
     Write-Host "Production deployment complete" -ForegroundColor Green
 }
 
-# Automatically select task based on environment
-Task Auto {
-    switch ($Environment) {
-        'dev'     { Invoke-psake -taskList Dev }
-        'staging' { Invoke-psake -taskList Staging }
-        'prod'    { Invoke-psake -taskList Production }
-        default   { throw "Unknown environment: $Environment" }
-    }
+$environmentTasks = @{
+    dev = 'Dev'
+    staging = 'Staging'
+    prod = 'Production'
 }
+$selectedEnvironment = if ($env:BUILD_ENV) { $env:BUILD_ENV } else { 'dev' }
+if (-not $environmentTasks.ContainsKey($selectedEnvironment)) {
+    throw "Unknown environment: $selectedEnvironment"
+}
+
+Task Default -depends $environmentTasks[$selectedEnvironment]
 ```
 
 ### Conditional Build Steps
@@ -502,8 +536,9 @@ Task Build {
     }
 
     if ($EnableTelemetry) {
-        Write-Host "Instrumenting for telemetry..." -ForegroundColor Cyan
-        # Add telemetry instrumentation
+        $env:OTEL_SERVICE_NAME = 'MyApp'
+        $env:OTEL_RESOURCE_ATTRIBUTES = "deployment.environment.name=$Environment"
+        Write-Host "Configured OpenTelemetry resource attributes" -ForegroundColor Cyan
     }
 }
 ```
@@ -515,30 +550,27 @@ Here's a comprehensive example combining all patterns:
 **psakefile.ps1:**
 
 ```powershell
+$selectedEnvironment = if ($env:BUILD_ENV) { $env:BUILD_ENV } else { 'dev' }
+$validEnvironments = @('dev', 'staging', 'prod')
+if ($selectedEnvironment -notin $validEnvironments) {
+    throw "Invalid environment: $selectedEnvironment. Valid options: $($validEnvironments -join ', ')"
+}
+
+$configDirectory = Join-Path $PSScriptRoot 'build/config'
+$environmentConfig = Join-Path $configDirectory "${selectedEnvironment}.ps1"
+if (-not (Test-Path $environmentConfig)) {
+    throw "Environment configuration not found: $environmentConfig"
+}
+
+Write-Host "Loading environment configuration: $selectedEnvironment" -ForegroundColor Cyan
+Include $environmentConfig
+
 Properties {
-    # Base properties
     $ProjectRoot = $PSScriptRoot
     $SrcDir = Join-Path $ProjectRoot 'src'
     $BuildDir = Join-Path $ProjectRoot 'build/output'
     $ConfigDir = Join-Path $ProjectRoot 'build/config'
-
-    # Environment detection
     $Environment = if ($env:BUILD_ENV) { $env:BUILD_ENV } else { 'dev' }
-
-    # Validate environment
-    $validEnvironments = @('dev', 'staging', 'prod')
-    if ($Environment -notin $validEnvironments) {
-        throw "Invalid environment: $Environment. Valid options: $($validEnvironments -join ', ')"
-    }
-}
-
-# Load environment-specific configuration
-$envConfigFile = Join-Path $ConfigDir "${Environment}.ps1"
-if (Test-Path $envConfigFile) {
-    Write-Host "Loading environment configuration: $Environment" -ForegroundColor Cyan
-    Include $envConfigFile
-} else {
-    throw "Environment configuration not found: $envConfigFile"
 }
 
 FormatTaskName {
@@ -610,15 +642,19 @@ Task Package -depends Test {
     Write-Host "Package created: $packagePath" -ForegroundColor Green
 }
 
-Task Deploy -depends Package {
-    if ($RequireApproval) {
-        Write-Warning "Deploying to $Environment environment!"
-        $confirmation = Read-Host "Are you sure you want to continue? (yes/no)"
+function Test-DeploymentHealth {
+    if ($SkipHealthChecks) { return }
 
-        if ($confirmation -ne 'yes') {
-            Write-Host "Deployment cancelled" -ForegroundColor Yellow
-            return
-        }
+    $response = Invoke-WebRequest -Uri "$ApiBaseUrl/health" -TimeoutSec 30
+    if ($response.StatusCode -ne 200) {
+        throw "Health check failed with status: $($response.StatusCode)"
+    }
+    Write-Host "  Health check passed" -ForegroundColor Green
+}
+
+Task Deploy -depends Package {
+    if ($RequireApproval -and $env:DEPLOY_APPROVED -ne 'true') {
+        throw "Deployment to $Environment requires DEPLOY_APPROVED=true"
     }
 
     Write-Host "Deploying to $DeploymentTarget..." -ForegroundColor Green
@@ -627,29 +663,24 @@ Task Deploy -depends Package {
         'local' {
             Copy-Item "$BuildDir/*" -Destination "C:\Deploy\$Environment" -Recurse -Force
         }
-        'azure-staging' {
+        { $_ -in 'azure-staging', 'azure-production' } {
+            $packageFile = Get-ChildItem "$BuildDir/*.zip" | Select-Object -First 1
+            if (-not $packageFile) { throw "Deployment package not found in $BuildDir" }
+
             exec {
-                az webapp deployment source config-zip `
+                az webapp deploy `
                     --resource-group $AzureResourceGroup `
                     --name $AzureWebAppName `
-                    --src "$BuildDir/*.zip"
-            }
-        }
-        'azure-production' {
-            exec {
-                az webapp deployment source config-zip `
-                    --resource-group $AzureResourceGroup `
-                    --name $AzureWebAppName `
-                    --src "$BuildDir/*.zip"
+                    --src-path $packageFile.FullName `
+                    --type zip
             }
 
-            # Run health checks after production deployment
-            Start-Sleep -Seconds 10
-            Invoke-psake -taskList HealthCheck
+            if ($DeploymentTarget -eq 'azure-production') {
+                Start-Sleep -Seconds 10
+                Test-DeploymentHealth
+            }
         }
-        default {
-            throw "Unknown deployment target: $DeploymentTarget"
-        }
+        default { throw "Unknown deployment target: $DeploymentTarget" }
     }
 
     Write-Host "Deployment to $Environment complete!" -ForegroundColor Green
@@ -731,13 +762,17 @@ jobs:
         shell: pwsh
         run: Install-Module -Name psake -Force
 
+      - name: Sign in to Azure
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS_STAGING }}
+
       - name: Build and Deploy to Staging
         shell: pwsh
         run: Invoke-psake -buildFile .\psakefile.ps1 -taskList Deploy
         env:
           BUILD_ENV: staging
-          AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS_STAGING }}
-
+          DEPLOY_APPROVED: 'true'
   build-production:
     runs-on: windows-latest
     if: github.ref == 'refs/heads/main'
@@ -749,12 +784,69 @@ jobs:
         shell: pwsh
         run: Install-Module -Name psake -Force
 
+      - name: Sign in to Azure
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS_PROD }}
+
       - name: Build and Deploy to Production
         shell: pwsh
         run: Invoke-psake -buildFile .\psakefile.ps1 -taskList Deploy
         env:
           BUILD_ENV: prod
-          AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS_PROD }}
+          DEPLOY_APPROVED: 'true'
+```
+
+### Azure Pipelines
+
+Use an Azure Resource Manager service connection so credentials never enter the build script:
+
+```yaml
+trigger:
+  branches:
+    include:
+      - main
+      - develop
+
+stages:
+  - stage: Build
+    jobs:
+      - job: Build
+        pool:
+          vmImage: windows-latest
+        steps:
+          - checkout: self
+          - pwsh: Install-Module -Name psake -Force
+            displayName: Install psake
+          - pwsh: Invoke-psake -BuildFile .\psakefile.ps1 -TaskList Build
+            displayName: Build
+            env:
+              BUILD_ENV: dev
+
+  - stage: DeployProduction
+    dependsOn: Build
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+    jobs:
+      - deployment: Deploy
+        environment: production
+        pool:
+          vmImage: windows-latest
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - checkout: self
+                - task: AzureCLI@2
+                  inputs:
+                    azureSubscription: MyProductionServiceConnection
+                    scriptType: pscore
+                    scriptLocation: inlineScript
+                    inlineScript: |
+                      Install-Module -Name psake -Force
+                      Invoke-psake -BuildFile .\psakefile.ps1 -TaskList Deploy
+                  env:
+                    BUILD_ENV: prod
+                    DEPLOY_APPROVED: 'true'
 ```
 
 ## Best Practices
@@ -763,7 +855,7 @@ jobs:
 2. **Validate early** - Check environment names at the start of the build
 3. **Externalize configuration** - Use separate config files for complex environments
 4. **Default to development** - Make the safest environment (dev) the default
-5. **Require approval for production** - Add confirmation prompts for production deployments
+5. **Require approval for production** - Use protected CI environments and a noninteractive approval signal
 6. **Use preconditions** - Leverage psake preconditions for environment-specific tasks
 7. **Keep secrets separate** - Never put secrets in environment config files (see [Secret Management](/docs/best-practices/secret-management))
 8. **Test all environments** - Validate builds for all environments in CI/CD

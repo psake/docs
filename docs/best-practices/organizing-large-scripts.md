@@ -29,13 +29,13 @@ Main `psakefile.ps1`:
 ```powershell
 Properties {
     $ProjectRoot = $PSScriptRoot
-    $TasksDir = Join-Path $ProjectRoot 'build/tasks'
 }
 
-# Include modular task files
-Include (Join-Path $TasksDir 'build.ps1')
-Include (Join-Path $TasksDir 'test.ps1')
-Include (Join-Path $TasksDir 'deploy.ps1')
+# Include paths must be resolved while the build file is loaded.
+$tasksDirectory = Join-Path $PSScriptRoot 'build/tasks'
+Include (Join-Path $tasksDirectory 'build.ps1')
+Include (Join-Path $tasksDirectory 'test.ps1')
+Include (Join-Path $tasksDirectory 'deploy.ps1')
 
 Task Default -depends Build, Test
 ```
@@ -70,31 +70,29 @@ my-project/
 **psakefile.ps1:**
 
 ```powershell
+$buildRoot = Join-Path $PSScriptRoot 'build'
+$utilsDirectory = Join-Path $buildRoot 'utils'
+$tasksDirectory = Join-Path $buildRoot 'tasks'
+$configDirectory = Join-Path $buildRoot 'config'
+$selectedEnvironment = if ($env:BUILD_ENV) { $env:BUILD_ENV } else { 'dev' }
+
+# Includes are resolved while the build file is loaded.
+Include (Join-Path $utilsDirectory 'logging.ps1')
+Include (Join-Path $utilsDirectory 'fileops.ps1')
+Include (Join-Path $utilsDirectory 'versioning.ps1')
+Include (Join-Path $configDirectory "${selectedEnvironment}.ps1")
+Include (Join-Path $tasksDirectory 'compile.ps1')
+Include (Join-Path $tasksDirectory 'test.ps1')
+Include (Join-Path $tasksDirectory 'package.ps1')
+Include (Join-Path $tasksDirectory 'deploy.ps1')
+Include (Join-Path $tasksDirectory 'cleanup.ps1')
+
 Properties {
     $ProjectRoot = $PSScriptRoot
     $BuildRoot = Join-Path $ProjectRoot 'build'
-    $TasksDir = Join-Path $BuildRoot 'tasks'
-    $UtilsDir = Join-Path $BuildRoot 'utils'
-    $ConfigDir = Join-Path $BuildRoot 'config'
-
     $Environment = if ($env:BUILD_ENV) { $env:BUILD_ENV } else { 'dev' }
     $Configuration = 'Release'
 }
-
-# Load utilities first (order matters)
-Include (Join-Path $UtilsDir 'logging.ps1')
-Include (Join-Path $UtilsDir 'fileops.ps1')
-Include (Join-Path $UtilsDir 'versioning.ps1')
-
-# Load environment-specific configuration
-Include (Join-Path $ConfigDir "${Environment}.ps1")
-
-# Load task modules
-Include (Join-Path $TasksDir 'compile.ps1')
-Include (Join-Path $TasksDir 'test.ps1')
-Include (Join-Path $TasksDir 'package.ps1')
-Include (Join-Path $TasksDir 'deploy.ps1')
-Include (Join-Path $TasksDir 'cleanup.ps1')
 
 FormatTaskName {
     param($taskName)
@@ -137,46 +135,40 @@ my-project/
 **psakefile.ps1:**
 
 ```powershell
+$buildRoot = Join-Path $PSScriptRoot 'build'
+$buildType = if ($env:BUILD_TYPE) { $env:BUILD_TYPE } else { 'all' }
+$buildTasks = @()
+
+Include (Join-Path $buildRoot 'shared/common.ps1')
+
+if ($buildType -in 'library', 'all') {
+    Include (Join-Path $buildRoot 'tasks/library/build.ps1')
+    Include (Join-Path $buildRoot 'tasks/library/test.ps1')
+    Include (Join-Path $buildRoot 'tasks/library/publish.ps1')
+    $buildTasks += 'Library:Build'
+}
+
+if ($buildType -in 'service', 'all') {
+    Include (Join-Path $buildRoot 'tasks/service/build.ps1')
+    Include (Join-Path $buildRoot 'tasks/service/docker.ps1')
+    Include (Join-Path $buildRoot 'tasks/service/deploy.ps1')
+    $buildTasks += 'Service:Build'
+}
+
+if ($buildType -in 'tools', 'all') {
+    Include (Join-Path $buildRoot 'tasks/tools/build.ps1')
+    Include (Join-Path $buildRoot 'tasks/tools/package.ps1')
+    $buildTasks += 'Tools:Build'
+}
+
 Properties {
     $ProjectRoot = $PSScriptRoot
     $BuildRoot = Join-Path $ProjectRoot 'build'
-    $BuildType = 'all'  # Options: library, service, tools, all
-}
-
-# Load shared utilities
-Include (Join-Path $BuildRoot 'shared/common.ps1')
-
-# Conditionally load build type tasks
-if ($BuildType -eq 'library' -or $BuildType -eq 'all') {
-    Include (Join-Path $BuildRoot 'tasks/library/build.ps1')
-    Include (Join-Path $BuildRoot 'tasks/library/test.ps1')
-    Include (Join-Path $BuildRoot 'tasks/library/publish.ps1')
-}
-
-if ($BuildType -eq 'service' -or $BuildType -eq 'all') {
-    Include (Join-Path $BuildRoot 'tasks/service/build.ps1')
-    Include (Join-Path $BuildRoot 'tasks/service/docker.ps1')
-    Include (Join-Path $BuildRoot 'tasks/service/deploy.ps1')
-}
-
-if ($BuildType -eq 'tools' -or $BuildType -eq 'all') {
-    Include (Join-Path $BuildRoot 'tasks/tools/build.ps1')
-    Include (Join-Path $BuildRoot 'tasks/tools/package.ps1')
+    $BuildType = if ($env:BUILD_TYPE) { $env:BUILD_TYPE } else { 'all' }
 }
 
 Task Default -depends Build
-
-Task Build {
-    if ($BuildType -eq 'library' -or $BuildType -eq 'all') {
-        Invoke-psake -taskList Library:Build
-    }
-    if ($BuildType -eq 'service' -or $BuildType -eq 'all') {
-        Invoke-psake -taskList Service:Build
-    }
-    if ($BuildType -eq 'tools' -or $BuildType -eq 'all') {
-        Invoke-psake -taskList Tools:Build
-    }
-}
+Task Build -depends $buildTasks
 ```
 
 ## Modular Task Files
@@ -194,34 +186,32 @@ Properties {
     $BuildDir = Join-Path $ProjectRoot 'build/output'
 }
 
-Task Compile -depends Clean {
-    Write-Host "Compiling solution..." -ForegroundColor Green
+function Invoke-SolutionBuild {
+    param([string]$BuildConfiguration)
 
     $solutionFile = Get-ChildItem "$SrcDir/*.sln" | Select-Object -First 1
-
-    if (-not $solutionFile) {
-        throw "No solution file found in $SrcDir"
-    }
+    if (-not $solutionFile) { throw "No solution file found in $SrcDir" }
 
     exec {
         dotnet build $solutionFile.FullName `
-            -c $Configuration `
+            -c $BuildConfiguration `
             -o $BuildDir `
             /p:Version=$Version `
             --no-incremental
     }
+}
 
+Task Compile -depends Clean {
+    Invoke-SolutionBuild -BuildConfiguration $Configuration
     Write-Host "Compilation complete: $BuildDir" -ForegroundColor Green
 }
 
-Task CompileDebug {
-    $script:Configuration = 'Debug'
-    Invoke-psake -taskList Compile
+Task CompileDebug -depends Clean {
+    Invoke-SolutionBuild -BuildConfiguration Debug
 }
 
-Task CompileRelease {
-    $script:Configuration = 'Release'
-    Invoke-psake -taskList Compile
+Task CompileRelease -depends Clean {
+    Invoke-SolutionBuild -BuildConfiguration Release
 }
 
 Task Restore {
@@ -323,49 +313,50 @@ Task TestIntegration -depends Build {
 **build/tasks/deploy.ps1:**
 
 ```powershell
+$deployTaskByTarget = @{
+    azure = 'Deploy:Azure'
+    aws = 'Deploy:AWS'
+    local = 'Deploy:Local'
+}
+$selectedDeployTarget = if ($env:DEPLOY_TARGET) { $env:DEPLOY_TARGET } else { 'local' }
+if (-not $deployTaskByTarget.ContainsKey($selectedDeployTarget)) {
+    throw "Unknown deployment target: $selectedDeployTarget"
+}
+
 Properties {
-    $DeployTarget = if ($env:DEPLOY_TARGET) { $env:DEPLOY_TARGET } else { 'dev' }
+    $DeployTarget = if ($env:DEPLOY_TARGET) { $env:DEPLOY_TARGET } else { 'local' }
     $DeploymentDir = Join-Path $ProjectRoot 'deployment'
+    $AwsDeploymentBucket = $env:AWS_DEPLOYMENT_BUCKET
+    $AwsApplicationName = $env:AWS_APPLICATION_NAME
+    $AwsDeploymentGroup = $env:AWS_DEPLOYMENT_GROUP
 }
 
-Task Deploy -depends Package -precondition { $Environment -ne 'dev' } {
-    Write-Host "Deploying to $DeployTarget..." -ForegroundColor Green
-
-    switch ($DeployTarget) {
-        'azure' { Invoke-psake -taskList Deploy:Azure }
-        'aws' { Invoke-psake -taskList Deploy:AWS }
-        'local' { Invoke-psake -taskList Deploy:Local }
-        default { throw "Unknown deploy target: $DeployTarget" }
-    }
-}
+Task Deploy -depends $deployTaskByTarget[$selectedDeployTarget]
 
 Task Deploy:Azure {
-    Write-Host "Deploying to Azure..." -ForegroundColor Green
-
-    $webAppName = $AzureWebAppName
-    $resourceGroup = $AzureResourceGroup
-
-    if ([string]::IsNullOrEmpty($webAppName) -or [string]::IsNullOrEmpty($resourceGroup)) {
-        throw "Azure configuration is incomplete"
-    }
-
     $packageFile = Get-ChildItem "$BuildDir/*.zip" | Select-Object -First 1
+    if (-not $packageFile) { throw "Deployment package not found in $BuildDir" }
 
     exec {
-        az webapp deployment source config-zip `
-            --resource-group $resourceGroup `
-            --name $webAppName `
-            --src $packageFile.FullName
+        az webapp deploy `
+            --resource-group $AzureResourceGroup `
+            --name $AzureWebAppName `
+            --src-path $packageFile.FullName `
+            --type zip
     }
-
-    Write-Host "Deployed to Azure: https://${webAppName}.azurewebsites.net" -ForegroundColor Green
 }
 
 Task Deploy:AWS {
-    Write-Host "Deploying to AWS..." -ForegroundColor Green
+    $packageFile = Get-ChildItem "$BuildDir/*.zip" | Select-Object -First 1
+    if (-not $packageFile) { throw "Deployment package not found in $BuildDir" }
 
-    # AWS deployment logic here
-    throw "AWS deployment not yet implemented"
+    exec { aws s3 cp $packageFile.FullName "s3://$AwsDeploymentBucket/$($packageFile.Name)" }
+    exec {
+        aws deploy create-deployment `
+            --application-name $AwsApplicationName `
+            --deployment-group-name $AwsDeploymentGroup `
+            --s3-location "bucket=$AwsDeploymentBucket,key=$($packageFile.Name),bundleType=zip"
+    }
 }
 
 Task Deploy:Local {
@@ -390,24 +381,18 @@ The `Include` function allows you to split build logic across multiple files.
 ### Include with Path Validation
 
 ```powershell
-Properties {
-    $BuildRoot = Join-Path $PSScriptRoot 'build'
-}
+$buildRoot = Join-Path $PSScriptRoot 'build'
 
-# Helper function to safely include files
 function Include-TaskFile {
     param([string]$RelativePath)
 
-    $fullPath = Join-Path $BuildRoot $RelativePath
-
+    $fullPath = Join-Path $buildRoot $RelativePath
     if (-not (Test-Path $fullPath)) {
         throw "Task file not found: $fullPath"
     }
-
     Include $fullPath
 }
 
-# Include task files with validation
 Include-TaskFile 'tasks/build.ps1'
 Include-TaskFile 'tasks/test.ps1'
 Include-TaskFile 'tasks/deploy.ps1'
@@ -416,26 +401,20 @@ Include-TaskFile 'tasks/deploy.ps1'
 ### Dynamic Includes Based on Configuration
 
 ```powershell
-Properties {
-    $ProjectType = 'dotnet'  # Options: dotnet, nodejs, docker
-    $TasksDir = Join-Path $PSScriptRoot 'build/tasks'
+$projectType = if ($env:PROJECT_TYPE) { $env:PROJECT_TYPE } else { 'dotnet' }
+$tasksDirectory = Join-Path $PSScriptRoot 'build/tasks'
+
+Include (Join-Path $tasksDirectory 'common.ps1')
+
+$projectTaskFile = Join-Path $tasksDirectory "${projectType}.ps1"
+if (-not (Test-Path $projectTaskFile)) {
+    throw "No task file found for project type: $projectType"
 }
+Include $projectTaskFile
 
-# Include common tasks
-Include (Join-Path $TasksDir 'common.ps1')
-
-# Include project-type specific tasks
-$projectTaskFile = Join-Path $TasksDir "${ProjectType}.ps1"
-if (Test-Path $projectTaskFile) {
-    Include $projectTaskFile
-} else {
-    throw "No task file found for project type: $ProjectType"
-}
-
-# Include optional tasks if they exist
 $optionalTasks = @('docker.ps1', 'kubernetes.ps1', 'terraform.ps1')
 foreach ($taskFile in $optionalTasks) {
-    $fullPath = Join-Path $TasksDir $taskFile
+    $fullPath = Join-Path $tasksDirectory $taskFile
     if (Test-Path $fullPath) {
         Write-Host "Loading optional tasks: $taskFile" -ForegroundColor Gray
         Include $fullPath
@@ -549,13 +528,6 @@ function Get-FileHash256 {
     return (Get-FileHash -Path $FilePath -Algorithm SHA256).Hash
 }
 
-# Export utilities (make them available to other scripts)
-Export-ModuleMember -Function @(
-    'Remove-DirectorySafe',
-    'New-DirectorySafe',
-    'Copy-DirectoryContents',
-    'Get-FileHash256'
-)
 ```
 
 ### Example: Logging Utility
@@ -615,16 +587,6 @@ function Write-LogStep {
     Write-Host "  [$Step/$Total] $Message" -ForegroundColor Cyan
 }
 
-# Export utilities
-Export-ModuleMember -Function @(
-    'Write-LogHeader',
-    'Write-LogSection',
-    'Write-LogInfo',
-    'Write-LogSuccess',
-    'Write-LogWarning',
-    'Write-LogError',
-    'Write-LogStep'
-)
 ```
 
 ### Example: Versioning Utility
@@ -634,63 +596,22 @@ Export-ModuleMember -Function @(
 ```powershell
 # Version management utilities
 
-function Get-GitVersion {
-    <#
-    .SYNOPSIS
-    Gets version information from git tags and commits
-    #>
-
-    try {
-        # Get latest tag
-        $tag = git describe --tags --abbrev=0 2>$null
-
-        if ([string]::IsNullOrEmpty($tag)) {
-            return "1.0.0"
-        }
-
-        # Parse semantic version
-        if ($tag -match '^v?(\d+)\.(\d+)\.(\d+)') {
-            $major = $matches[1]
-            $minor = $matches[2]
-            $patch = $matches[3]
-
-            # Get commits since tag
-            $commitsSinceTag = git rev-list "$tag..HEAD" --count 2>$null
-
-            if ($commitsSinceTag -gt 0) {
-                # Bump patch version
-                $patch = [int]$patch + 1
-                return "$major.$minor.$patch-dev.$commitsSinceTag"
-            }
-
-            return "$major.$minor.$patch"
-        }
-
-        return "1.0.0"
-    }
-    catch {
-        Write-Warning "Failed to get git version: $_"
-        return "1.0.0"
-    }
-}
 
 function Get-BuildVersion {
     param(
-        [string]$BaseVersion = "1.0.0",
+        [string]$BaseVersion = '1.0.0',
         [string]$BuildNumber = $null
     )
 
     if ([string]::IsNullOrEmpty($BuildNumber)) {
-        $BuildNumber = if ($env:BUILD_NUMBER) { $env:BUILD_NUMBER } else { "0" }
+        $BuildNumber = if ($env:BUILD_NUMBER) { $env:BUILD_NUMBER } else { '0' }
     }
 
-    if ($BaseVersion -match '^(\d+)\.(\d+)\.(\d+)') {
-        $major = $matches[1]
-        $minor = $matches[2]
-        return "$major.$minor.$BuildNumber"
+    if ($BaseVersion -notmatch '^\d+\.\d+\.\d+$') {
+        throw "Base version is not valid SemVer: $BaseVersion"
     }
 
-    return "$BaseVersion.$BuildNumber"
+    return "$BaseVersion-ci.$BuildNumber"
 }
 
 function Set-AssemblyVersion {
@@ -719,11 +640,6 @@ function Set-AssemblyVersion {
     Write-Host "Updated version to $Version in $ProjectFile" -ForegroundColor Green
 }
 
-Export-ModuleMember -Function @(
-    'Get-GitVersion',
-    'Get-BuildVersion',
-    'Set-AssemblyVersion'
-)
 ```
 
 ## Complete Example: Large Project
@@ -733,40 +649,36 @@ Here's a complete example combining all patterns:
 **psakefile.ps1:**
 
 ```powershell
+$buildRoot = Join-Path $PSScriptRoot 'build'
+$selectedEnvironment = if ($env:BUILD_ENV) { $env:BUILD_ENV } else { 'dev' }
+
+Include (Join-Path $buildRoot 'utils/logging.ps1')
+Include (Join-Path $buildRoot 'utils/fileops.ps1')
+Include (Join-Path $buildRoot 'utils/versioning.ps1')
+
+$environmentConfig = Join-Path $buildRoot "config/${selectedEnvironment}.ps1"
+if (-not (Test-Path $environmentConfig)) {
+    throw "Environment configuration not found: $environmentConfig"
+}
+Include $environmentConfig
+
+Include (Join-Path $buildRoot 'tasks/compile.ps1')
+Include (Join-Path $buildRoot 'tasks/test.ps1')
+Include (Join-Path $buildRoot 'tasks/package.ps1')
+Include (Join-Path $buildRoot 'tasks/deploy.ps1')
+Include (Join-Path $buildRoot 'tasks/cleanup.ps1')
+
 Properties {
-    # Base paths
     $ProjectRoot = $PSScriptRoot
     $BuildRoot = Join-Path $ProjectRoot 'build'
     $SrcDir = Join-Path $ProjectRoot 'src'
     $TestDir = Join-Path $ProjectRoot 'tests'
     $BuildDir = Join-Path $ProjectRoot 'build/output'
-
-    # Configuration
     $Configuration = if ($env:BUILD_CONFIGURATION) { $env:BUILD_CONFIGURATION } else { 'Debug' }
     $Environment = if ($env:BUILD_ENV) { $env:BUILD_ENV } else { 'dev' }
-
-    # Versioning
-    $Version = Get-GitVersion
     $BuildNumber = if ($env:BUILD_NUMBER) { $env:BUILD_NUMBER } else { '0' }
+    $Version = Get-BuildVersion -BaseVersion '1.0.0' -BuildNumber $BuildNumber
 }
-
-# Load utilities (order matters!)
-Include (Join-Path $BuildRoot 'utils/logging.ps1')
-Include (Join-Path $BuildRoot 'utils/fileops.ps1')
-Include (Join-Path $BuildRoot 'utils/versioning.ps1')
-
-# Load environment configuration
-$envConfig = Join-Path $BuildRoot "config/${Environment}.ps1"
-if (Test-Path $envConfig) {
-    Include $envConfig
-}
-
-# Load task modules
-Include (Join-Path $BuildRoot 'tasks/compile.ps1')
-Include (Join-Path $BuildRoot 'tasks/test.ps1')
-Include (Join-Path $BuildRoot 'tasks/package.ps1')
-Include (Join-Path $BuildRoot 'tasks/deploy.ps1')
-Include (Join-Path $BuildRoot 'tasks/cleanup.ps1')
 
 # Custom task formatter
 FormatTaskName {
@@ -793,6 +705,35 @@ Task Full -depends Clean, Restore, Compile, TestWithCoverage, Package, Deploy {
     Write-LogSuccess "Full build and deployment completed"
 }
 ```
+
+The environment and utility files are the complete implementations shown earlier in this guide. Add these remaining task files:
+
+**build/tasks/package.ps1:**
+
+```powershell
+Task Package -depends Build {
+    if (-not (Test-Path $BuildDir)) {
+        throw "Build output not found: $BuildDir"
+    }
+
+    $packagePath = Join-Path $BuildRoot "MyApp-$Version.zip"
+    Compress-Archive -Path "$BuildDir/*" -DestinationPath $packagePath -Force
+    Write-LogSuccess "Created $packagePath"
+}
+```
+
+**build/tasks/cleanup.ps1:**
+
+```powershell
+Task Clean {
+    if (Test-Path $BuildDir) {
+        Remove-Item $BuildDir -Recurse -Force
+    }
+    New-Item -ItemType Directory -Path $BuildDir -Force | Out-Null
+}
+```
+
+Use the `compile.ps1`, `test.ps1`, and `deploy.ps1` implementations from the modular task-file examples above. Together, these files satisfy every `Include` in the orchestrator.
 
 ## Best Practices Summary
 

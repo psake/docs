@@ -12,25 +12,22 @@ Proper version management ensures traceability, reproducibility, and clear relea
 Here's a basic versioning setup using git tags and build numbers:
 
 ```powershell
-Properties {
-    # Base version from git tag
-    $BaseVersion = Get-GitVersion
-    $BuildNumber = if ($env:BUILD_NUMBER) { $env:BUILD_NUMBER } else { '0' }
-
-    # Construct full version
-    $Version = "$BaseVersion.$BuildNumber"
-}
-
 function Get-GitVersion {
     try {
         $tag = git describe --tags --abbrev=0 2>$null
-        if ($tag -match '^v?(\d+\.\d+\.\d+)') {
+        if ($tag -match '^v?(\d+\.\d+\.\d+)$') {
             return $matches[1]
         }
     }
     catch { }
 
     return '1.0.0'
+}
+
+Properties {
+    $BaseVersion = Get-GitVersion
+    $BuildNumber = if ($env:BUILD_NUMBER) { $env:BUILD_NUMBER } else { '0' }
+    $Version = "$BaseVersion-ci.$BuildNumber"
 }
 
 Task Build {
@@ -137,54 +134,20 @@ Derive versions from git tags and commit history:
 
 ### Using Git Tags
 
+The `Get-GitVersion` helper from the quick start validates tags as `X.Y.Z`. Add commit distance when the checkout is ahead of the tag:
+
 ```powershell
-function Get-GitVersion {
-    <#
-    .SYNOPSIS
-    Gets version from git tags
-    #>
-
-    try {
-        # Get the latest tag
-        $latestTag = git describe --tags --abbrev=0 2>$null
-
-        if ([string]::IsNullOrEmpty($latestTag)) {
-            Write-Warning "No git tags found, using default version"
-            return '0.1.0'
-        }
-
-        # Parse version from tag (handles v1.0.0 or 1.0.0)
-        if ($latestTag -match '^v?(\d+)\.(\d+)\.(\d+)') {
-            $major = [int]$matches[1]
-            $minor = [int]$matches[2]
-            $patch = [int]$matches[3]
-
-            # Get commits since tag
-            $commitsSinceTag = git rev-list "$latestTag..HEAD" --count 2>$null
-
-            if ($commitsSinceTag -gt 0) {
-                # Bump patch for commits since last tag
-                $patch++
-                return "$major.$minor.$patch-dev.$commitsSinceTag"
-            }
-
-            return "$major.$minor.$patch"
-        }
-
-        Write-Warning "Tag format not recognized: $latestTag"
-        return '0.1.0'
-    }
-    catch {
-        Write-Warning "Error getting git version: $_"
-        return '0.1.0'
-    }
-}
-
 Properties {
-    $GitVersion = Get-GitVersion
-    $BuildNumber = if ($env:BUILD_NUMBER) { $env:BUILD_NUMBER } else { '0' }
-    $Version = $GitVersion
+    $LatestTag = git describe --tags --abbrev=0 2>$null
+    $BaseVersion = Get-GitVersion
+    $CommitsSinceTag = if ($LatestTag) { git rev-list "$LatestTag..HEAD" --count 2>$null } else { 0 }
+    $Version = if ($CommitsSinceTag -gt 0) {
+        "$BaseVersion-dev.$CommitsSinceTag"
+    } else {
+        $BaseVersion
+    }
 }
+
 
 Task Build {
     Write-Host "Git-based version: $Version" -ForegroundColor Cyan
@@ -263,15 +226,15 @@ Task Build -depends GetGitVersion {
 mode: Mainline
 branches:
   main:
-    tag: ''
+    label: ''
   develop:
-    tag: 'beta'
+    label: 'beta'
   feature:
-    tag: 'alpha.{BranchName}'
+    label: 'alpha.{BranchName}'
   release:
-    tag: 'rc'
+    label: 'rc'
   hotfix:
-    tag: 'hotfix'
+    label: 'hotfix'
 ignore:
   sha: []
 ```
@@ -288,8 +251,8 @@ Properties {
     $BuildNumber = if ($env:GITHUB_RUN_NUMBER) { $env:GITHUB_RUN_NUMBER } else { '0' }
     $GitSha = if ($env:GITHUB_SHA) { $env:GITHUB_SHA.Substring(0, 7) } else { 'local' }
 
-    # Construct version
-    $Version = "$BaseVersion.$BuildNumber"
+    # SemVer build identity and informational metadata
+    $Version = "$BaseVersion-ci.$BuildNumber"
     $InformationalVersion = "$Version+$GitSha"
 }
 
@@ -340,8 +303,8 @@ jobs:
 ```powershell
 Properties {
     $BaseVersion = '1.0.0'
-    $BuildNumber = if ($env:BUILD_BUILDNUMBER) { $env:BUILD_BUILDNUMBER } else { '0' }
-    $Version = "$BaseVersion.$BuildNumber"
+    $BuildNumber = if ($env:BUILD_BUILDID) { $env:BUILD_BUILDID } else { '0' }
+    $Version = "$BaseVersion-ci.$BuildNumber"
 }
 
 Task Build {
@@ -389,54 +352,48 @@ Automatically update project file versions:
 function Update-ProjectVersion {
     param(
         [string]$ProjectFile,
-        [string]$Version
+        [string]$Version,
+        [string]$AssemblyVersion
     )
 
     if (-not (Test-Path $ProjectFile)) {
         throw "Project file not found: $ProjectFile"
     }
 
-    Write-Host "Updating version in $ProjectFile to $Version" -ForegroundColor Green
-
-    # Load project file
     [xml]$project = Get-Content $ProjectFile
-
-    # Find or create PropertyGroup
     $propertyGroup = $project.Project.PropertyGroup | Select-Object -First 1
-
     if ($null -eq $propertyGroup) {
         $propertyGroup = $project.CreateElement('PropertyGroup')
         $project.Project.AppendChild($propertyGroup) | Out-Null
     }
 
-    # Update or create version properties
-    $versionProperties = @(
-        'Version',
-        'AssemblyVersion',
-        'FileVersion'
-    )
-
-    foreach ($propName in $versionProperties) {
-        if ($null -eq $propertyGroup.$propName) {
-            $propNode = $project.CreateElement($propName)
-            $propertyGroup.AppendChild($propNode) | Out-Null
+    $versions = @{
+        Version = $Version
+        InformationalVersion = $Version
+        AssemblyVersion = $AssemblyVersion
+        FileVersion = $AssemblyVersion
+    }
+    foreach ($entry in $versions.GetEnumerator()) {
+        if ($null -eq $propertyGroup.($entry.Key)) {
+            $propertyGroup.AppendChild($project.CreateElement($entry.Key)) | Out-Null
         }
-        $propertyGroup.$propName = $Version
+        $propertyGroup.($entry.Key) = $entry.Value
     }
 
-    # Save updated project file
     $project.Save($ProjectFile)
-
     Write-Host "  Version updated to: $Version" -ForegroundColor Gray
 }
+
 
 Task UpdateProjectVersions {
     Write-Host "Updating project versions..." -ForegroundColor Green
 
     $projects = Get-ChildItem "$SrcDir/**/*.csproj" -Recurse
-
     foreach ($project in $projects) {
-        Update-ProjectVersion -ProjectFile $project.FullName -Version $Version
+        Update-ProjectVersion `
+            -ProjectFile $project.FullName `
+            -Version $Version `
+            -AssemblyVersion "$MajorVersion.$MinorVersion.$PatchVersion.0"
     }
 
     Write-Host "Updated $($projects.Count) project files" -ForegroundColor Green
@@ -453,20 +410,17 @@ Task Build -depends UpdateProjectVersions {
 function Update-AssemblyInfo {
     param(
         [string]$AssemblyInfoPath,
-        [string]$Version
+        [string]$Version,
+        [string]$AssemblyVersion
     )
 
     if (-not (Test-Path $AssemblyInfoPath)) {
         throw "AssemblyInfo.cs not found: $AssemblyInfoPath"
     }
 
-    Write-Host "Updating AssemblyInfo: $AssemblyInfoPath" -ForegroundColor Green
-
     $content = Get-Content $AssemblyInfoPath
-
-    # Update version attributes
-    $content = $content -replace '\[assembly: AssemblyVersion\(".*?"\)\]', "[assembly: AssemblyVersion(""$Version"")]"
-    $content = $content -replace '\[assembly: AssemblyFileVersion\(".*?"\)\]', "[assembly: AssemblyFileVersion(""$Version"")]"
+    $content = $content -replace '\[assembly: AssemblyVersion\(".*?"\)\]', "[assembly: AssemblyVersion(""$AssemblyVersion"")]"
+    $content = $content -replace '\[assembly: AssemblyFileVersion\(".*?"\)\]', "[assembly: AssemblyFileVersion(""$AssemblyVersion"")]"
     $content = $content -replace '\[assembly: AssemblyInformationalVersion\(".*?"\)\]', "[assembly: AssemblyInformationalVersion(""$Version"")]"
 
     Set-Content -Path $AssemblyInfoPath -Value $content
@@ -478,7 +432,10 @@ Task UpdateAssemblyInfoFiles {
     $assemblyInfoFiles = Get-ChildItem "$SrcDir/**/AssemblyInfo.cs" -Recurse
 
     foreach ($file in $assemblyInfoFiles) {
-        Update-AssemblyInfo -AssemblyInfoPath $file.FullName -Version $Version
+        Update-AssemblyInfo `
+            -AssemblyInfoPath $file.FullName `
+            -Version $Version `
+            -AssemblyVersion "$MajorVersion.$MinorVersion.$PatchVersion.0"
     }
 }
 ```
@@ -566,8 +523,7 @@ function Get-BuildVersion {
     # Determine pre-release label
     $preRelease = switch -Regex ($Branch) {
         '^main$|^master$' {
-            # Production release
-            return "$baseVersion.$BuildNumber"
+            return "$baseVersion-ci.$BuildNumber"
         }
         '^release/.*' {
             # Release candidate
