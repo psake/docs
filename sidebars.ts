@@ -121,6 +121,11 @@ const sidebars: SidebarsConfig = {
       items: [
         'reference/configuration-reference',
         'reference/cheat-sheet',
+        {
+          type: 'doc',
+          label: 'Domain Language',
+          id: 'reference/domain-language'
+        },
         'reference/glossary',
         'reference/exit-codes',
       ]
