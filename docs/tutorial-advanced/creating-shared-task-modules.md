@@ -245,6 +245,7 @@ Provider function tests do not prove module discovery, task registration, or dep
 ```powershell title="SharedTaskModule.Tests.ps1"
 Describe 'Example.BuildTasks consumer contract' {
     BeforeAll {
+        Import-Module psake -MinimumVersion '5.0.0'
         $consumerRoot = Join-Path $PSScriptRoot 'consumer'
         $consumerBuild = Join-Path $consumerRoot 'psakeFile.ps1'
         $outputDirectory = Join-Path $consumerRoot 'build'
@@ -256,9 +257,9 @@ Describe 'Example.BuildTasks consumer contract' {
     }
 
     It 'cleans and prepares the build directory' {
-        Invoke-psake -BuildFile $consumerBuild -TaskList default -NoLogo
+        $result = Invoke-psake -BuildFile $consumerBuild -TaskList default -NoLogo
 
-        $psake.build_success | Should -BeTrue
+        $result.Success | Should -BeTrue
         $outputDirectory | Should -Exist
         (Join-Path $outputDirectory 'stale.txt') | Should -Not -Exist
     }
