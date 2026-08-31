@@ -24,3 +24,5 @@ Task Clean {
 
 You can have more than 1 include file in your script if you need to include
 multiple script files.
+
+`Include` shares code within one repository. To distribute versioned tasks across repositories, see [Creating Shared Task Modules](./creating-shared-task-modules.md).

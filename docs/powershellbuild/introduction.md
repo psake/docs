@@ -28,11 +28,11 @@ PowerShellBuild lives under the same GitHub organization as psake (`psake/PowerS
 ┌─────────────────────────────────────┐
 │  Your project's psakeFile.ps1       │
 │                                     │
-│  task Build -FromModule             │
-│      PowerShellBuild -Version 0.7.1 │
+│  Task Build -FromModule            │
+│      PowerShellBuild               │
+│      -RequiredVersion 0.8.2        │
 └────────────────┬────────────────────┘
-                 │ psake loads tasks from
-                 ▼
+                 │ psake discovers task definitions
 ┌─────────────────────────────────────┐
 │  PowerShellBuild module             │
 │  (Init → Clean → StageFiles →       │
@@ -40,7 +40,7 @@ PowerShellBuild lives under the same GitHub organization as psake (`psake/PowerS
 └─────────────────────────────────────┘
 ```
 
-When psake encounters a task declared with `-FromModule`, it automatically loads that task (and all its dependencies) from the installed module and runs them as if they were defined locally. Your `psakeFile.ps1` stays minimal; PowerShellBuild handles the details.
+When psake encounters a task declared with `-FromModule`, it finds the selected module and dot-sources the module-root `psakeFile.ps1` in the current build context. That file registers all its provider tasks; psake later runs only `Build` and its reachable dependencies. This process does not itself import the module's `.psm1`.
 
 ## Also Supports Invoke-Build
 
@@ -66,7 +66,7 @@ Install PowerShellBuild from the PowerShell Gallery:
 Install-Module -Name PowerShellBuild -Repository PSGallery
 ```
 
-psake v4.9.0 or later is also required:
+PowerShellBuild 0.8.2 requires psake 5.0.4 or later. Check the [current module manifest](https://github.com/psake/PowerShellBuild/blob/main/PowerShellBuild/PowerShellBuild.psd1) when selecting a newer version:
 
 ```powershell
 Install-Module -Name psake -Repository PSGallery
@@ -84,6 +84,7 @@ Or declare both as dependencies in a `requirements.psd1` (managed via [PSDepend]
 ## See Also
 
 - [Getting Started with PowerShellBuild](./getting-started) — Set up your first project
+- [Creating Shared Task Modules](../tutorial-advanced/creating-shared-task-modules.md) — Build your own reusable task provider
 - [Task Reference](./task-reference) — All available tasks and their dependencies
 - [Configuration Reference](./configuration) — `$PSBPreference` settings
 - [Real-World Example](./real-world-example) — Complete project walkthrough
